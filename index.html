@@ -21,6 +21,352 @@
             --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
+        /* Custom Cursor System */
+        * {
+            cursor: none !important;
+        }
+        
+        #custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease-out;
+        }
+        
+        .cursor-brain {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(145deg, rgba(77, 182, 172, 0.9), rgba(64, 224, 208, 0.8));
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            box-shadow: 
+                0 0 10px rgba(77, 182, 172, 0.6),
+                inset 0 1px 2px rgba(255,255,255,0.3);
+            animation: cursorBrainPulse 2s ease-in-out infinite;
+        }
+        
+        .cursor-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.4), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+        
+        .cursor-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+        }
+        
+        .cursor-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            border-radius: 1px;
+            animation: cursorNeuralFlow 1.8s ease-in-out infinite;
+        }
+        
+        .cursor-neural-line:nth-child(1) {
+            width: 6px;
+            height: 1px;
+            top: 4px;
+            left: 2px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+        
+        .cursor-neural-line:nth-child(2) {
+            width: 5px;
+            height: 1px;
+            top: 7px;
+            left: 6px;
+            transform: rotate(-30deg);
+            animation-delay: 0.3s;
+        }
+        
+        .cursor-neural-line:nth-child(3) {
+            width: 4px;
+            height: 1px;
+            top: 11px;
+            left: 3px;
+            transform: rotate(60deg);
+            animation-delay: 0.6s;
+        }
+        
+        .cursor-neural-line:nth-child(4) {
+            width: 6px;
+            height: 1px;
+            top: 9px;
+            left: 9px;
+            transform: rotate(-45deg);
+            animation-delay: 0.9s;
+        }
+        
+        .cursor-particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+        }
+        
+        .cursor-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, rgba(77, 182, 172, 0.8), rgba(64, 224, 208, 0.6));
+            border-radius: 50%;
+            opacity: 0;
+            animation: cursorParticleOrbit 3s ease-in-out infinite;
+        }
+        
+        .cursor-particle:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .cursor-particle:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+        
+        .cursor-particle:nth-child(3) {
+            animation-delay: 1.2s;
+        }
+        
+        .cursor-particle:nth-child(4) {
+            animation-delay: 1.8s;
+        }
+        
+        .cursor-particle:nth-child(5) {
+            animation-delay: 2.4s;
+        }
+        
+        .cursor-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(77, 182, 172, 0.4);
+            border-radius: 50%;
+            animation: cursorRingRotate 4s linear infinite;
+        }
+        
+        .cursor-ring::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 2px;
+            background: rgba(64, 224, 208, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(64, 224, 208, 0.6);
+        }
+        
+        .cursor-data-stream {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .cursor-stream-line {
+            position: absolute;
+            width: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(77, 182, 172, 0.6), transparent);
+            animation: cursorStreamFlow 2s ease-in-out infinite;
+        }
+        
+        .cursor-stream-line:nth-child(1) {
+            top: 15px;
+            left: 10px;
+            transform: rotate(30deg);
+            animation-delay: 0s;
+        }
+        
+        .cursor-stream-line:nth-child(2) {
+            top: 25px;
+            left: 20px;
+            transform: rotate(-45deg);
+            animation-delay: 0.4s;
+        }
+        
+        .cursor-stream-line:nth-child(3) {
+            top: 35px;
+            left: 15px;
+            transform: rotate(60deg);
+            animation-delay: 0.8s;
+        }
+        
+        /* Cursor States */
+        #custom-cursor.hover {
+            transform: scale(1.3);
+        }
+        
+        #custom-cursor.hover .cursor-brain {
+            animation-duration: 1s;
+            box-shadow: 
+                0 0 20px rgba(77, 182, 172, 0.8),
+                inset 0 1px 2px rgba(255,255,255,0.5);
+        }
+        
+        #custom-cursor.hover .cursor-neural-line {
+            animation-duration: 0.8s;
+        }
+        
+        #custom-cursor.hover .cursor-particle {
+            animation-duration: 1.5s;
+        }
+        
+        #custom-cursor.hover .cursor-data-stream {
+            opacity: 1;
+        }
+        
+        #custom-cursor.click {
+            transform: scale(0.8);
+        }
+        
+        #custom-cursor.click .cursor-brain {
+            background: linear-gradient(145deg, rgba(64, 224, 208, 1), rgba(77, 182, 172, 0.9));
+            box-shadow: 
+                0 0 25px rgba(64, 224, 208, 1),
+                inset 0 1px 2px rgba(255,255,255,0.7);
+        }
+        
+        #custom-cursor.click .cursor-ring {
+            animation-duration: 1s;
+        }
+        
+        #custom-cursor.text {
+            transform: scale(1.1);
+        }
+        
+        #custom-cursor.text .cursor-brain {
+            border-radius: 20%;
+            background: linear-gradient(145deg, rgba(38, 166, 154, 0.9), rgba(77, 182, 172, 0.8));
+        }
+        
+        #custom-cursor.text::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            animation: cursorTextBlink 1s ease-in-out infinite;
+        }
+        
+        /* Cursor Animations */
+        @keyframes cursorBrainPulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.9;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes cursorNeuralFlow {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.8; transform: scaleX(1); }
+        }
+        
+        @keyframes cursorParticleOrbit {
+            0% { 
+                opacity: 0; 
+                transform: rotate(0deg) translateX(15px) rotate(0deg) scale(0.5);
+            }
+            50% { 
+                opacity: 1; 
+                transform: rotate(180deg) translateX(15px) rotate(-180deg) scale(1);
+            }
+            100% { 
+                opacity: 0; 
+                transform: rotate(360deg) translateX(15px) rotate(-360deg) scale(0.5);
+            }
+        }
+        
+        @keyframes cursorRingRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        @keyframes cursorStreamFlow {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.7; transform: scaleX(1); }
+        }
+        
+        @keyframes cursorTextBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Cursor Trail Effect */
+        .cursor-trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, rgba(77, 182, 172, 0.6), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            animation: cursorTrailFade 0.8s ease-out forwards;
+        }
+        
+        @keyframes cursorTrailFade {
+            from { 
+                opacity: 0.8; 
+                transform: scale(1); 
+            }
+            to { 
+                opacity: 0; 
+                transform: scale(0.3); 
+            }
+        }
+        
+        /* Accessibility - Fallback for reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            #custom-cursor {
+                display: none !important;
+            }
+            
+            * {
+                cursor: auto !important;
+            }
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -1563,404 +1909,8 @@
             50% { opacity: 1; stroke-width: 2; }
         }
         
-        /* Executive Intelligence Platform - Animated Icon */
-        .executive-intelligence-icon {
-            position: relative;
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 24px auto;
-            display: block;
-            border-radius: 16px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(135, 206, 235, 0.15));
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 
-                0 8px 24px rgba(135, 206, 235, 0.2),
-                inset 0 1px 0 rgba(255,255,255,0.3);
-            overflow: hidden;
-        }
-
-        .executive-intelligence-icon::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(135, 206, 235, 0.1) 100%);
-            animation: executiveIconPulse 4s ease-in-out infinite;
-            border-radius: 16px;
-        }
-
-        .executive-brain-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 32px;
-            height: 32px;
-            z-index: 3;
-        }
-
-        .executive-brain {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(135, 206, 235, 0.6), rgba(255, 255, 255, 0.7));
-            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
-            position: relative;
-            animation: executiveBrainGlow 3s ease-in-out infinite alternate;
-            box-shadow: 
-                0 4px 12px rgba(135, 206, 235, 0.3),
-                inset 0 1px 2px rgba(255,255,255,0.4);
-        }
-
-        .executive-brain::before {
-            content: '';
-            position: absolute;
-            top: 15%;
-            left: 15%;
-            width: 70%;
-            height: 70%;
-            background: linear-gradient(145deg, rgba(255,255,255,0.5), transparent);
-            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
-        }
-
-        .executive-neural-paths {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 28px;
-            height: 28px;
-        }
-
-        .executive-neural-line {
-            position: absolute;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
-            border-radius: 1px;
-            animation: executiveNeuralPulse 2.5s ease-in-out infinite;
-        }
-
-        .executive-neural-line:nth-child(1) {
-            width: 10px;
-            height: 1px;
-            top: 7px;
-            left: 4px;
-            transform: rotate(45deg);
-            animation-delay: 0s;
-        }
-
-        .executive-neural-line:nth-child(2) {
-            width: 8px;
-            height: 1px;
-            top: 12px;
-            left: 10px;
-            transform: rotate(-30deg);
-            animation-delay: 0.5s;
-        }
-
-        .executive-neural-line:nth-child(3) {
-            width: 7px;
-            height: 1px;
-            top: 17px;
-            left: 5px;
-            transform: rotate(60deg);
-            animation-delay: 1s;
-        }
-
-        .executive-neural-line:nth-child(4) {
-            width: 9px;
-            height: 1px;
-            top: 14px;
-            left: 15px;
-            transform: rotate(-45deg);
-            animation-delay: 1.5s;
-        }
-
-        .executive-data-streams {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .executive-data-particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: linear-gradient(45deg, rgba(255, 255, 255, 0.8), rgba(135, 206, 235, 0.7));
-            border-radius: 50%;
-            opacity: 0;
-            animation: executiveParticleFlow 3.5s ease-in-out infinite;
-        }
-
-        .executive-data-particle:nth-child(1) {
-            top: 20%;
-            left: 15%;
-            animation-delay: 0s;
-        }
-
-        .executive-data-particle:nth-child(2) {
-            top: 70%;
-            left: 80%;
-            animation-delay: 0.8s;
-        }
-
-        .executive-data-particle:nth-child(3) {
-            top: 45%;
-            left: 85%;
-            animation-delay: 1.6s;
-        }
-
-        .executive-data-particle:nth-child(4) {
-            top: 80%;
-            left: 25%;
-            animation-delay: 2.4s;
-        }
-
-        .executive-data-particle:nth-child(5) {
-            top: 35%;
-            left: 10%;
-            animation-delay: 3.2s;
-        }
-
-        .executive-dashboard-corner {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 16px;
-            height: 16px;
-            opacity: 0.7;
-        }
-
-        .executive-mini-screen {
-            width: 100%;
-            height: 10px;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(135, 206, 235, 0.3));
-            border-radius: 2px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .executive-screen-data {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 255, 255, 0.6) 20%, 
-                rgba(135, 206, 235, 0.7) 40%, 
-                rgba(255, 255, 255, 0.5) 60%, 
-                rgba(135, 206, 235, 0.6) 80%, 
-                transparent 100%);
-            animation: executiveDataScroll 3s ease-in-out infinite;
-        }
-
-        .executive-status-indicators {
-            margin-top: 3px;
-            display: flex;
-            gap: 2px;
-        }
-
-        .executive-status-dot {
-            width: 3px;
-            height: 3px;
-            background: rgba(135, 206, 235, 0.8);
-            border-radius: 50%;
-            animation: executiveStatusBlink 2s ease-in-out infinite;
-        }
-
-        .executive-status-dot:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .executive-status-dot:nth-child(2) {
-            animation-delay: 0.4s;
-        }
-
-        .executive-status-dot:nth-child(3) {
-            animation-delay: 0.8s;
-        }
-
-        .executive-corner-chart {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            width: 20px;
-            height: 12px;
-            opacity: 0.6;
-        }
-
-        .executive-chart-lines {
-            position: relative;
-            width: 100%;
-            height: 8px;
-        }
-
-        .executive-chart-line {
-            position: absolute;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
-            animation: executiveChartPulse 2.8s ease-in-out infinite;
-        }
-
-        .executive-chart-line:nth-child(1) {
-            top: 2px;
-            left: 0;
-            width: 14px;
-            animation-delay: 0s;
-        }
-
-        .executive-chart-line:nth-child(2) {
-            top: 4px;
-            left: 2px;
-            width: 16px;
-            animation-delay: 0.3s;
-        }
-
-        .executive-chart-line:nth-child(3) {
-            top: 6px;
-            left: 1px;
-            width: 12px;
-            animation-delay: 0.6s;
-        }
-
-        .executive-chart-points {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 2px;
-            display: flex;
-            justify-content: space-between;
-            align-items: end;
-        }
-
-        .executive-chart-point {
-            width: 2px;
-            background: rgba(135, 206, 235, 0.9);
-            border-radius: 1px;
-            animation: executivePointGrow 2.2s ease-in-out infinite;
-        }
-
-        .executive-chart-point:nth-child(1) {
-            height: 60%;
-            animation-delay: 0s;
-        }
-
-        .executive-chart-point:nth-child(2) {
-            height: 100%;
-            animation-delay: 0.2s;
-        }
-
-        .executive-chart-point:nth-child(3) {
-            height: 40%;
-            animation-delay: 0.4s;
-        }
-
-        .executive-chart-point:nth-child(4) {
-            height: 80%;
-            animation-delay: 0.6s;
-        }
-
-        @keyframes executiveIconPulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
-        }
-
-        @keyframes executiveBrainGlow {
-            0% { 
-                box-shadow: 
-                    0 4px 12px rgba(135, 206, 235, 0.3),
-                    inset 0 1px 2px rgba(255,255,255,0.4);
-                transform: scale(1);
-            }
-            100% { 
-                box-shadow: 
-                    0 6px 16px rgba(135, 206, 235, 0.5),
-                    inset 0 1px 2px rgba(255,255,255,0.6);
-                transform: scale(1.05);
-            }
-        }
-
-        @keyframes executiveNeuralPulse {
-            0%, 100% { opacity: 0; transform: scaleX(0); }
-            50% { opacity: 0.9; transform: scaleX(1); }
-        }
-
-        @keyframes executiveParticleFlow {
-            0% { 
-                opacity: 0; 
-                transform: translateX(0px) translateY(0px) scale(0.5); 
-            }
-            30% { 
-                opacity: 1; 
-                transform: translateX(-8px) translateY(-6px) scale(1); 
-            }
-            70% { 
-                opacity: 0.8; 
-                transform: translateX(-16px) translateY(-12px) scale(0.8); 
-            }
-            100% { 
-                opacity: 0; 
-                transform: translateX(-24px) translateY(-18px) scale(0.3); 
-            }
-        }
-
-        @keyframes executiveDataScroll {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        @keyframes executiveStatusBlink {
-            0%, 100% { 
-                opacity: 0.4; 
-                transform: scale(1);
-                background: rgba(135, 206, 235, 0.8);
-            }
-            50% { 
-                opacity: 1; 
-                transform: scale(1.3);
-                background: rgba(255, 255, 255, 0.9);
-            }
-        }
-
-        @keyframes executiveChartPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
-        }
-
-        @keyframes executivePointGrow {
-            0%, 100% { 
-                transform: scaleY(0.7); 
-                opacity: 0.6;
-                background: rgba(135, 206, 235, 0.9);
-            }
-            50% { 
-                transform: scaleY(1.2); 
-                opacity: 1;
-                background: rgba(255, 255, 255, 0.8);
-            }
-        }
-
-        .service-card:nth-child(6):hover .executive-brain {
-            animation-duration: 1.5s;
-        }
-
-        .service-card:nth-child(6):hover .executive-neural-line {
-            animation-duration: 1.2s;
-        }
-
-        .service-card:nth-child(6):hover .executive-data-particle {
-            animation-duration: 2s;
-        }
-
-        .service-card:nth-child(6):hover .executive-data-scroll {
-            animation-duration: 1.5s;
+        .service-card:hover .service-icon svg * {
+            animation-play-state: paused;
         }
         
         /* About Section */
@@ -2062,15 +2012,6 @@
         @keyframes pulse {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
-        }
-        
-        /* Accessibility */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
         }
         
         /* Mobile Responsive */
@@ -2194,6 +2135,31 @@
     </style>
 </head>
 <body>
+    <!-- Custom Cursor -->
+    <div id="custom-cursor">
+        <div class="cursor-brain">
+            <div class="cursor-neural-paths">
+                <div class="cursor-neural-line"></div>
+                <div class="cursor-neural-line"></div>
+                <div class="cursor-neural-line"></div>
+                <div class="cursor-neural-line"></div>
+            </div>
+        </div>
+        <div class="cursor-particles">
+            <div class="cursor-particle"></div>
+            <div class="cursor-particle"></div>
+            <div class="cursor-particle"></div>
+            <div class="cursor-particle"></div>
+            <div class="cursor-particle"></div>
+        </div>
+        <div class="cursor-ring"></div>
+        <div class="cursor-data-stream">
+            <div class="cursor-stream-line"></div>
+            <div class="cursor-stream-line"></div>
+            <div class="cursor-stream-line"></div>
+        </div>
+    </div>
+
     <div id="animation-container">
         <div id="loading">Initializing Data Visualization...</div>
     </div>
@@ -2475,47 +2441,51 @@
                         <p>Tailored data solutions for unique challenges. We architect custom analytical frameworks, algorithms, and methodologies that perfectly match your specific requirements and deliver innovative results.</p>
                     </div>
                     <div class="service-card glass">
-                        <div class="executive-intelligence-icon">
-                            <div class="executive-brain-container">
-                                <div class="executive-brain">
-                                    <div class="executive-neural-paths">
-                                        <div class="executive-neural-line"></div>
-                                        <div class="executive-neural-line"></div>
-                                        <div class="executive-neural-line"></div>
-                                        <div class="executive-neural-line"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="executive-data-streams">
-                                <div class="executive-data-particle"></div>
-                                <div class="executive-data-particle"></div>
-                                <div class="executive-data-particle"></div>
-                                <div class="executive-data-particle"></div>
-                                <div class="executive-data-particle"></div>
-                            </div>
-                            <div class="executive-dashboard-corner">
-                                <div class="executive-mini-screen">
-                                    <div class="executive-screen-data"></div>
-                                </div>
-                                <div class="executive-status-indicators">
-                                    <div class="executive-status-dot"></div>
-                                    <div class="executive-status-dot"></div>
-                                    <div class="executive-status-dot"></div>
-                                </div>
-                            </div>
-                            <div class="executive-corner-chart">
-                                <div class="executive-chart-lines">
-                                    <div class="executive-chart-line"></div>
-                                    <div class="executive-chart-line"></div>
-                                    <div class="executive-chart-line"></div>
-                                </div>
-                                <div class="executive-chart-points">
-                                    <div class="executive-chart-point"></div>
-                                    <div class="executive-chart-point"></div>
-                                    <div class="executive-chart-point"></div>
-                                    <div class="executive-chart-point"></div>
-                                </div>
-                            </div>
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Executive command center screen -->
+                                <rect x="10" y="20" width="80" height="50" rx="8" fill="none" stroke="currentColor" stroke-width="2.5"/>
+                                <rect x="10" y="20" width="80" height="12" rx="8" fill="currentColor" opacity="0.15"/>
+                                
+                                <!-- AI Brain in center -->
+                                <circle cx="50" cy="45" r="12" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <path d="M42 40 Q45 35 50 40 Q55 35 58 40" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                                <path d="M42 50 Q45 55 50 50 Q55 55 58 50" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                                <circle cx="45" cy="42" r="1.5" fill="currentColor"/>
+                                <circle cx="55" cy="42" r="1.5" fill="currentColor"/>
+                                <path d="M47 47 Q50 49 53 47" stroke="currentColor" stroke-width="1" fill="none"/>
+                                
+                                <!-- Data streams flowing to brain -->
+                                <path d="M20 35 Q30 40 38 42" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+                                <path d="M20 50 Q30 45 38 47" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+                                <path d="M80 35 Q70 40 62 42" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+                                <path d="M80 50 Q70 45 62 47" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+                                
+                                <!-- Executive KPI indicators -->
+                                <rect x="15" y="25" width="8" height="5" rx="1" fill="currentColor" opacity="0.6"/>
+                                <rect x="25" y="25" width="8" height="5" rx="1" fill="currentColor" opacity="0.6"/>
+                                <rect x="77" y="25" width="8" height="5" rx="1" fill="currentColor" opacity="0.6"/>
+                                
+                                <!-- Strategic arrows pointing to insights -->
+                                <path d="M50 57 L50 65 M47 62 L50 65 L53 62" stroke="currentColor" stroke-width="2" fill="none"/>
+                                
+                                <!-- CEO crown/authority symbol -->
+                                <path d="M45 15 L47 10 L50 12 L53 10 L55 15 L50 18 Z" fill="currentColor" opacity="0.8"/>
+                                <circle cx="50" cy="13" r="1" fill="white"/>
+                                
+                                <!-- Strategic database foundation -->
+                                <ellipse cx="50" cy="75" rx="15" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <ellipse cx="50" cy="80" rx="15" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <ellipse cx="50" cy="85" rx="15" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <line x1="35" y1="75" x2="35" y2="85" stroke="currentColor" stroke-width="2"/>
+                                <line x1="65" y1="75" x2="65" y2="85" stroke="currentColor" stroke-width="2"/>
+                                
+                                <!-- Intelligence network connections -->
+                                <circle cx="25" cy="40" r="2" fill="currentColor" opacity="0.5"/>
+                                <circle cx="75" cy="40" r="2" fill="currentColor" opacity="0.5"/>
+                                <circle cx="30" cy="55" r="2" fill="currentColor" opacity="0.5"/>
+                                <circle cx="70" cy="55" r="2" fill="currentColor" opacity="0.5"/>
+                            </svg>
                         </div>
                         <h3>Executive Intelligence Platform</h3>
                         <p>AI-powered executive command center that transforms your enterprise SQL databases into strategic intelligence. Delivers instant insights with natural language queries like "What drove our 23% revenue spike last week?" - empowering C-suite leaders with real-time competitive intelligence and predictive business analytics.</p>
@@ -2558,6 +2528,109 @@
     </div>
 
     <script>
+        // Custom Cursor System
+        let cursor = document.getElementById('custom-cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        // Smooth cursor following
+        function updateCursor() {
+            const ease = 0.15;
+            cursorX += (mouseX - cursorX) * ease;
+            cursorY += (mouseY - cursorY) * ease;
+            
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            
+            requestAnimationFrame(updateCursor);
+        }
+
+        // Mouse tracking
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Cursor state management
+        const clickableElements = document.querySelectorAll('a, button, [role="button"], input, textarea, select');
+        const textElements = document.querySelectorAll('input[type="text"], input[type="email"], input[type="search"], textarea');
+
+        clickableElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+            });
+            
+            el.addEventListener('mousedown', () => {
+                cursor.classList.add('click');
+            });
+            
+            el.addEventListener('mouseup', () => {
+                cursor.classList.remove('click');
+            });
+        });
+
+        textElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('text');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('text');
+            });
+        });
+
+        // Cursor trail effect
+        let trails = [];
+        let trailCount = 0;
+        const maxTrails = 8;
+
+        function createTrail() {
+            if (trailCount < maxTrails) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.style.left = cursorX - 4 + 'px';
+                trail.style.top = cursorY - 4 + 'px';
+                
+                document.body.appendChild(trail);
+                trails.push(trail);
+                trailCount++;
+
+                setTimeout(() => {
+                    if (trail.parentNode) {
+                        trail.parentNode.removeChild(trail);
+                        trails = trails.filter(t => t !== trail);
+                        trailCount--;
+                    }
+                }, 800);
+            }
+        }
+
+        // Create trails periodically during movement
+        let lastMoveTime = 0;
+        let isMoving = false;
+
+        document.addEventListener('mousemove', () => {
+            const now = Date.now();
+            if (now - lastMoveTime > 100) { // Create trail every 100ms
+                createTrail();
+                lastMoveTime = now;
+            }
+            
+            if (!isMoving) {
+                isMoving = true;
+                setTimeout(() => {
+                    isMoving = false;
+                }, 50);
+            }
+        });
+
+        // Initialize cursor animation
+        updateCursor();
+
         // Optimized Three.js Animation
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
