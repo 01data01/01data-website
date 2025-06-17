@@ -2234,54 +2234,6 @@
             z-index: 2;
         }
 
-        .auth-modal-logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 25px auto;
-            background: linear-gradient(145deg, var(--accent-color), var(--accent-dark), #40e0d0);
-            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 
-                0 10px 30px rgba(77, 182, 172, 0.4),
-                inset 0 2px 4px rgba(255,255,255,0.3);
-            position: relative;
-            animation: modalLogoBreathe 3s ease-in-out infinite;
-        }
-
-        .auth-modal-logo::before {
-            content: '';
-            position: absolute;
-            top: 15%;
-            left: 15%;
-            width: 70%;
-            height: 70%;
-            background: linear-gradient(145deg, rgba(255,255,255,0.4), transparent);
-            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
-        }
-
-        .auth-modal-logo-icon {
-            color: white;
-            font-size: 2rem;
-            z-index: 2;
-        }
-
-        @keyframes modalLogoBreathe {
-            0%, 100% { 
-                transform: scale(1);
-                box-shadow: 
-                    0 10px 30px rgba(77, 182, 172, 0.4),
-                    inset 0 2px 4px rgba(255,255,255,0.3);
-            }
-            50% { 
-                transform: scale(1.05);
-                box-shadow: 
-                    0 15px 40px rgba(77, 182, 172, 0.6),
-                    inset 0 2px 4px rgba(255,255,255,0.4);
-            }
-        }
-
         .auth-modal h3 {
             font-size: 2.2rem;
             font-weight: 800;
@@ -3044,9 +2996,6 @@
         <div class="auth-modal-content">
             <button class="modal-close" id="modalClose">&times;</button>
             <div class="auth-modal-header">
-                <div class="auth-modal-logo">
-                    <div class="auth-modal-logo-icon">🧠</div>
-                </div>
                 <h3 id="modalTitle">Sign In to 01data</h3>
                 <p id="modalDescription">Access your personalized data analytics dashboard</p>
             </div>
