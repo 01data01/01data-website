@@ -5,10 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>01data - Transform Your Data Into Insights</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMZY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2c5f5d;
+            --accent-color: #4db6ac;
+            --accent-dark: #26a69a;
+            --text-light: rgba(44, 95, 93, 0.8);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --gradient-bg: radial-gradient(ellipse at center, #f0fffe 0%, #e8f8f5 40%, #e1f5fe 100%);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -18,18 +30,15 @@
         body {
             font-family: 'Inter', sans-serif;
             overflow-x: hidden;
-            background: radial-gradient(ellipse at center, #f0fffe 0%, #e8f8f5 40%, #e1f5fe 100%);
-            color: #2c5f5d;
+            background: var(--gradient-bg);
+            color: var(--primary-color);
             line-height: 1.6;
         }
         
-        /* Animation Canvas Background */
+        /* Animation Canvas */
         #animation-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            inset: 0;
             z-index: 1;
             pointer-events: none;
         }
@@ -39,11 +48,22 @@
             pointer-events: auto;
         }
         
-        /* Content Overlay */
         .content-overlay {
             position: relative;
             z-index: 10;
-            background: transparent;
+        }
+        
+        /* Utility Classes */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         
         /* Navigation */
@@ -53,32 +73,333 @@
             width: 100%;
             padding: 20px 0;
             backdrop-filter: blur(20px);
-            background: rgba(255, 255, 255, 0.1);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
             z-index: 100;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease;
         }
         
         nav.scrolled {
             background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
         }
         
         .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
         
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #2c5f5d;
-            text-decoration: none;
-            letter-spacing: -0.5px;
+        /* Executive Intelligence Platform Logo */
+        .logo-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            border-radius: 12px;
+            background: linear-gradient(145deg, rgba(77, 182, 172, 0.2) 0%, rgba(38, 166, 154, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(77, 182, 172, 0.3);
+            box-shadow: 
+                0 8px 16px rgba(44, 95, 93, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--accent-color) 0%, var(--accent-dark) 50%, #40e0d0 100%);
+            opacity: 0.15;
+            border-radius: 12px;
+            animation: logoPulse 4s ease-in-out infinite;
+        }
+
+        .logo-brain-container {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            z-index: 2;
+        }
+
+        .logo-brain {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, var(--accent-color), var(--accent-dark), #40e0d0);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            box-shadow: 
+                0 4px 8px rgba(77, 182, 172, 0.4),
+                inset 0 1px 2px rgba(255,255,255,0.2);
+            animation: logoBrainGlow 3s ease-in-out infinite alternate;
+        }
+
+        .logo-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.2), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+
+        .logo-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+        }
+
+        .logo-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            border-radius: 1px;
+            animation: logoNeuralPulse 2s ease-in-out infinite;
+        }
+
+        .logo-neural-line:nth-child(1) {
+            width: 9px;
+            height: 1px;
+            top: 6px;
+            left: 3px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .logo-neural-line:nth-child(2) {
+            width: 7px;
+            height: 1px;
+            top: 10px;
+            left: 9px;
+            transform: rotate(-30deg);
+            animation-delay: 0.5s;
+        }
+
+        .logo-neural-line:nth-child(3) {
+            width: 6px;
+            height: 1px;
+            top: 15px;
+            left: 4px;
+            transform: rotate(60deg);
+            animation-delay: 1s;
+        }
+
+        .logo-neural-line:nth-child(4) {
+            width: 8px;
+            height: 1px;
+            top: 12px;
+            left: 13px;
+            transform: rotate(-45deg);
+            animation-delay: 1.5s;
+        }
+
+        .logo-data-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .logo-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, var(--accent-color), #40e0d0);
+            border-radius: 50%;
+            opacity: 0;
+            animation: logoParticleFloat 3s ease-in-out infinite;
+        }
+
+        .logo-particle:nth-child(1) {
+            top: 20%;
+            left: 80%;
+            animation-delay: 0s;
+        }
+
+        .logo-particle:nth-child(2) {
+            top: 60%;
+            left: 85%;
+            animation-delay: 0.8s;
+        }
+
+        .logo-particle:nth-child(3) {
+            top: 40%;
+            left: 90%;
+            animation-delay: 1.6s;
+        }
+
+        .logo-dashboard-elements {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 12px;
+            height: 12px;
+            opacity: 0.7;
+        }
+
+        .logo-chart-bars {
+            display: flex;
+            align-items: end;
+            height: 6px;
+            gap: 1px;
+        }
+
+        .logo-bar {
+            width: 1.5px;
+            background: linear-gradient(to top, var(--accent-color), #40e0d0);
+            border-radius: 1px;
+            animation: logoBarGrow 2s ease-in-out infinite;
+        }
+
+        .logo-bar:nth-child(1) {
+            height: 60%;
+            animation-delay: 0s;
+        }
+
+        .logo-bar:nth-child(2) {
+            height: 100%;
+            animation-delay: 0.3s;
+        }
+
+        .logo-bar:nth-child(3) {
+            height: 40%;
+            animation-delay: 0.6s;
+        }
+
+        .logo-bar:nth-child(4) {
+            height: 80%;
+            animation-delay: 0.9s;
+        }
+
+        .logo-trend-line {
+            margin-top: 2px;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            border-radius: 0.5px;
+            animation: logoTrendPulse 3s ease-in-out infinite;
+        }
+
+        .logo-floating-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 54px;
+            height: 54px;
+            border: 1px solid rgba(77, 182, 172, 0.4);
+            border-radius: 50%;
+            animation: logoRingRotate 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .logo-floating-ring::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, var(--accent-color), #40e0d0);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(77, 182, 172, 0.8);
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.25; }
+        }
+
+        @keyframes logoBrainGlow {
+            0% { 
+                box-shadow: 
+                    0 4px 8px rgba(77, 182, 172, 0.4),
+                    inset 0 1px 2px rgba(255,255,255,0.2);
+            }
+            100% { 
+                box-shadow: 
+                    0 6px 12px rgba(77, 182, 172, 0.6),
+                    inset 0 1px 2px rgba(255,255,255,0.3);
+            }
+        }
+
+        @keyframes logoNeuralPulse {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.8; transform: scaleX(1); }
+        }
+
+        @keyframes logoParticleFloat {
+            0% { 
+                opacity: 0; 
+                transform: translateY(0px) translateX(0px); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: translateY(-6px) translateX(-3px); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-12px) translateX(-6px); 
+            }
+        }
+
+        @keyframes logoBarGrow {
+            0%, 100% { transform: scaleY(0.6); }
+            50% { transform: scaleY(1); }
+        }
+
+        @keyframes logoTrendPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes logoRingRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .logo-container:hover .logo-brain {
+            animation-duration: 1s;
+        }
+
+        .logo-container:hover .logo-neural-line {
+            animation-duration: 0.8s;
+        }
+
+        .logo-container:hover .logo-floating-ring {
+            animation-duration: 8s;
+        }
+        
+        .nav-center {
+            display: flex;
+            align-items: center;
         }
         
         .nav-links {
@@ -88,15 +409,15 @@
         }
         
         .nav-links a {
-            color: #2c5f5d;
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: color 0.3s ease;
             position: relative;
         }
         
         .nav-links a:hover {
-            color: #4db6ac;
+            color: var(--accent-color);
         }
         
         .nav-links a::after {
@@ -106,8 +427,8 @@
             height: 2px;
             bottom: -5px;
             left: 50%;
-            background: #4db6ac;
-            transition: all 0.3s ease;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
             transform: translateX(-50%);
         }
         
@@ -116,19 +437,49 @@
         }
         
         .cta-button {
-            background: linear-gradient(135deg, #4db6ac, #26a69a);
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
             color: white;
             padding: 12px 24px;
             border-radius: 25px;
             text-decoration: none;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
             box-shadow: 0 4px 15px rgba(77, 182, 172, 0.3);
+            margin-left: 30px;
         }
         
         .cta-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(77, 182, 172, 0.4);
+        }
+        
+        /* Section Base */
+        section {
+            padding: 100px 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
         
         /* Hero Section */
@@ -143,12 +494,11 @@
         
         .hero-content {
             max-width: 800px;
-            padding: 0 20px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
             padding: 60px 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             animation: fadeInUp 1s ease-out;
         }
         
@@ -167,7 +517,7 @@
             font-size: 3.5rem;
             font-weight: 700;
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #2c5f5d, #4db6ac, #26a69a);
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color), var(--accent-dark));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -177,14 +527,14 @@
         .hero-subtitle {
             font-size: 1.3rem;
             margin-bottom: 15px;
-            color: #2c5f5d;
+            color: var(--primary-color);
             font-weight: 500;
         }
         
         .hero-description {
             font-size: 1.1rem;
             margin-bottom: 40px;
-            color: rgba(44, 95, 93, 0.8);
+            color: var(--text-light);
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
@@ -197,174 +547,1481 @@
             flex-wrap: wrap;
         }
         
-        .btn-primary {
-            background: linear-gradient(135deg, #4db6ac, #26a69a);
-            color: white;
+        .btn {
             padding: 15px 30px;
             border-radius: 30px;
             text-decoration: none;
             font-weight: 600;
             font-size: 1.1rem;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+            color: white;
             box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(64, 224, 208, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .btn-primary:hover::before {
+            opacity: 1;
         }
         
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
         }
-        
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: #2c5f5d;
-            padding: 15px 30px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(77, 182, 172, 0.3);
-            backdrop-filter: blur(10px);
+
+        /* Animated Intelligence Button */
+        .btn-intelligence {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark), #40e0d0);
+            color: white;
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 220px;
+            justify-content: center;
         }
-        
-        .btn-secondary:hover {
-            background: rgba(77, 182, 172, 0.1);
-            border-color: #4db6ac;
+
+        .btn-intelligence::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(64, 224, 208, 0.15) 100%);
+            animation: btnIntelligencePulse 3s ease-in-out infinite;
+        }
+
+        .btn-intelligence-icon {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-intelligence-brain {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(64, 224, 208, 0.8));
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            animation: btnBrainGlow 2s ease-in-out infinite alternate;
+        }
+
+        .btn-intelligence-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.4), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+
+        .btn-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            border-radius: 1px;
+            animation: btnNeuralPulse 1.5s ease-in-out infinite;
+        }
+
+        .btn-neural-line:nth-child(1) {
+            width: 8px;
+            height: 1px;
+            top: 5px;
+            left: 2px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .btn-neural-line:nth-child(2) {
+            width: 6px;
+            height: 1px;
+            top: 8px;
+            left: 8px;
+            transform: rotate(-30deg);
+            animation-delay: 0.3s;
+        }
+
+        .btn-neural-line:nth-child(3) {
+            width: 5px;
+            height: 1px;
+            top: 12px;
+            left: 3px;
+            transform: rotate(60deg);
+            animation-delay: 0.6s;
+        }
+
+        .btn-neural-line:nth-child(4) {
+            width: 7px;
+            height: 1px;
+            top: 10px;
+            left: 11px;
+            transform: rotate(-45deg);
+            animation-delay: 0.9s;
+        }
+
+        .btn-data-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 30px;
+        }
+
+        .btn-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.8), rgba(64, 224, 208, 0.6));
+            border-radius: 50%;
+            opacity: 0;
+            animation: btnParticleFloat 2.5s ease-in-out infinite;
+        }
+
+        .btn-particle:nth-child(1) {
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .btn-particle:nth-child(2) {
+            top: 60%;
+            left: 85%;
+            animation-delay: 0.6s;
+        }
+
+        .btn-particle:nth-child(3) {
+            top: 80%;
+            left: 25%;
+            animation-delay: 1.2s;
+        }
+
+        .btn-particle:nth-child(4) {
+            top: 30%;
+            left: 75%;
+            animation-delay: 1.8s;
+        }
+
+        .btn-mini-chart {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            width: 16px;
+            height: 8px;
+            opacity: 0.7;
+        }
+
+        .btn-chart-bars {
+            display: flex;
+            align-items: end;
+            height: 6px;
+            gap: 1px;
+        }
+
+        .btn-chart-bar {
+            width: 2px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.6), rgba(64, 224, 208, 0.8));
+            border-radius: 1px;
+            animation: btnChartGrow 1.8s ease-in-out infinite;
+        }
+
+        .btn-chart-bar:nth-child(1) {
+            height: 60%;
+            animation-delay: 0s;
+        }
+
+        .btn-chart-bar:nth-child(2) {
+            height: 100%;
+            animation-delay: 0.2s;
+        }
+
+        .btn-chart-bar:nth-child(3) {
+            height: 40%;
+            animation-delay: 0.4s;
+        }
+
+        .btn-chart-bar:nth-child(4) {
+            height: 80%;
+            animation-delay: 0.6s;
+        }
+
+        .btn-trend-line {
+            margin-top: 1px;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: btnTrendPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes btnIntelligencePulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes btnBrainGlow {
+            0% { 
+                box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 0 12px rgba(64, 224, 208, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes btnNeuralPulse {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 1; transform: scaleX(1); }
+        }
+
+        @keyframes btnParticleFloat {
+            0% { 
+                opacity: 0; 
+                transform: translateY(0px) translateX(0px) scale(0.5); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: translateY(-8px) translateX(-4px) scale(1); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-16px) translateX(-8px) scale(0.5); 
+            }
+        }
+
+        @keyframes btnChartGrow {
+            0%, 100% { transform: scaleY(0.6); opacity: 0.6; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+
+        @keyframes btnTrendPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        .btn-intelligence:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(77, 182, 172, 0.5);
+        }
+
+        .btn-intelligence:hover .btn-intelligence-brain {
+            animation-duration: 0.8s;
+        }
+
+        .btn-intelligence:hover .btn-neural-line {
+            animation-duration: 0.6s;
+        }
+
+        .btn-intelligence:hover .btn-particle {
+            animation-duration: 1.5s;
+        }
+
+        .btn-intelligence:active {
             transform: translateY(-2px);
         }
         
-        /* Philosophy Badge */
-        .philosophy-badge {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.15);
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1), rgba(135, 206, 235, 0.15));
+            color: var(--primary-color);
+            border: 2px solid rgba(77, 182, 172, 0.3);
             backdrop-filter: blur(15px);
-            padding: 15px 25px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.9rem;
-            color: rgba(44, 95, 93, 0.8);
-            animation: fadeIn 2s ease-out 1s both;
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 200px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.2);
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .btn-secondary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(135, 206, 235, 0.1) 100%);
+            animation: btnServicesPulse 4s ease-in-out infinite;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15), rgba(135, 206, 235, 0.2));
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.3);
+        }
+
+        /* Animated Services Button */
+        .btn-services {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1), rgba(135, 206, 235, 0.15));
+            color: var(--primary-color);
+            border: 2px solid rgba(77, 182, 172, 0.3);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 200px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.2);
+        }
+
+        .btn-services::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(135, 206, 235, 0.1) 100%);
+            animation: btnServicesPulse 4s ease-in-out infinite;
+        }
+
+        .btn-services-icon {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-services-network {
+            position: relative;
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-network-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, rgba(77, 182, 172, 0.8), rgba(135, 206, 235, 0.9));
+            border-radius: 50%;
+            animation: btnNodePulse 2s ease-in-out infinite;
+        }
+
+        .btn-network-node:nth-child(1) {
+            top: 2px;
+            left: 8px;
+            animation-delay: 0s;
+        }
+
+        .btn-network-node:nth-child(2) {
+            top: 8px;
+            left: 2px;
+            animation-delay: 0.3s;
+        }
+
+        .btn-network-node:nth-child(3) {
+            top: 8px;
+            left: 14px;
+            animation-delay: 0.6s;
+        }
+
+        .btn-network-node:nth-child(4) {
+            top: 14px;
+            left: 8px;
+            animation-delay: 0.9s;
+        }
+
+        .btn-network-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn-connection-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(77, 182, 172, 0.6), transparent);
+            animation: btnConnectionFlow 3s ease-in-out infinite;
+        }
+
+        .btn-connection-line:nth-child(1) {
+            width: 10px;
+            height: 1px;
+            top: 4px;
+            left: 5px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .btn-connection-line:nth-child(2) {
+            width: 10px;
+            height: 1px;
+            top: 10px;
+            left: 9px;
+            transform: rotate(-45deg);
+            animation-delay: 0.5s;
+        }
+
+        .btn-connection-line:nth-child(3) {
+            width: 8px;
+            height: 1px;
+            top: 10px;
+            left: 3px;
+            transform: rotate(45deg);
+            animation-delay: 1s;
+        }
+
+        .btn-services-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 30px;
+        }
+
+        .btn-services-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, rgba(135, 206, 235, 0.7), rgba(255, 255, 255, 0.8));
+            border-radius: 50%;
+            opacity: 0;
+            animation: btnServicesParticleFlow 3s ease-in-out infinite;
+        }
+
+        .btn-services-particle:nth-child(1) {
+            top: 25%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .btn-services-particle:nth-child(2) {
+            top: 75%;
+            left: 20%;
+            animation-delay: 0.7s;
+        }
+
+        .btn-services-particle:nth-child(3) {
+            top: 50%;
+            left: 80%;
+            animation-delay: 1.4s;
+        }
+
+        .btn-services-particle:nth-child(4) {
+            top: 30%;
+            left: 70%;
+            animation-delay: 2.1s;
+        }
+
+        .btn-analytics-display {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            width: 18px;
+            height: 10px;
+            opacity: 0.6;
+        }
+
+        .btn-analytics-graph {
+            position: relative;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, transparent, rgba(135, 206, 235, 0.3), transparent);
+            border-radius: 4px;
+            animation: btnAnalyticsGlow 2.5s ease-in-out infinite;
+        }
+
+        .btn-analytics-points {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(77, 182, 172, 0.8) 20%, 
+                rgba(135, 206, 235, 0.9) 40%, 
+                rgba(77, 182, 172, 0.7) 60%, 
+                rgba(135, 206, 235, 0.8) 80%, 
+                transparent 100%);
+            animation: btnDataFlow 2s ease-in-out infinite;
+        }
+
+        .btn-analytics-indicators {
+            position: absolute;
+            top: -2px;
+            width: 100%;
+            height: 1px;
+        }
+
+        .btn-indicator-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(135, 206, 235, 0.9);
+            border-radius: 50%;
+            animation: btnIndicatorBlink 1.8s ease-in-out infinite;
+        }
+
+        .btn-indicator-dot:nth-child(1) {
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .btn-indicator-dot:nth-child(2) {
+            left: 45%;
+            animation-delay: 0.3s;
+        }
+
+        .btn-indicator-dot:nth-child(3) {
+            left: 75%;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes btnServicesPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes btnNodePulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 0.7;
+                box-shadow: 0 0 4px rgba(135, 206, 235, 0.3);
+            }
+            50% { 
+                transform: scale(1.3); 
+                opacity: 1;
+                box-shadow: 0 0 8px rgba(135, 206, 235, 0.6);
+            }
+        }
+
+        @keyframes btnConnectionFlow {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.7; transform: scaleX(1); }
+        }
+
+        @keyframes btnServicesParticleFlow {
+            0% { 
+                opacity: 0; 
+                transform: translateX(0px) translateY(0px) scale(0.5); 
+            }
+            30% { 
+                opacity: 1; 
+                transform: translateX(20px) translateY(-5px) scale(1); 
+            }
+            70% { 
+                opacity: 0.8; 
+                transform: translateX(40px) translateY(-10px) scale(0.8); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateX(60px) translateY(-15px) scale(0.3); 
+            }
+        }
+
+        @keyframes btnAnalyticsGlow {
+            0%, 100% { 
+                opacity: 0.4; 
+                background: linear-gradient(90deg, transparent, rgba(135, 206, 235, 0.3), transparent);
+            }
+            50% { 
+                opacity: 0.8; 
+                background: linear-gradient(90deg, transparent, rgba(135, 206, 235, 0.6), transparent);
+            }
+        }
+
+        @keyframes btnDataFlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes btnIndicatorBlink {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .btn-services:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15), rgba(135, 206, 235, 0.2));
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn-services:hover .btn-network-node {
+            animation-duration: 1s;
+        }
+
+        .btn-services:hover .btn-connection-line {
+            animation-duration: 1.5s;
+        }
+
+        .btn-services:hover .btn-services-particle {
+            animation-duration: 2s;
+        }
+
+        .btn-services:active {
+            transform: translateY(-1px);
         }
         
         /* Services Section */
         .services {
-            padding: 100px 0;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(240, 255, 254, 0.12) 50%, rgba(225, 245, 254, 0.08) 100%);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        .services::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(77, 182, 172, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(38, 166, 154, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(128, 203, 196, 0.06) 0%, transparent 50%);
+            pointer-events: none;
         }
         
-        .section-header {
-            text-align: center;
-            margin-bottom: 80px;
-        }
-        
-        .section-header h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #2c5f5d;
-        }
-        
-        .section-header p {
-            font-size: 1.2rem;
-            color: rgba(44, 95, 93, 0.7);
-            max-width: 600px;
-            margin: 0 auto;
+        .services .container {
+            position: relative;
+            z-index: 2;
         }
         
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
         }
         
         .service-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            padding: 40px 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            padding: 45px 35px;
+            border-radius: 24px;
+            transition: var(--transition-smooth);
             text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                0 8px 32px rgba(44, 95, 93, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .service-card:nth-child(1) { animation-delay: 0.1s; }
+        .service-card:nth-child(2) { animation-delay: 0.2s; }
+        .service-card:nth-child(3) { animation-delay: 0.3s; }
+        .service-card:nth-child(4) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) { animation-delay: 0.5s; }
+        .service-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(77, 182, 172, 0.05) 0%, rgba(38, 166, 154, 0.02) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: 24px;
         }
         
         .service-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transform: translateY(-12px) scale(1.02);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(77, 182, 172, 0.4);
+        }
+        
+        .service-card:hover::before {
+            opacity: 1;
         }
         
         .service-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 24px auto;
             display: block;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .service-icon svg {
+            width: 100%;
+            height: 100%;
+            transition: var(--transition-smooth);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+        }
+        
+        /* Service Color Palette - Professional & Inspiring */
+        .service-card:nth-child(1) .service-icon svg { fill: #1e40af; } /* Deep Blue - Trust */
+        .service-card:nth-child(1):hover .service-icon svg { 
+            fill: #2563eb; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(30, 64, 175, 0.3));
+        }
+        .service-card:nth-child(1):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(2) .service-icon svg { fill: #059669; } /* Emerald Green - Growth */
+        .service-card:nth-child(2):hover .service-icon svg { 
+            fill: #10b981; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(5, 150, 105, 0.3));
+        }
+        .service-card:nth-child(2):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(3) .service-icon svg { fill: #7c3aed; } /* Deep Purple - Innovation */
+        .service-card:nth-child(3):hover .service-icon svg { 
+            fill: #a855f7; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(124, 58, 237, 0.3));
+        }
+        .service-card:nth-child(3):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(4) .service-icon svg { fill: #0891b2; } /* Professional Cyan - Research */
+        .service-card:nth-child(4):hover .service-icon svg { 
+            fill: #0ea5e9; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(8, 145, 178, 0.3));
+        }
+        .service-card:nth-child(4):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(5) .service-icon svg { fill: #dc2626; } /* Crimson Red - Solutions */
+        .service-card:nth-child(5):hover .service-icon svg { 
+            fill: #f87171; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(220, 38, 38, 0.3));
+        }
+        .service-card:nth-child(5):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(248, 113, 113, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(6) .service-icon svg { fill: #0d9488; } /* Professional Teal - Executive Intelligence */
+        .service-card:nth-child(6):hover .service-icon svg { 
+            fill: #14b8a6; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(13, 148, 136, 0.3));
+        }
+        .service-card:nth-child(6):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(20, 184, 166, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
         }
         
         .service-card h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #2c5f5d;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: var(--primary-color);
+            letter-spacing: -0.3px;
+            line-height: 1.3;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .service-card:hover h3 {
+            color: #1a4a47;
         }
         
         .service-card p {
-            color: rgba(44, 95, 93, 0.8);
-            line-height: 1.6;
+            color: rgba(44, 95, 93, 0.85);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .service-card:hover p {
+            color: rgba(44, 95, 93, 0.95);
+        }
+        
+        /* Icon Animations */
+        .service-card:nth-child(1) .service-icon svg circle {
+            animation: dataPulse 2s ease-in-out infinite;
+        }
+        .service-card:nth-child(1) .service-icon svg circle:nth-child(2) { animation-delay: 0.2s; }
+        .service-card:nth-child(1) .service-icon svg circle:nth-child(3) { animation-delay: 0.4s; }
+        .service-card:nth-child(1) .service-icon svg circle:nth-child(4) { animation-delay: 0.6s; }
+        .service-card:nth-child(1) .service-icon svg circle:nth-child(5) { animation-delay: 0.8s; }
+        
+        @keyframes dataPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        .service-card:nth-child(2) .service-icon svg path {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: drawChart 3s ease-in-out infinite;
+        }
+        
+        @keyframes drawChart {
+            0% { stroke-dashoffset: 100; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -100; }
+        }
+        
+        .service-card:nth-child(3) .service-icon svg path {
+            opacity: 0;
+            animation: networkPulse 2.5s ease-in-out infinite;
+        }
+        .service-card:nth-child(3) .service-icon svg path:nth-child(5) { animation-delay: 0.1s; }
+        .service-card:nth-child(3) .service-icon svg path:nth-child(6) { animation-delay: 0.2s; }
+        .service-card:nth-child(3) .service-icon svg path:nth-child(7) { animation-delay: 0.3s; }
+        .service-card:nth-child(3) .service-icon svg path:nth-child(8) { animation-delay: 0.4s; }
+        .service-card:nth-child(3) .service-icon svg circle {
+            animation: nodePulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes networkPulse {
+            0%, 70% { opacity: 0; }
+            10%, 60% { opacity: 0.7; }
+        }
+        
+        @keyframes nodePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .service-card:nth-child(4) .service-icon svg circle:last-child {
+            transform-origin: center;
+            animation: magnifySearch 3s ease-in-out infinite;
+        }
+        .service-card:nth-child(4) .service-icon svg path:last-child {
+            animation: magnifyMove 3s ease-in-out infinite;
+        }
+        
+        @keyframes magnifySearch {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            75% { transform: scale(0.95); }
+        }
+        
+        @keyframes magnifyMove {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(2px) translateY(-2px); }
+            50% { transform: translateX(-1px) translateY(2px); }
+            75% { transform: translateX(1px) translateY(-1px); }
+        }
+        
+        /* Custom Solutions - Neural Network Animations */
+        .service-card:nth-child(5) .service-icon svg .neuron {
+            animation: neuronFire 2.5s ease-in-out infinite;
+        }
+        
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(1) { animation-delay: 0s; }
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(2) { animation-delay: 0.3s; }
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(3) { animation-delay: 0.6s; }
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(4) { animation-delay: 0.9s; }
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(5) { animation-delay: 1.2s; }
+        
+        .service-card:nth-child(5) .service-icon svg .connection {
+            stroke-dasharray: 20;
+            animation: neuralFlow 3s ease-in-out infinite;
+        }
+        
+        .service-card:nth-child(5) .service-icon svg .connection:nth-child(6) { animation-delay: 0.2s; }
+        .service-card:nth-child(5) .service-icon svg .connection:nth-child(7) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) .service-icon svg .connection:nth-child(8) { animation-delay: 0.6s; }
+        .service-card:nth-child(5) .service-icon svg .connection:nth-child(9) { animation-delay: 0.8s; }
+        
+        .service-card:nth-child(5) .service-icon svg .prediction-arrow {
+            animation: predictionFlow 2s ease-in-out infinite;
+        }
+        
+        .service-card:nth-child(5) .service-icon svg .brain-waves {
+            animation: brainActivity 3s ease-in-out infinite;
+        }
+        
+        @keyframes neuronFire {
+            0%, 70% { opacity: 0.6; transform: scale(1); }
+            10%, 30% { opacity: 1; transform: scale(1.3); }
+            100% { opacity: 0.6; transform: scale(1); }
+        }
+        
+        @keyframes neuralFlow {
+            0%, 100% { stroke-dashoffset: 20; opacity: 0.3; }
+            50% { stroke-dashoffset: 0; opacity: 0.9; }
+        }
+        
+        @keyframes predictionFlow {
+            0%, 100% { transform: translateX(0); opacity: 0.7; }
+            50% { transform: translateX(8px); opacity: 1; }
+        }
+        
+        @keyframes brainActivity {
+            0%, 100% { opacity: 0.4; }
+            33% { opacity: 0.8; }
+            66% { opacity: 0.6; }
+        }
+        
+        /* Executive Intelligence Dashboard - Data flow and intelligence */
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(4) {
+            animation: chartUpdate 3s ease-in-out infinite;
+        }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(6),
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(7),
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(8),
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(9) {
+            animation: barChart 2.5s ease-in-out infinite;
+        }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(6) { animation-delay: 0.1s; }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(7) { animation-delay: 0.2s; }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(8) { animation-delay: 0.3s; }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(9) { animation-delay: 0.4s; }
+        
+        .service-card:nth-child(6) .service-icon svg circle {
+            animation: intelligencePulse 2s ease-in-out infinite;
+        }
+        
+        .service-card:nth-child(6) .service-icon svg path {
+            animation: dataFlow 3s ease-in-out infinite;
+        }
+        .service-card:nth-child(6) .service-icon svg path:nth-child(15) { animation-delay: 0.5s; }
+        .service-card:nth-child(6) .service-icon svg path:nth-child(16) { animation-delay: 1s; }
+        .service-card:nth-child(6) .service-icon svg path:nth-child(17) { animation-delay: 1.5s; }
+        
+        .service-card:nth-child(6) .service-icon svg ellipse {
+            animation: databaseActivity 2.5s ease-in-out infinite;
+        }
+        .service-card:nth-child(6) .service-icon svg ellipse:nth-child(19) { animation-delay: 0.2s; }
+        .service-card:nth-child(6) .service-icon svg ellipse:nth-child(20) { animation-delay: 0.4s; }
+        .service-card:nth-child(6) .service-icon svg ellipse:nth-child(21) { animation-delay: 0.6s; }
+        
+        @keyframes chartUpdate {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+        
+        @keyframes barChart {
+            0%, 100% { opacity: 0.7; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.1); }
+        }
+        
+        @keyframes intelligencePulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        @keyframes dataFlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.9; }
+        }
+        
+        @keyframes databaseActivity {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; stroke-width: 2; }
+        }
+        
+        /* Executive Intelligence Platform - Animated Icon */
+        .executive-intelligence-icon {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 24px auto;
+            display: block;
+            border-radius: 16px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(135, 206, 235, 0.15));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 
+                0 8px 24px rgba(135, 206, 235, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            overflow: hidden;
+        }
+
+        .executive-intelligence-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(135, 206, 235, 0.1) 100%);
+            animation: executiveIconPulse 4s ease-in-out infinite;
+            border-radius: 16px;
+        }
+
+        .executive-brain-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 32px;
+            height: 32px;
+            z-index: 3;
+        }
+
+        .executive-brain {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(135, 206, 235, 0.6), rgba(255, 255, 255, 0.7));
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            animation: executiveBrainGlow 3s ease-in-out infinite alternate;
+            box-shadow: 
+                0 4px 12px rgba(135, 206, 235, 0.3),
+                inset 0 1px 2px rgba(255,255,255,0.4);
+        }
+
+        .executive-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.5), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+
+        .executive-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28px;
+            height: 28px;
+        }
+
+        .executive-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+            border-radius: 1px;
+            animation: executiveNeuralPulse 2.5s ease-in-out infinite;
+        }
+
+        .executive-neural-line:nth-child(1) {
+            width: 10px;
+            height: 1px;
+            top: 7px;
+            left: 4px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .executive-neural-line:nth-child(2) {
+            width: 8px;
+            height: 1px;
+            top: 12px;
+            left: 10px;
+            transform: rotate(-30deg);
+            animation-delay: 0.5s;
+        }
+
+        .executive-neural-line:nth-child(3) {
+            width: 7px;
+            height: 1px;
+            top: 17px;
+            left: 5px;
+            transform: rotate(60deg);
+            animation-delay: 1s;
+        }
+
+        .executive-neural-line:nth-child(4) {
+            width: 9px;
+            height: 1px;
+            top: 14px;
+            left: 15px;
+            transform: rotate(-45deg);
+            animation-delay: 1.5s;
+        }
+
+        .executive-data-streams {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .executive-data-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.8), rgba(135, 206, 235, 0.7));
+            border-radius: 50%;
+            opacity: 0;
+            animation: executiveParticleFlow 3.5s ease-in-out infinite;
+        }
+
+        .executive-data-particle:nth-child(1) {
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .executive-data-particle:nth-child(2) {
+            top: 70%;
+            left: 80%;
+            animation-delay: 0.8s;
+        }
+
+        .executive-data-particle:nth-child(3) {
+            top: 45%;
+            left: 85%;
+            animation-delay: 1.6s;
+        }
+
+        .executive-data-particle:nth-child(4) {
+            top: 80%;
+            left: 25%;
+            animation-delay: 2.4s;
+        }
+
+        .executive-data-particle:nth-child(5) {
+            top: 35%;
+            left: 10%;
+            animation-delay: 3.2s;
+        }
+
+        .executive-dashboard-corner {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .executive-mini-screen {
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.4), rgba(135, 206, 235, 0.3));
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .executive-screen-data {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.6) 20%, 
+                rgba(135, 206, 235, 0.7) 40%, 
+                rgba(255, 255, 255, 0.5) 60%, 
+                rgba(135, 206, 235, 0.6) 80%, 
+                transparent 100%);
+            animation: executiveDataScroll 3s ease-in-out infinite;
+        }
+
+        .executive-status-indicators {
+            margin-top: 3px;
+            display: flex;
+            gap: 2px;
+        }
+
+        .executive-status-dot {
+            width: 3px;
+            height: 3px;
+            background: rgba(135, 206, 235, 0.8);
+            border-radius: 50%;
+            animation: executiveStatusBlink 2s ease-in-out infinite;
+        }
+
+        .executive-status-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .executive-status-dot:nth-child(2) {
+            animation-delay: 0.4s;
+        }
+
+        .executive-status-dot:nth-child(3) {
+            animation-delay: 0.8s;
+        }
+
+        .executive-corner-chart {
+            position: absolute;
+            bottom: 8px;
+            left: 8px;
+            width: 20px;
+            height: 12px;
+            opacity: 0.6;
+        }
+
+        .executive-chart-lines {
+            position: relative;
+            width: 100%;
+            height: 8px;
+        }
+
+        .executive-chart-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+            animation: executiveChartPulse 2.8s ease-in-out infinite;
+        }
+
+        .executive-chart-line:nth-child(1) {
+            top: 2px;
+            left: 0;
+            width: 14px;
+            animation-delay: 0s;
+        }
+
+        .executive-chart-line:nth-child(2) {
+            top: 4px;
+            left: 2px;
+            width: 16px;
+            animation-delay: 0.3s;
+        }
+
+        .executive-chart-line:nth-child(3) {
+            top: 6px;
+            left: 1px;
+            width: 12px;
+            animation-delay: 0.6s;
+        }
+
+        .executive-chart-points {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+        }
+
+        .executive-chart-point {
+            width: 2px;
+            background: rgba(135, 206, 235, 0.9);
+            border-radius: 1px;
+            animation: executivePointGrow 2.2s ease-in-out infinite;
+        }
+
+        .executive-chart-point:nth-child(1) {
+            height: 60%;
+            animation-delay: 0s;
+        }
+
+        .executive-chart-point:nth-child(2) {
+            height: 100%;
+            animation-delay: 0.2s;
+        }
+
+        .executive-chart-point:nth-child(3) {
+            height: 40%;
+            animation-delay: 0.4s;
+        }
+
+        .executive-chart-point:nth-child(4) {
+            height: 80%;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes executiveIconPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes executiveBrainGlow {
+            0% { 
+                box-shadow: 
+                    0 4px 12px rgba(135, 206, 235, 0.3),
+                    inset 0 1px 2px rgba(255,255,255,0.4);
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 
+                    0 6px 16px rgba(135, 206, 235, 0.5),
+                    inset 0 1px 2px rgba(255,255,255,0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes executiveNeuralPulse {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.9; transform: scaleX(1); }
+        }
+
+        @keyframes executiveParticleFlow {
+            0% { 
+                opacity: 0; 
+                transform: translateX(0px) translateY(0px) scale(0.5); 
+            }
+            30% { 
+                opacity: 1; 
+                transform: translateX(-8px) translateY(-6px) scale(1); 
+            }
+            70% { 
+                opacity: 0.8; 
+                transform: translateX(-16px) translateY(-12px) scale(0.8); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateX(-24px) translateY(-18px) scale(0.3); 
+            }
+        }
+
+        @keyframes executiveDataScroll {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes executiveStatusBlink {
+            0%, 100% { 
+                opacity: 0.4; 
+                transform: scale(1);
+                background: rgba(135, 206, 235, 0.8);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1.3);
+                background: rgba(255, 255, 255, 0.9);
+            }
+        }
+
+        @keyframes executiveChartPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes executivePointGrow {
+            0%, 100% { 
+                transform: scaleY(0.7); 
+                opacity: 0.6;
+                background: rgba(135, 206, 235, 0.9);
+            }
+            50% { 
+                transform: scaleY(1.2); 
+                opacity: 1;
+                background: rgba(255, 255, 255, 0.8);
+            }
+        }
+
+        .service-card:nth-child(6):hover .executive-brain {
+            animation-duration: 1.5s;
+        }
+
+        .service-card:nth-child(6):hover .executive-neural-line {
+            animation-duration: 1.2s;
+        }
+
+        .service-card:nth-child(6):hover .executive-data-particle {
+            animation-duration: 2s;
+        }
+
+        .service-card:nth-child(6):hover .executive-data-scroll {
+            animation-duration: 1.5s;
+        }
+        
+        /* About Section */
+        .about {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+        }
+        
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px 40px;
+            border-radius: 20px;
+        }
+        
+        .about-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            color: rgba(44, 95, 93, 0.9);
+            text-align: justify;
+        }
+        
+        .about-text p:last-child {
+            margin-bottom: 0;
+            font-weight: 500;
+            color: var(--primary-color);
         }
         
         /* Contact Section */
-        .contact {
-            padding: 100px 0;
-        }
-        
         .contact-content {
             text-align: center;
             max-width: 600px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
             padding: 60px 40px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
         
         .contact h2 {
             font-size: 2.5rem;
             font-weight: 700;
             margin-bottom: 20px;
-            color: #2c5f5d;
+            color: var(--primary-color);
         }
         
         .contact p {
             font-size: 1.2rem;
             margin-bottom: 30px;
-            color: rgba(44, 95, 93, 0.8);
+            color: var(--text-light);
         }
         
         .contact-email {
             display: inline-block;
-            background: linear-gradient(135deg, #4db6ac, #26a69a);
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
             color: white;
             padding: 15px 30px;
             border-radius: 25px;
             text-decoration: none;
             font-weight: 600;
             font-size: 1.1rem;
-            transition: all 0.3s ease;
+            transition: var(--transition-smooth);
             box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
         }
         
@@ -379,88 +2036,11 @@
             background: rgba(44, 95, 93, 0.1);
             backdrop-filter: blur(10px);
             text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-top: 1px solid var(--glass-border);
         }
         
         footer p {
-            color: rgba(44, 95, 93, 0.7);
-        }
-        
-        /* Animation Controls */
-        .animation-controls {
-            position: fixed;
-            top: 120px;
-            right: 30px;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .control-btn {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #2c5f5d;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-        
-        .control-btn:hover {
-            background: rgba(77, 182, 172, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        /* Performance Stats */
-        .stats {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            color: rgba(44, 95, 93, 0.6);
-            font-size: 0.8rem;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 10px 15px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-        
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero-content {
-                padding: 40px 20px;
-            }
-            
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .animation-controls {
-                top: 80px;
-                right: 10px;
-            }
-            
-            .stats {
-                bottom: 10px;
-                left: 10px;
-                font-size: 0.7rem;
-            }
+            color: var(--text-light);
         }
         
         /* Loading Screen */
@@ -469,7 +2049,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #2c5f5d;
+            color: var(--primary-color);
             font-size: 1.2rem;
             z-index: 200;
             animation: pulse 2s infinite;
@@ -483,50 +2063,258 @@
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
         }
+        
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-center .nav-links { display: none; }
+            .cta-button { 
+                margin-left: 0;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .nav-container {
+                justify-content: space-between;
+            }
+            
+            .logo-container {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 10px;
+            }
+            
+            .logo-brain-container {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .logo-floating-ring {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .hero h1 { font-size: 2.5rem; }
+            .hero-content { padding: 40px 20px; }
+            .hero-buttons { 
+                flex-direction: column; 
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .btn-intelligence {
+                min-width: 200px;
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            
+            .btn-intelligence-icon {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .btn-intelligence-brain {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .btn-services {
+                min-width: 180px;
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            
+            .btn-services-icon {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .btn-services-network {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .services-grid { 
+                grid-template-columns: 1fr; 
+                gap: 25px;
+                margin-top: 40px;
+            }
+            
+            .service-card {
+                padding: 35px 25px;
+                margin: 0 10px;
+            }
+            
+            .service-card:hover {
+                transform: translateY(-8px) scale(1.01);
+            }
+            
+            .service-icon {
+                width: 64px;
+                height: 64px;
+                margin-bottom: 20px;
+            }
+            
+            .service-card h3 {
+                font-size: 1.4rem;
+                margin-bottom: 16px;
+            }
+            
+            .service-card p {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+            
+            .section-header h2 {
+                font-size: 2.2rem;
+                margin-bottom: 20px;
+            }
+            
+            .section-header p {
+                font-size: 1.1rem;
+                padding: 0 10px;
+            }
+            
+            .about-content { padding: 30px 20px; }
+            .about-text p { font-size: 1rem; text-align: left; }
+        }
     </style>
 </head>
 <body>
-    <!-- Animation Background -->
     <div id="animation-container">
         <div id="loading">Initializing Data Visualization...</div>
     </div>
     
-    <!-- Content Overlay -->
     <div class="content-overlay">
-        <!-- Navigation -->
         <nav id="navbar">
             <div class="nav-container">
-                <a href="#" class="logo">01data</a>
-                <ul class="nav-links">
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#services">Services</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
+                <div class="logo-container">
+                    <div class="logo-floating-ring"></div>
+                    <div class="logo-icon">
+                        <div class="logo-brain-container">
+                            <div class="logo-brain">
+                                <div class="logo-neural-paths">
+                                    <div class="logo-neural-line"></div>
+                                    <div class="logo-neural-line"></div>
+                                    <div class="logo-neural-line"></div>
+                                    <div class="logo-neural-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="logo-dashboard-elements">
+                            <div class="logo-chart-bars">
+                                <div class="logo-bar"></div>
+                                <div class="logo-bar"></div>
+                                <div class="logo-bar"></div>
+                                <div class="logo-bar"></div>
+                            </div>
+                            <div class="logo-trend-line"></div>
+                        </div>
+                        <div class="logo-data-particles">
+                            <div class="logo-particle"></div>
+                            <div class="logo-particle"></div>
+                            <div class="logo-particle"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-center">
+                    <ul class="nav-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
                 <a href="#contact" class="cta-button">Get Started</a>
             </div>
         </nav>
         
-        <!-- Hero Section -->
         <section class="hero" id="home">
             <div class="hero-content">
                 <h1>Transform Data Into Insights</h1>
-                <p class="hero-subtitle">Professional Python Analysis • Statistical Modeling • Research Excellence</p>
+                <p class="hero-subtitle">Advanced Statistical Analysis • Advanced Data Visualization • Research Excellence</p>
                 <p class="hero-description">
                     We turn complex datasets into actionable insights through advanced statistical analysis, 
-                    Python programming, and research manuscript preparation.
+                    data visualization, and research manuscript preparation.
                 </p>
                 <div class="hero-buttons">
-                    <a href="#contact" class="btn-primary">Start Your Project</a>
-                    <a href="#services" class="btn-secondary">Our Services</a>
+                    <a href="#contact" class="btn btn-intelligence">
+                        <div class="btn-intelligence-icon">
+                            <div class="btn-intelligence-brain">
+                                <div class="btn-neural-paths">
+                                    <div class="btn-neural-line"></div>
+                                    <div class="btn-neural-line"></div>
+                                    <div class="btn-neural-line"></div>
+                                    <div class="btn-neural-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span>Start Your Project</span>
+                        <div class="btn-data-particles">
+                            <div class="btn-particle"></div>
+                            <div class="btn-particle"></div>
+                            <div class="btn-particle"></div>
+                            <div class="btn-particle"></div>
+                        </div>
+                        <div class="btn-mini-chart">
+                            <div class="btn-chart-bars">
+                                <div class="btn-chart-bar"></div>
+                                <div class="btn-chart-bar"></div>
+                                <div class="btn-chart-bar"></div>
+                                <div class="btn-chart-bar"></div>
+                            </div>
+                            <div class="btn-trend-line"></div>
+                        </div>
+                    </a>
+                    <a href="#services" class="btn btn-services">
+                        <div class="btn-services-icon">
+                            <div class="btn-services-network">
+                                <div class="btn-network-node"></div>
+                                <div class="btn-network-node"></div>
+                                <div class="btn-network-node"></div>
+                                <div class="btn-network-node"></div>
+                                <div class="btn-network-connections">
+                                    <div class="btn-connection-line"></div>
+                                    <div class="btn-connection-line"></div>
+                                    <div class="btn-connection-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span>Our Services</span>
+                        <div class="btn-services-particles">
+                            <div class="btn-services-particle"></div>
+                            <div class="btn-services-particle"></div>
+                            <div class="btn-services-particle"></div>
+                            <div class="btn-services-particle"></div>
+                        </div>
+                        <div class="btn-analytics-display">
+                            <div class="btn-analytics-graph">
+                                <div class="btn-analytics-points"></div>
+                                <div class="btn-analytics-indicators">
+                                    <div class="btn-indicator-dot"></div>
+                                    <div class="btn-indicator-dot"></div>
+                                    <div class="btn-indicator-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            </div>
-            <div class="philosophy-badge">
-                "0 = we didn't exist, 1 = we exist now, data = we exist in data"
             </div>
         </section>
         
-        <!-- Services Section -->
         <section class="services" id="services">
             <div class="container">
                 <div class="section-header">
@@ -534,74 +2322,247 @@
                     <p>Comprehensive data solutions tailored to your research and business needs</p>
                 </div>
                 <div class="services-grid">
-                    <div class="service-card">
-                        <span class="service-icon">🐍</span>
-                        <h3>Python Data Analysis</h3>
-                        <p>Advanced data processing, cleaning, and analysis using Python. From pandas to machine learning, we handle complex datasets with precision and efficiency.</p>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-icon">📊</span>
-                        <h3>Statistical Analysis</h3>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="15" y="70" width="8" height="20" rx="2"/>
+                                <rect x="30" y="55" width="8" height="35" rx="2"/>
+                                <rect x="45" y="40" width="8" height="50" rx="2"/>
+                                <rect x="60" y="30" width="8" height="60" rx="2"/>
+                                <rect x="75" y="45" width="8" height="45" rx="2"/>
+                                <path d="M10 25 L25 20 L40 15 L55 10 L70 15 L85 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <circle cx="25" cy="20" r="3"/>
+                                <circle cx="40" cy="15" r="3"/>
+                                <circle cx="55" cy="10" r="3"/>
+                                <circle cx="70" cy="15" r="3"/>
+                                <circle cx="85" cy="12" r="3"/>
+                            </svg>
+                        </div>
+                        <h3>Advanced Statistical Analysis</h3>
                         <p>Rigorous statistical modeling and hypothesis testing. We provide comprehensive analysis with clear interpretations and actionable recommendations.</p>
                     </div>
-                    <div class="service-card">
-                        <span class="service-icon">📝</span>
-                        <h3>Research Manuscripts</h3>
-                        <p>Professional manuscript preparation for academic publications. We ensure your research meets the highest standards of scientific communication.</p>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-icon">📈</span>
-                        <h3>Data Visualization</h3>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="10" y="10" width="80" height="50" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <path d="M15 45 L30 35 L45 25 L60 30 L75 20 L85 25" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                                <circle cx="30" cy="35" r="2.5"/>
+                                <circle cx="45" cy="25" r="2.5"/>
+                                <circle cx="60" cy="30" r="2.5"/>
+                                <circle cx="75" cy="20" r="2.5"/>
+                                <rect x="15" y="70" width="25" height="20" rx="2"/>
+                                <circle cx="27.5" cy="80" r="6"/>
+                                <path d="M21.5 80 L27.5 74 L33.5 80 Z"/>
+                                <rect x="50" y="70" width="35" height="20" rx="2"/>
+                                <rect x="55" y="75" width="6" height="10" rx="1"/>
+                                <rect x="65" y="77" width="6" height="8" rx="1"/>
+                                <rect x="75" y="74" width="6" height="11" rx="1"/>
+                            </svg>
+                        </div>
+                        <h3>Advanced Data Visualization</h3>
                         <p>Create compelling visualizations that tell your data's story. Interactive dashboards and publication-ready figures that communicate insights clearly.</p>
                     </div>
-                    <div class="service-card">
-                        <span class="service-icon">🔬</span>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="20" cy="25" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="20" cy="50" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="20" cy="75" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="50" cy="20" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="50" cy="40" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="50" cy="60" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="50" cy="80" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="80" cy="35" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="80" cy="65" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <path d="M26 25 L44 20" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 25 L44 40" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 50 L44 40" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 50 L44 60" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 75 L44 60" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 75 L44 80" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M56 20 L74 35" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M56 40 L74 35" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M56 60 L74 65" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M56 80 L74 65" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <circle cx="20" cy="25" r="2"/>
+                                <circle cx="50" cy="40" r="2"/>
+                                <circle cx="80" cy="35" r="2"/>
+                            </svg>
+                        </div>
+                        <h3>Predictive AI/ML Models</h3>
+                        <p>Advanced machine learning and artificial intelligence solutions for predictive analytics. We develop custom models for forecasting, classification, and pattern recognition to drive data-driven decision making.</p>
+                    </div>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="15" y="15" width="50" height="65" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <line x1="22" y1="25" x2="50" y2="25" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="22" y1="35" x2="58" y2="35" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="22" y1="45" x2="55" y2="45" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="22" y1="55" x2="52" y2="55" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="22" y1="65" x2="45" y2="65" stroke="currentColor" stroke-width="1.5"/>
+                                <circle cx="65" cy="50" r="12" fill="none" stroke="currentColor" stroke-width="2.5"/>
+                                <path d="M74 59 L85 70" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                <circle cx="65" cy="50" r="6" fill="currentColor" opacity="0.3"/>
+                                <path d="M60 45 L70 55" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M70 45 L60 55" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </div>
                         <h3>Research Consulting</h3>
                         <p>Expert guidance on research design, methodology, and data strategy. We help you make informed decisions from project conception to publication.</p>
                     </div>
-                    <div class="service-card">
-                        <span class="service-icon">⚡</span>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Neural Network Neurons -->
+                                <circle class="neuron" cx="20" cy="30" r="4"/>
+                                <circle class="neuron" cx="20" cy="50" r="4"/>
+                                <circle class="neuron" cx="20" cy="70" r="4"/>
+                                
+                                <circle class="neuron" cx="50" cy="25" r="4"/>
+                                <circle class="neuron" cx="50" cy="40" r="4"/>
+                                <circle class="neuron" cx="50" cy="55" r="4"/>
+                                <circle class="neuron" cx="50" cy="70" r="4"/>
+                                
+                                <circle class="neuron" cx="80" cy="45" r="4"/>
+                                <circle class="neuron" cx="80" cy="60" r="4"/>
+                                
+                                <!-- Neural Connections -->
+                                <line class="connection" x1="24" y1="30" x2="46" y2="25" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="30" x2="46" y2="40" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="50" x2="46" y2="40" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="50" x2="46" y2="55" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="70" x2="46" y2="55" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="70" x2="46" y2="70" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                
+                                <line class="connection" x1="54" y1="25" x2="76" y2="45" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="54" y1="40" x2="76" y2="45" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="54" y1="55" x2="76" y2="60" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="54" y1="70" x2="76" y2="60" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                
+                                <!-- Prediction Arrow -->
+                                <path class="prediction-arrow" d="M85 52 L95 52 M92 49 L95 52 L92 55" 
+                                      stroke="currentColor" stroke-width="2"/>
+                                
+                                <!-- AI Brain Waves -->
+                                <path class="brain-waves" d="M15 15 Q25 10 35 15 Q45 20 55 15" 
+                                      stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.6"/>
+                                
+                                <!-- ML Algorithm Symbol -->
+                                <text x="30" y="10" font-size="8" fill="currentColor" font-weight="bold">ML</text>
+                                
+                                <!-- Prediction Accuracy -->
+                                <text x="70" y="25" font-size="6" fill="currentColor">98.7%</text>
+                                
+                                <!-- Deep Learning Layers Indicator -->
+                                <rect x="5" y="85" width="90" height="2" opacity="0.4" rx="1"/>
+                                <rect x="10" y="88" width="80" height="2" opacity="0.4" rx="1"/>
+                                <rect x="15" y="91" width="70" height="2" opacity="0.4" rx="1"/>
+                                <text x="35" y="98" font-size="6" fill="currentColor">Deep Learning</text>
+                            </svg>
+                        </div>
                         <h3>Custom Solutions</h3>
-                        <p>Tailored data solutions for unique challenges. Whether it's automation, custom algorithms, or specialized analysis - we deliver results.</p>
+                        <p>Tailored data solutions for unique challenges. We architect custom analytical frameworks, algorithms, and methodologies that perfectly match your specific requirements and deliver innovative results.</p>
+                    </div>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Executive command center screen -->
+                                <rect x="10" y="20" width="80" height="50" rx="8" fill="none" stroke="currentColor" stroke-width="2.5"/>
+                                <rect x="10" y="20" width="80" height="12" rx="8" fill="currentColor" opacity="0.15"/>
+                                
+                                <!-- AI Brain in center -->
+                                <circle cx="50" cy="45" r="12" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <path d="M42 40 Q45 35 50 40 Q55 35 58 40" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                                <path d="M42 50 Q45 55 50 50 Q55 55 58 50" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                                <circle cx="45" cy="42" r="1.5" fill="currentColor"/>
+                                <circle cx="55" cy="42" r="1.5" fill="currentColor"/>
+                                <path d="M47 47 Q50 49 53 47" stroke="currentColor" stroke-width="1" fill="none"/>
+                                
+                                <!-- Data streams flowing to brain -->
+                                <path d="M20 35 Q30 40 38 42" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+                                <path d="M20 50 Q30 45 38 47" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+                                <path d="M80 35 Q70 40 62 42" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+                                <path d="M80 50 Q70 45 62 47" stroke="currentColor" stroke-width="2" fill="none" opacity="0.7"/>
+                                
+                                <!-- Executive KPI indicators -->
+                                <rect x="15" y="25" width="8" height="5" rx="1" fill="currentColor" opacity="0.6"/>
+                                <rect x="25" y="25" width="8" height="5" rx="1" fill="currentColor" opacity="0.6"/>
+                                <rect x="77" y="25" width="8" height="5" rx="1" fill="currentColor" opacity="0.6"/>
+                                
+                                <!-- Strategic arrows pointing to insights -->
+                                <path d="M50 57 L50 65 M47 62 L50 65 L53 62" stroke="currentColor" stroke-width="2" fill="none"/>
+                                
+                                <!-- CEO crown/authority symbol -->
+                                <path d="M45 15 L47 10 L50 12 L53 10 L55 15 L50 18 Z" fill="currentColor" opacity="0.8"/>
+                                <circle cx="50" cy="13" r="1" fill="white"/>
+                                
+                                <!-- Strategic database foundation -->
+                                <ellipse cx="50" cy="75" rx="15" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <ellipse cx="50" cy="80" rx="15" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <ellipse cx="50" cy="85" rx="15" ry="5" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <line x1="35" y1="75" x2="35" y2="85" stroke="currentColor" stroke-width="2"/>
+                                <line x1="65" y1="75" x2="65" y2="85" stroke="currentColor" stroke-width="2"/>
+                                
+                                <!-- Intelligence network connections -->
+                                <circle cx="25" cy="40" r="2" fill="currentColor" opacity="0.5"/>
+                                <circle cx="75" cy="40" r="2" fill="currentColor" opacity="0.5"/>
+                                <circle cx="30" cy="55" r="2" fill="currentColor" opacity="0.5"/>
+                                <circle cx="70" cy="55" r="2" fill="currentColor" opacity="0.5"/>
+                            </svg>
+                        </div>
+                        <h3>Executive Intelligence Platform</h3>
+                        <p>AI-powered executive command center that transforms your enterprise SQL databases into strategic intelligence. Delivers instant insights with natural language queries like "What drove our 23% revenue spike last week?" - empowering C-suite leaders with real-time competitive intelligence and predictive business analytics.</p>
                     </div>
                 </div>
             </div>
         </section>
         
-        <!-- Contact Section -->
-        <section class="contact" id="contact">
+        <section class="about" id="about">
             <div class="container">
-                <div class="contact-content">
-                    <h2>Ready to Transform Your Data?</h2>
-                    <p>Let's discuss how we can help you unlock insights from your data and achieve your research goals.</p>
-                    <a href="mailto:info@01data.org" class="contact-email">info@01data.org</a>
+                <div class="section-header">
+                    <h2>About</h2>
+                    <p>Your trusted partner in data-driven decision making</p>
+                </div>
+                <div class="about-content glass">
+                    <div class="about-text">
+                        <p>Based in the United States of America, we have advanced data analysis expertise dedicated to providing custom solutions for researchers, businesses, and organizations worldwide. We combine cutting-edge statistical methodologies with practical insights to help our clients unlock the full potential of their data.</p>
+                        <p>Our team of experienced data scientists and statisticians brings years of expertise in transforming complex datasets into actionable intelligence. Whether you're conducting academic research, making business decisions, or seeking to understand patterns in your data, we provide tailored solutions that meet your unique requirements.</p>
+                        <p>We believe that every dataset contains valuable insights waiting to be discovered. Our mission is to help you uncover, understand, and communicate those insights with precision and clarity.</p>
+                    </div>
                 </div>
             </div>
         </section>
         
-        <!-- Footer -->
+        <section class="contact" id="contact">
+            <div class="container">
+                <div class="contact-content glass">
+                    <h2>Ready to Transform Your Data?</h2>
+                    <p>Let's discuss how we can help you unlock insights from your data and achieve your research goals.</p>
+                    <a href="mailto:support@01data.org" class="contact-email">support@01data.org</a>
+                </div>
+            </div>
+        </section>
+        
         <footer>
             <div class="container">
                 <p>&copy; 2025 01data.org - Professional Data Analysis & Research Services</p>
             </div>
         </footer>
     </div>
-    
-    <!-- Animation Controls -->
-    <div class="animation-controls">
-        <button class="control-btn" onclick="toggleAnimation()">Pause</button>
-        <button class="control-btn" onclick="resetView()">Reset</button>
-        <button class="control-btn" onclick="toggleEffects()">Effects</button>
-    </div>
-    
-    <!-- Performance Stats -->
-    <div class="stats">
-        <div>Elements: <span id="elementCount">0</span></div>
-        <div>FPS: <span id="fps">60</span></div>
-    </div>
 
     <script>
-        // Three.js Animation (Enhanced from your original)
+        // Optimized Three.js Animation
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         const renderer = new THREE.WebGLRenderer({ 
@@ -613,398 +2574,211 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.setClearColor(0x000000, 0);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.getElementById('animation-container').appendChild(renderer.domElement);
 
-        // Enhanced lighting system
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
-        scene.add(ambientLight);
-        
+        // Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
         const directionalLight = new THREE.DirectionalLight(0x4db6ac, 1.2);
         directionalLight.position.set(20, 20, 10);
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.width = 2048;
-        directionalLight.shadow.mapSize.height = 2048;
         scene.add(directionalLight);
-
-        const pointLight1 = new THREE.PointLight(0x26a69a, 0.8, 200);
-        pointLight1.position.set(-30, -30, -10);
-        scene.add(pointLight1);
-
-        const pointLight2 = new THREE.PointLight(0x80cbc4, 0.6, 150);
-        pointLight2.position.set(30, 30, 20);
-        scene.add(pointLight2);
-
-        // Add atmospheric fog
+        const pointLight = new THREE.PointLight(0x26a69a, 0.8, 200);
+        pointLight.position.set(-30, -30, -10);
+        scene.add(pointLight);
         scene.fog = new THREE.Fog(0xf0fffe, 50, 200);
 
-        // Animation control variables
-        let animationPaused = false;
-        let effectsEnabled = true;
-        let animationSpeed = 1;
-
-        // Performance monitoring
-        let fps = 60;
-        let lastTime = performance.now();
-        let frameCount = 0;
-
-        // Data particles system
-        const particleCount = 80;
-        const graphCount = 40;
-        const connectionCount = 20;
+        // Particle system
         const particles = new THREE.Group();
         const dataElements = [];
-        const connections = [];
+        const particleCount = 30;
+        const graphCount = 15;
 
-        // Your enhanced graph creation functions (abbreviated for space)
-        function createGraph(type, size = 112) {
+        // Create simple charts
+        function createChart(type, size = 48) {
             const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = size;
-            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.height = size;
             
-            // Enhanced background with gradient
-            const gradient = context.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
-            gradient.addColorStop(1, 'rgba(240, 255, 254, 0.95)');
-            context.fillStyle = gradient;
-            context.fillRect(0, 0, size, size);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(0, 0, size, size);
+            ctx.strokeStyle = 'rgba(44, 95, 93, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(2, 2, size - 4, size - 4);
             
-            // Enhanced border with glow effect
-            context.shadowColor = 'rgba(77, 182, 172, 0.3)';
-            context.shadowBlur = 10;
-            context.strokeStyle = 'rgba(44, 95, 93, 0.4)';
-            context.lineWidth = 2;
-            context.strokeRect(5, 5, size - 10, size - 10);
-            context.shadowBlur = 0;
+            const colors = ['#4db6ac', '#26a69a', '#80cbc4'];
             
-            const colors = [
-                'rgba(77, 182, 172, 0.9)',
-                'rgba(38, 166, 154, 0.9)',
-                'rgba(0, 150, 136, 0.9)',
-                'rgba(128, 203, 196, 0.9)',
-                'rgba(178, 223, 219, 0.9)'
-            ];
-            
-            // Simplified chart creation for demo
             switch(type) {
                 case 'line':
-                    createLineChart(context, size, colors);
+                    ctx.strokeStyle = colors[0];
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        const x = 6 + (i / 4) * (size - 12);
+                        const y = 6 + Math.random() * (size - 12);
+                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
                     break;
                 case 'bar':
-                    createBarChart(context, size, colors);
+                    for (let i = 0; i < 3; i++) {
+                        const x = 8 + i * (size - 16) / 3;
+                        const h = Math.random() * (size - 16) + 4;
+                        ctx.fillStyle = colors[i];
+                        ctx.fillRect(x, size - h - 6, (size - 16) / 4, h);
+                    }
                     break;
                 case 'pie':
-                    createPieChart(context, size, colors);
+                    const centerX = size / 2, centerY = size / 2, radius = size * 0.2;
+                    let angle = 0;
+                    [0.5, 0.3, 0.2].forEach((segment, i) => {
+                        const sliceAngle = segment * Math.PI * 2;
+                        ctx.fillStyle = colors[i];
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.arc(centerX, centerY, radius, angle, angle + sliceAngle);
+                        ctx.closePath();
+                        ctx.fill();
+                        angle += sliceAngle;
+                    });
                     break;
-                default:
-                    createLineChart(context, size, colors);
             }
-            
             return new THREE.CanvasTexture(canvas);
         }
 
-        function createLineChart(ctx, size, colors) {
-            const padding = 20;
-            const chartWidth = size - 2 * padding;
-            const chartHeight = size - 2 * padding;
-            
-            // Generate smooth curve data
-            const points = [];
-            for (let i = 0; i < 8; i++) {
-                points.push({
-                    x: padding + (i / 7) * chartWidth,
-                    y: padding + chartHeight * (0.3 + 0.4 * Math.sin(i * 0.5) + 0.1 * Math.random())
-                });
-            }
-            
-            // Draw line with gradient
-            const gradient = ctx.createLinearGradient(0, padding, 0, size - padding);
-            gradient.addColorStop(0, colors[0]);
-            gradient.addColorStop(1, colors[1]);
-            
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (let i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i].x, points[i].y);
-            }
-            ctx.stroke();
-            
-            // Points
-            points.forEach((point) => {
-                ctx.fillStyle = colors[1];
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
-
-        function createBarChart(ctx, size, colors) {
-            const padding = 20;
-            const chartWidth = size - 2 * padding;
-            const chartHeight = size - 2 * padding;
-            const barCount = 5;
-            const barWidth = chartWidth / barCount * 0.7;
-            
-            for (let i = 0; i < barCount; i++) {
-                const height = Math.random() * chartHeight * 0.8 + chartHeight * 0.1;
-                const x = padding + i * (chartWidth / barCount);
-                const y = size - padding - height;
-                
-                ctx.fillStyle = colors[i % colors.length];
-                ctx.fillRect(x, y, barWidth, height);
-            }
-        }
-
-        function createPieChart(ctx, size, colors) {
-            const centerX = size / 2;
-            const centerY = size / 2;
-            const radius = Math.min(size, size) * 0.3;
-            
-            const segments = [0.4, 0.3, 0.2, 0.1];
-            let currentAngle = 0;
-            
-            segments.forEach((segment, index) => {
-                const sliceAngle = segment * Math.PI * 2;
-                
-                ctx.fillStyle = colors[index % colors.length];
-                ctx.beginPath();
-                ctx.moveTo(centerX, centerY);
-                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
-                ctx.closePath();
-                ctx.fill();
-                
-                currentAngle += sliceAngle;
-            });
-        }
-
-        // Create enhanced floating elements
+        // Create elements
         const graphTypes = ['line', 'bar', 'pie'];
         
-        // Create graphs (reduced count for performance)
         for (let i = 0; i < graphCount; i++) {
-            const graphType = graphTypes[Math.floor(Math.random() * graphTypes.length)];
-            const texture = createGraph(graphType, 90);
-            
-            const material = new THREE.SpriteMaterial({ 
-                map: texture, 
-                transparent: true,
-                opacity: 0.3 + Math.random() * 0.3
-            });
-            
+            const texture = createChart(graphTypes[Math.floor(Math.random() * 3)]);
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.5 });
             const sprite = new THREE.Sprite(material);
-            const scale = 2 + Math.random() * 2;
-            sprite.scale.set(scale, scale, 1);
-            
+            sprite.scale.setScalar(1.2 + Math.random() * 0.8);
             sprite.position.set(
-                (Math.random() - 0.5) * 120,
-                (Math.random() - 0.5) * 120,
-                (Math.random() - 0.5) * 120
+                (Math.random() - 0.5) * 80,
+                (Math.random() - 0.5) * 80,
+                (Math.random() - 0.5) * 80
             );
-            
             sprite.userData = {
-                initialX: sprite.position.x,
-                initialY: sprite.position.y,
-                initialZ: sprite.position.z,
-                speed: 0.2 + Math.random() * 0.4,
-                amplitude: 1 + Math.random() * 1.5,
+                speed: 0.3 + Math.random() * 0.3,
+                amplitude: 1 + Math.random(),
                 phase: Math.random() * Math.PI * 2,
-                rotationSpeed: 0.002 + Math.random() * 0.005,
-                type: 'graph'
+                initialPos: sprite.position.clone()
             };
-            
             particles.add(sprite);
             dataElements.push(sprite);
         }
 
-        // Create data numbers (reduced count)
         for (let i = 0; i < particleCount; i++) {
-            const dataChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-            const char = dataChars[Math.floor(Math.random() * dataChars.length)];
-            
             const canvas = document.createElement('canvas');
-            const context = canvas.getContext('2d');
-            canvas.width = 48;
-            canvas.height = 48;
-            
-            context.fillStyle = `hsl(${160 + Math.random() * 40}, 60%, ${50 + Math.random() * 30}%)`;
-            context.font = 'bold 20px Arial';
-            context.textAlign = 'center';
-            context.fillText(char, 24, 30);
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.height = 24;
+            ctx.fillStyle = `hsl(${160 + Math.random() * 40}, 60%, ${50 + Math.random() * 30}%)`;
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(Math.floor(Math.random() * 10), 12, 16);
             
             const texture = new THREE.CanvasTexture(canvas);
-            const material = new THREE.SpriteMaterial({ 
-                map: texture, 
-                transparent: true,
-                opacity: 0.2 + Math.random() * 0.3
-            });
-            
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.4 });
             const sprite = new THREE.Sprite(material);
-            sprite.scale.set(1, 1, 1);
-            
+            sprite.scale.setScalar(0.6);
             sprite.position.set(
-                (Math.random() - 0.5) * 100,
-                (Math.random() - 0.5) * 100,
-                (Math.random() - 0.5) * 100
+                (Math.random() - 0.5) * 60,
+                (Math.random() - 0.5) * 60,
+                (Math.random() - 0.5) * 60
             );
-            
             sprite.userData = {
-                initialX: sprite.position.x,
-                initialY: sprite.position.y,
-                initialZ: sprite.position.z,
-                speed: 0.3 + Math.random() * 0.5,
-                amplitude: 1 + Math.random() * 2,
+                speed: 0.4 + Math.random() * 0.4,
+                amplitude: 1 + Math.random(),
                 phase: Math.random() * Math.PI * 2,
-                type: 'number'
+                initialPos: sprite.position.clone()
             };
-            
             particles.add(sprite);
             dataElements.push(sprite);
         }
 
         scene.add(particles);
+        camera.position.set(0, 0, 40);
 
-        // Camera setup
-        camera.position.set(0, 0, 50);
-        let cameraTarget = new THREE.Vector3(0, 0, 0);
-
-        // Mouse interaction
+        // Animation variables
         let mouse = new THREE.Vector2();
         let mouseTarget = new THREE.Vector2();
         let time = 0;
 
-        // Control functions
-        window.toggleAnimation = function() {
-            animationPaused = !animationPaused;
-            document.querySelector('.control-btn').textContent = animationPaused ? 'Play' : 'Pause';
-        };
-
-        window.resetView = function() {
-            camera.position.set(0, 0, 50);
-            cameraTarget.set(0, 0, 0);
-            mouse.set(0, 0);
-            mouseTarget.set(0, 0);
-        };
-
-        window.toggleEffects = function() {
-            effectsEnabled = !effectsEnabled;
-            scene.fog = effectsEnabled ? new THREE.Fog(0xf0fffe, 50, 200) : null;
-        };
-
         // Animation loop
         function animate() {
             requestAnimationFrame(animate);
-            
-            if (!animationPaused) {
-                time += 0.006 * animationSpeed;
+            time += 0.006;
 
-                // Animate data elements
-                dataElements.forEach((element) => {
-                    const userData = element.userData;
-                    
-                    element.position.x = userData.initialX + 
-                        Math.sin(time * userData.speed + userData.phase) * userData.amplitude;
-                    element.position.y = userData.initialY + 
-                        Math.cos(time * userData.speed * 0.7 + userData.phase) * userData.amplitude;
-                    element.position.z = userData.initialZ + 
-                        Math.sin(time * userData.speed * 0.5 + userData.phase) * userData.amplitude * 0.5;
-                    
-                    if (userData.rotationSpeed) {
-                        element.rotation.z += userData.rotationSpeed;
-                    }
-                });
+            dataElements.forEach((element) => {
+                const { speed, amplitude, phase, initialPos } = element.userData;
+                element.position.x = initialPos.x + Math.sin(time * speed + phase) * amplitude;
+                element.position.y = initialPos.y + Math.cos(time * speed * 0.7 + phase) * amplitude;
+                element.position.z = initialPos.z + Math.sin(time * speed * 0.5 + phase) * amplitude * 0.5;
+            });
 
-                // Enhanced camera movement
-                mouseTarget.x += (mouse.x - mouseTarget.x) * 0.02;
-                mouseTarget.y += (mouse.y - mouseTarget.y) * 0.02;
-                
-                camera.position.x += (mouseTarget.x * 5 - camera.position.x) * 0.02;
-                camera.position.y += (mouseTarget.y * 5 - camera.position.y) * 0.02;
-                
-                // Smooth camera orbit
-                const radius = 50 + Math.sin(time * 0.1) * 3;
-                camera.position.z = radius + Math.cos(time * 0.08) * 2;
-                
-                camera.lookAt(cameraTarget);
+            mouseTarget.lerp(mouse, 0.02);
+            camera.position.x += (mouseTarget.x * 3 - camera.position.x) * 0.02;
+            camera.position.y += (mouseTarget.y * 3 - camera.position.y) * 0.02;
+            camera.position.z = 40 + Math.sin(time * 0.1) * 2;
+            camera.lookAt(0, 0, 0);
 
-                // Rotate particle system
-                particles.rotation.y += 0.0008;
-                particles.rotation.x += 0.0003;
-
-                // Animate lights
-                pointLight1.position.x = Math.sin(time * 0.7) * 30;
-                pointLight1.position.z = Math.cos(time * 0.7) * 30;
-                pointLight2.position.y = Math.sin(time * 0.5) * 25;
-            }
+            particles.rotation.y += 0.0005;
+            particles.rotation.x += 0.0002;
+            pointLight.position.x = Math.sin(time * 0.5) * 20;
 
             renderer.render(scene, camera);
-
-            // Performance monitoring
-            frameCount++;
-            const currentTime = performance.now();
-            if (currentTime - lastTime >= 1000) {
-                fps = Math.round(frameCount / ((currentTime - lastTime) / 1000));
-                document.getElementById('fps').textContent = fps;
-                frameCount = 0;
-                lastTime = currentTime;
-            }
         }
 
-        // Mouse interaction
-        document.addEventListener('mousemove', (event) => {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        // Event listeners
+        document.addEventListener('mousemove', (e) => {
+            mouse.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
         });
 
-        // Touch support
-        document.addEventListener('touchmove', (event) => {
-            event.preventDefault();
-            const touch = event.touches[0];
-            mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
-        });
-
-        // Window resize handler
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Smooth scrolling for navigation links
+        // Navigation
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
+                target?.scrollIntoView({ behavior: 'smooth' });
             });
         });
 
-        // Navbar scroll effect
         window.addEventListener('scroll', () => {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
         });
+
+        // Logo interactions
+        const logoContainer = document.querySelector('.logo-container');
+        const logoBrain = document.querySelector('.logo-brain');
+        
+        if (logoContainer && logoBrain) {
+            logoContainer.addEventListener('mouseenter', () => {
+                logoBrain.style.transform = 'scale(1.1)';
+                logoBrain.style.transition = 'transform 0.3s ease';
+            });
+            
+            logoContainer.addEventListener('mouseleave', () => {
+                logoBrain.style.transform = 'scale(1)';
+            });
+
+            // Add click interaction
+            logoContainer.addEventListener('click', () => {
+                logoBrain.style.animation = 'logoBrainGlow 0.5s ease-in-out';
+                setTimeout(() => {
+                    logoBrain.style.animation = 'logoBrainGlow 3s ease-in-out infinite alternate';
+                }, 500);
+            });
+        }
 
         // Initialize
         setTimeout(() => {
             document.getElementById('loading').style.display = 'none';
-            document.getElementById('elementCount').textContent = dataElements.length;
-        }, 2000);
+        }, 1500);
 
         animate();
     </script>
