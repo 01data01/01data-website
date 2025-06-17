@@ -1,0 +1,1012 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01data - Transform Your Data Into Insights</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: radial-gradient(ellipse at center, #f0fffe 0%, #e8f8f5 40%, #e1f5fe 100%);
+            color: #2c5f5d;
+            line-height: 1.6;
+        }
+        
+        /* Animation Canvas Background */
+        #animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        #animation-container canvas {
+            display: block;
+            pointer-events: auto;
+        }
+        
+        /* Content Overlay */
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+            background: transparent;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 0;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+        
+        nav.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c5f5d;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: #2c5f5d;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: #4db6ac;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: #4db6ac;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, #4db6ac, #26a69a);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(77, 182, 172, 0.3);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.4);
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            padding: 0 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #2c5f5d, #4db6ac, #26a69a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #2c5f5d;
+            font-weight: 500;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: rgba(44, 95, 93, 0.8);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4db6ac, #26a69a);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: #2c5f5d;
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(77, 182, 172, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(77, 182, 172, 0.1);
+            border-color: #4db6ac;
+            transform: translateY(-2px);
+        }
+        
+        /* Philosophy Badge */
+        .philosophy-badge {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            padding: 15px 25px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.9rem;
+            color: rgba(44, 95, 93, 0.8);
+            animation: fadeIn 2s ease-out 1s both;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Services Section */
+        .services {
+            padding: 100px 0;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c5f5d;
+        }
+        
+        .section-header p {
+            font-size: 1.2rem;
+            color: rgba(44, 95, 93, 0.7);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        
+        .service-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 40px 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        .service-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c5f5d;
+        }
+        
+        .service-card p {
+            color: rgba(44, 95, 93, 0.8);
+            line-height: 1.6;
+        }
+        
+        /* Contact Section */
+        .contact {
+            padding: 100px 0;
+        }
+        
+        .contact-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 60px 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .contact h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c5f5d;
+        }
+        
+        .contact p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: rgba(44, 95, 93, 0.8);
+        }
+        
+        .contact-email {
+            display: inline-block;
+            background: linear-gradient(135deg, #4db6ac, #26a69a);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
+        }
+        
+        .contact-email:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
+        }
+        
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            background: rgba(44, 95, 93, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        footer p {
+            color: rgba(44, 95, 93, 0.7);
+        }
+        
+        /* Animation Controls */
+        .animation-controls {
+            position: fixed;
+            top: 120px;
+            right: 30px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #2c5f5d;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .control-btn:hover {
+            background: rgba(77, 182, 172, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* Performance Stats */
+        .stats {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            color: rgba(44, 95, 93, 0.6);
+            font-size: 0.8rem;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-content {
+                padding: 40px 20px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .animation-controls {
+                top: 80px;
+                right: 10px;
+            }
+            
+            .stats {
+                bottom: 10px;
+                left: 10px;
+                font-size: 0.7rem;
+            }
+        }
+        
+        /* Loading Screen */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #2c5f5d;
+            font-size: 1.2rem;
+            z-index: 200;
+            animation: pulse 2s infinite;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animation Background -->
+    <div id="animation-container">
+        <div id="loading">Initializing Data Visualization...</div>
+    </div>
+    
+    <!-- Content Overlay -->
+    <div class="content-overlay">
+        <!-- Navigation -->
+        <nav id="navbar">
+            <div class="nav-container">
+                <a href="#" class="logo">01data</a>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <a href="#contact" class="cta-button">Get Started</a>
+            </div>
+        </nav>
+        
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1>Transform Data Into Insights</h1>
+                <p class="hero-subtitle">Professional Python Analysis • Statistical Modeling • Research Excellence</p>
+                <p class="hero-description">
+                    We turn complex datasets into actionable insights through advanced statistical analysis, 
+                    Python programming, and research manuscript preparation.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="btn-primary">Start Your Project</a>
+                    <a href="#services" class="btn-secondary">Our Services</a>
+                </div>
+            </div>
+            <div class="philosophy-badge">
+                "0 = we didn't exist, 1 = we exist now, data = we exist in data"
+            </div>
+        </section>
+        
+        <!-- Services Section -->
+        <section class="services" id="services">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Our Expertise</h2>
+                    <p>Comprehensive data solutions tailored to your research and business needs</p>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <span class="service-icon">🐍</span>
+                        <h3>Python Data Analysis</h3>
+                        <p>Advanced data processing, cleaning, and analysis using Python. From pandas to machine learning, we handle complex datasets with precision and efficiency.</p>
+                    </div>
+                    <div class="service-card">
+                        <span class="service-icon">📊</span>
+                        <h3>Statistical Analysis</h3>
+                        <p>Rigorous statistical modeling and hypothesis testing. We provide comprehensive analysis with clear interpretations and actionable recommendations.</p>
+                    </div>
+                    <div class="service-card">
+                        <span class="service-icon">📝</span>
+                        <h3>Research Manuscripts</h3>
+                        <p>Professional manuscript preparation for academic publications. We ensure your research meets the highest standards of scientific communication.</p>
+                    </div>
+                    <div class="service-card">
+                        <span class="service-icon">📈</span>
+                        <h3>Data Visualization</h3>
+                        <p>Create compelling visualizations that tell your data's story. Interactive dashboards and publication-ready figures that communicate insights clearly.</p>
+                    </div>
+                    <div class="service-card">
+                        <span class="service-icon">🔬</span>
+                        <h3>Research Consulting</h3>
+                        <p>Expert guidance on research design, methodology, and data strategy. We help you make informed decisions from project conception to publication.</p>
+                    </div>
+                    <div class="service-card">
+                        <span class="service-icon">⚡</span>
+                        <h3>Custom Solutions</h3>
+                        <p>Tailored data solutions for unique challenges. Whether it's automation, custom algorithms, or specialized analysis - we deliver results.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section class="contact" id="contact">
+            <div class="container">
+                <div class="contact-content">
+                    <h2>Ready to Transform Your Data?</h2>
+                    <p>Let's discuss how we can help you unlock insights from your data and achieve your research goals.</p>
+                    <a href="mailto:info@01data.org" class="contact-email">info@01data.org</a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <p>&copy; 2025 01data.org - Professional Data Analysis & Research Services</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Animation Controls -->
+    <div class="animation-controls">
+        <button class="control-btn" onclick="toggleAnimation()">Pause</button>
+        <button class="control-btn" onclick="resetView()">Reset</button>
+        <button class="control-btn" onclick="toggleEffects()">Effects</button>
+    </div>
+    
+    <!-- Performance Stats -->
+    <div class="stats">
+        <div>Elements: <span id="elementCount">0</span></div>
+        <div>FPS: <span id="fps">60</span></div>
+    </div>
+
+    <script>
+        // Three.js Animation (Enhanced from your original)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            alpha: true,
+            powerPreference: "high-performance"
+        });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.getElementById('animation-container').appendChild(renderer.domElement);
+
+        // Enhanced lighting system
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0x4db6ac, 1.2);
+        directionalLight.position.set(20, 20, 10);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 2048;
+        directionalLight.shadow.mapSize.height = 2048;
+        scene.add(directionalLight);
+
+        const pointLight1 = new THREE.PointLight(0x26a69a, 0.8, 200);
+        pointLight1.position.set(-30, -30, -10);
+        scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(0x80cbc4, 0.6, 150);
+        pointLight2.position.set(30, 30, 20);
+        scene.add(pointLight2);
+
+        // Add atmospheric fog
+        scene.fog = new THREE.Fog(0xf0fffe, 50, 200);
+
+        // Animation control variables
+        let animationPaused = false;
+        let effectsEnabled = true;
+        let animationSpeed = 1;
+
+        // Performance monitoring
+        let fps = 60;
+        let lastTime = performance.now();
+        let frameCount = 0;
+
+        // Data particles system
+        const particleCount = 80;
+        const graphCount = 40;
+        const connectionCount = 20;
+        const particles = new THREE.Group();
+        const dataElements = [];
+        const connections = [];
+
+        // Your enhanced graph creation functions (abbreviated for space)
+        function createGraph(type, size = 112) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = size;
+            canvas.height = size;
+            
+            // Enhanced background with gradient
+            const gradient = context.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
+            gradient.addColorStop(1, 'rgba(240, 255, 254, 0.95)');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, size, size);
+            
+            // Enhanced border with glow effect
+            context.shadowColor = 'rgba(77, 182, 172, 0.3)';
+            context.shadowBlur = 10;
+            context.strokeStyle = 'rgba(44, 95, 93, 0.4)';
+            context.lineWidth = 2;
+            context.strokeRect(5, 5, size - 10, size - 10);
+            context.shadowBlur = 0;
+            
+            const colors = [
+                'rgba(77, 182, 172, 0.9)',
+                'rgba(38, 166, 154, 0.9)',
+                'rgba(0, 150, 136, 0.9)',
+                'rgba(128, 203, 196, 0.9)',
+                'rgba(178, 223, 219, 0.9)'
+            ];
+            
+            // Simplified chart creation for demo
+            switch(type) {
+                case 'line':
+                    createLineChart(context, size, colors);
+                    break;
+                case 'bar':
+                    createBarChart(context, size, colors);
+                    break;
+                case 'pie':
+                    createPieChart(context, size, colors);
+                    break;
+                default:
+                    createLineChart(context, size, colors);
+            }
+            
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createLineChart(ctx, size, colors) {
+            const padding = 20;
+            const chartWidth = size - 2 * padding;
+            const chartHeight = size - 2 * padding;
+            
+            // Generate smooth curve data
+            const points = [];
+            for (let i = 0; i < 8; i++) {
+                points.push({
+                    x: padding + (i / 7) * chartWidth,
+                    y: padding + chartHeight * (0.3 + 0.4 * Math.sin(i * 0.5) + 0.1 * Math.random())
+                });
+            }
+            
+            // Draw line with gradient
+            const gradient = ctx.createLinearGradient(0, padding, 0, size - padding);
+            gradient.addColorStop(0, colors[0]);
+            gradient.addColorStop(1, colors[1]);
+            
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+            
+            // Points
+            points.forEach((point) => {
+                ctx.fillStyle = colors[1];
+                ctx.beginPath();
+                ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function createBarChart(ctx, size, colors) {
+            const padding = 20;
+            const chartWidth = size - 2 * padding;
+            const chartHeight = size - 2 * padding;
+            const barCount = 5;
+            const barWidth = chartWidth / barCount * 0.7;
+            
+            for (let i = 0; i < barCount; i++) {
+                const height = Math.random() * chartHeight * 0.8 + chartHeight * 0.1;
+                const x = padding + i * (chartWidth / barCount);
+                const y = size - padding - height;
+                
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.fillRect(x, y, barWidth, height);
+            }
+        }
+
+        function createPieChart(ctx, size, colors) {
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const radius = Math.min(size, size) * 0.3;
+            
+            const segments = [0.4, 0.3, 0.2, 0.1];
+            let currentAngle = 0;
+            
+            segments.forEach((segment, index) => {
+                const sliceAngle = segment * Math.PI * 2;
+                
+                ctx.fillStyle = colors[index % colors.length];
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fill();
+                
+                currentAngle += sliceAngle;
+            });
+        }
+
+        // Create enhanced floating elements
+        const graphTypes = ['line', 'bar', 'pie'];
+        
+        // Create graphs (reduced count for performance)
+        for (let i = 0; i < graphCount; i++) {
+            const graphType = graphTypes[Math.floor(Math.random() * graphTypes.length)];
+            const texture = createGraph(graphType, 90);
+            
+            const material = new THREE.SpriteMaterial({ 
+                map: texture, 
+                transparent: true,
+                opacity: 0.3 + Math.random() * 0.3
+            });
+            
+            const sprite = new THREE.Sprite(material);
+            const scale = 2 + Math.random() * 2;
+            sprite.scale.set(scale, scale, 1);
+            
+            sprite.position.set(
+                (Math.random() - 0.5) * 120,
+                (Math.random() - 0.5) * 120,
+                (Math.random() - 0.5) * 120
+            );
+            
+            sprite.userData = {
+                initialX: sprite.position.x,
+                initialY: sprite.position.y,
+                initialZ: sprite.position.z,
+                speed: 0.2 + Math.random() * 0.4,
+                amplitude: 1 + Math.random() * 1.5,
+                phase: Math.random() * Math.PI * 2,
+                rotationSpeed: 0.002 + Math.random() * 0.005,
+                type: 'graph'
+            };
+            
+            particles.add(sprite);
+            dataElements.push(sprite);
+        }
+
+        // Create data numbers (reduced count)
+        for (let i = 0; i < particleCount; i++) {
+            const dataChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            const char = dataChars[Math.floor(Math.random() * dataChars.length)];
+            
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 48;
+            canvas.height = 48;
+            
+            context.fillStyle = `hsl(${160 + Math.random() * 40}, 60%, ${50 + Math.random() * 30}%)`;
+            context.font = 'bold 20px Arial';
+            context.textAlign = 'center';
+            context.fillText(char, 24, 30);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ 
+                map: texture, 
+                transparent: true,
+                opacity: 0.2 + Math.random() * 0.3
+            });
+            
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.set(1, 1, 1);
+            
+            sprite.position.set(
+                (Math.random() - 0.5) * 100,
+                (Math.random() - 0.5) * 100,
+                (Math.random() - 0.5) * 100
+            );
+            
+            sprite.userData = {
+                initialX: sprite.position.x,
+                initialY: sprite.position.y,
+                initialZ: sprite.position.z,
+                speed: 0.3 + Math.random() * 0.5,
+                amplitude: 1 + Math.random() * 2,
+                phase: Math.random() * Math.PI * 2,
+                type: 'number'
+            };
+            
+            particles.add(sprite);
+            dataElements.push(sprite);
+        }
+
+        scene.add(particles);
+
+        // Camera setup
+        camera.position.set(0, 0, 50);
+        let cameraTarget = new THREE.Vector3(0, 0, 0);
+
+        // Mouse interaction
+        let mouse = new THREE.Vector2();
+        let mouseTarget = new THREE.Vector2();
+        let time = 0;
+
+        // Control functions
+        window.toggleAnimation = function() {
+            animationPaused = !animationPaused;
+            document.querySelector('.control-btn').textContent = animationPaused ? 'Play' : 'Pause';
+        };
+
+        window.resetView = function() {
+            camera.position.set(0, 0, 50);
+            cameraTarget.set(0, 0, 0);
+            mouse.set(0, 0);
+            mouseTarget.set(0, 0);
+        };
+
+        window.toggleEffects = function() {
+            effectsEnabled = !effectsEnabled;
+            scene.fog = effectsEnabled ? new THREE.Fog(0xf0fffe, 50, 200) : null;
+        };
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (!animationPaused) {
+                time += 0.006 * animationSpeed;
+
+                // Animate data elements
+                dataElements.forEach((element) => {
+                    const userData = element.userData;
+                    
+                    element.position.x = userData.initialX + 
+                        Math.sin(time * userData.speed + userData.phase) * userData.amplitude;
+                    element.position.y = userData.initialY + 
+                        Math.cos(time * userData.speed * 0.7 + userData.phase) * userData.amplitude;
+                    element.position.z = userData.initialZ + 
+                        Math.sin(time * userData.speed * 0.5 + userData.phase) * userData.amplitude * 0.5;
+                    
+                    if (userData.rotationSpeed) {
+                        element.rotation.z += userData.rotationSpeed;
+                    }
+                });
+
+                // Enhanced camera movement
+                mouseTarget.x += (mouse.x - mouseTarget.x) * 0.02;
+                mouseTarget.y += (mouse.y - mouseTarget.y) * 0.02;
+                
+                camera.position.x += (mouseTarget.x * 5 - camera.position.x) * 0.02;
+                camera.position.y += (mouseTarget.y * 5 - camera.position.y) * 0.02;
+                
+                // Smooth camera orbit
+                const radius = 50 + Math.sin(time * 0.1) * 3;
+                camera.position.z = radius + Math.cos(time * 0.08) * 2;
+                
+                camera.lookAt(cameraTarget);
+
+                // Rotate particle system
+                particles.rotation.y += 0.0008;
+                particles.rotation.x += 0.0003;
+
+                // Animate lights
+                pointLight1.position.x = Math.sin(time * 0.7) * 30;
+                pointLight1.position.z = Math.cos(time * 0.7) * 30;
+                pointLight2.position.y = Math.sin(time * 0.5) * 25;
+            }
+
+            renderer.render(scene, camera);
+
+            // Performance monitoring
+            frameCount++;
+            const currentTime = performance.now();
+            if (currentTime - lastTime >= 1000) {
+                fps = Math.round(frameCount / ((currentTime - lastTime) / 1000));
+                document.getElementById('fps').textContent = fps;
+                frameCount = 0;
+                lastTime = currentTime;
+            }
+        }
+
+        // Mouse interaction
+        document.addEventListener('mousemove', (event) => {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Touch support
+        document.addEventListener('touchmove', (event) => {
+            event.preventDefault();
+            const touch = event.touches[0];
+            mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Initialize
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('elementCount').textContent = dataElements.length;
+        }, 2000);
+
+        animate();
+    </script>
+</body>
+</html>
