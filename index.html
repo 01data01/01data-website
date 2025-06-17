@@ -3015,6 +3015,7 @@
             </div>
             
             <div class="privacy-note">
+                <strong>Demo Mode:</strong> Currently using simulated authentication. To enable real Google Sign-In, configure your Google Client ID in the code.<br><br>
                 By signing in, you agree to our <a href="#privacy">Privacy Policy</a> and <a href="#terms">Terms of Service</a>. Your data is protected and never shared without your consent.
             </div>
         </div>
@@ -3339,7 +3340,7 @@
 
         // Google Authentication System
         let currentUser = null;
-        const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID'; // Replace with your actual Google Client ID
+        const GOOGLE_CLIENT_ID = 'YOUR_ACTUAL_GOOGLE_CLIENT_ID'; // Replace with your real Google Client ID from Google Cloud Console
 
         // For demo purposes, we'll simulate Google Sign-In
         let isGoogleApiLoaded = false;
