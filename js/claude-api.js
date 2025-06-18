@@ -9,7 +9,6 @@ class ClaudeAPI {
         this.userEmail = null;
         this.baseUrl = '/.netlify/functions'; // Use Netlify Functions
         this.mockMode = false;
-        this.requestCache = new Map();
         this.maxRetries = 3;
         this.retryDelay = 1000; // 1 second base delay
         this.requestTimeout = 30000; // 30 seconds

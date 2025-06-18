@@ -9,27 +9,19 @@ class TaskManager {
         this.sortBy = 'priority'; // priority, dueDate, created, alphabetical
         this.sortOrder = 'asc';
         
-        // Performance optimizations
-        this.domCache = new Map();
+        // Event listener tracking for cleanup
         this.eventListeners = [];
-        this.dateCache = new Map();
-        this.filterCache = new Map();
-        this.lastRenderTime = 0;
-        this.minRenderInterval = 50; // Minimum time between renders (ms)
         
-        // Pre-compiled regex patterns for performance
+        // Pre-compiled regex patterns
         this.patterns = {
             todayDate: new RegExp(new Date().toISOString().split('T')[0]),
             timeFormat: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
         };
     }
 
-    // DOM caching utility for performance
+    // Simple DOM element getter
     getElement(id) {
-        if (!this.domCache.has(id)) {
-            this.domCache.set(id, document.getElementById(id));
-        }
-        return this.domCache.get(id);
+        return document.getElementById(id);
     }
 
     // Add event listener with cleanup tracking
@@ -44,19 +36,9 @@ class TaskManager {
             element.removeEventListener(event, handler, options);
         });
         this.eventListeners = [];
-        this.domCache.clear();
-        this.dateCache.clear();
-        this.filterCache.clear();
     }
 
     renderTasksList() {
-        // Throttle renders for performance
-        const now = Date.now();
-        if (now - this.lastRenderTime < this.minRenderInterval) {
-            return;
-        }
-        this.lastRenderTime = now;
-
         const container = this.getElement('allTasksList');
         if (!container) return;
 
@@ -73,8 +55,8 @@ class TaskManager {
             return;
         }
 
-        // Group tasks by status or date with performance optimization
-        const groupedTasks = this.groupTasksOptimized(sortedTasks);
+        // Group tasks by status or date
+        const groupedTasks = this.groupTasks(sortedTasks);
         
         // Use document fragment for better performance
         const fragment = document.createDocumentFragment();
@@ -90,24 +72,18 @@ class TaskManager {
     }
 
     getFilteredTasks() {
-        // Use cache for better performance
-        const cacheKey = `${this.currentFilter}-${this.assistant.tasks.length}-${this.assistant.tasks.map(t => t.id).join(',')}`;
-        if (this.filterCache.has(cacheKey)) {
-            return this.filterCache.get(cacheKey);
-        }
-
-        const filtered = this.assistant.tasks.filter(task => {
+        return this.assistant.tasks.filter(task => {
             switch (this.currentFilter) {
                 case 'pending':
                     return task.status === 'pending';
                 case 'completed':
                     return task.status === 'completed';
                 case 'overdue':
-                    return this.isOverdueOptimized(task);
+                    return this.isOverdue(task);
                 case 'today':
-                    return this.isDueTodayOptimized(task);
+                    return this.isDueToday(task);
                 case 'this-week':
-                    return this.isDueThisWeekOptimized(task);
+                    return this.isDueThisWeek(task);
                 case 'no-date':
                     return !task.dueDate;
                 case 'high-priority':
@@ -116,15 +92,6 @@ class TaskManager {
                     return true;
             }
         });
-
-        // Limit cache size to prevent memory issues
-        if (this.filterCache.size > 10) {
-            const firstKey = this.filterCache.keys().next().value;
-            this.filterCache.delete(firstKey);
-        }
-
-        this.filterCache.set(cacheKey, filtered);
-        return filtered;
     }
 
     getSortedTasks(tasks) {
@@ -157,8 +124,8 @@ class TaskManager {
         });
     }
 
-    // Optimized grouping with better performance for large task lists
-    groupTasksOptimized(tasks) {
+    // Group tasks by status and date
+    groupTasks(tasks) {
         const groups = {
             'Overdue': [],
             'Today': [],
@@ -169,12 +136,11 @@ class TaskManager {
             'Completed': []
         };
 
-        // Cache date calculations
         const today = this.getTodayString();
         const tomorrow = this.getTomorrowString();
         const weekEnd = this.getWeekEndDate();
 
-        // Single pass through tasks for optimal performance
+        // Categorize tasks
         tasks.forEach(task => {
             if (task.status === 'completed') {
                 groups['Completed'].push(task);

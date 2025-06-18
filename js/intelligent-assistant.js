@@ -13,8 +13,7 @@ class IntelligentAssistant {
         this.currentDate = new Date();
         this.storageKey = 'intelligent_assistant_data';
         
-        // Cache frequently used DOM elements
-        this.domCache = {};
+        // Track event listeners for cleanup
         this.eventListeners = [];
         
         this.initializeEventListeners();

@@ -13,11 +13,7 @@ class CalendarManager {
         this.hoursStart = 6; // Start time for day/week view
         this.hoursEnd = 22; // End time for day/week view
         
-        // Performance optimizations
-        this.dateCache = new Map();
-        this.taskCache = new Map();
-        this.lastRenderTime = 0;
-        this.minRenderInterval = 100; // Minimum time between renders (ms)
+        // Basic properties for calendar functionality
         
         this.initializeEventHandlers();
     }
@@ -61,16 +57,6 @@ class CalendarManager {
     }
 
     render() {
-        // Throttle renders for performance
-        const now = Date.now();
-        if (now - this.lastRenderTime < this.minRenderInterval) {
-            return;
-        }
-        this.lastRenderTime = now;
-        
-        // Clear task cache when rendering (data might have changed)
-        this.taskCache.clear();
-        
         switch (this.viewMode) {
             case 'month':
                 this.renderMonthView();
