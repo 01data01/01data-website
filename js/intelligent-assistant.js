@@ -149,6 +149,11 @@ class IntelligentAssistant {
             if (savedApiKey) {
                 document.getElementById('claudeApiKey').value = savedApiKey;
             }
+            
+            // Load mock mode setting
+            const mockMode = localStorage.getItem('claude_mock_mode') === 'true';
+            document.getElementById('mockModeToggle').checked = mockMode;
+            
             this.showModal('settingsModal');
         });
 
@@ -942,22 +947,25 @@ function closeModal(modalId) {
 
 function saveSettings() {
     const apiKey = document.getElementById('claudeApiKey').value;
+    const mockMode = document.getElementById('mockModeToggle').checked;
+    
+    // Save mock mode setting
+    localStorage.setItem('claude_mock_mode', mockMode.toString());
+    
     if (apiKey) {
         localStorage.setItem('claude_api_key', apiKey);
-        
-        // If the assistant has Claude API integration, set it up
-        if (window.assistant && window.assistant.setupClaudeAPI) {
-            window.assistant.setupClaudeAPI();
-        } else if (window.assistant && window.assistant.claudeAPI) {
-            window.assistant.claudeAPI.setApiKey(apiKey);
-            window.assistant.testAIConnection();
-        }
-        
-        window.assistant.showNotification('Settings saved successfully!', 'success');
-        window.assistant.closeModal('settingsModal');
-    } else {
-        window.assistant.showNotification('Please enter a valid API key', 'warning');
     }
+    
+    // Update Claude API settings
+    if (window.assistant && window.assistant.claudeAPI) {
+        if (apiKey) {
+            window.assistant.claudeAPI.setApiKey(apiKey);
+        }
+        window.assistant.claudeAPI.enableMockMode(mockMode);
+    }
+    
+    window.assistant.showNotification('Settings saved successfully!', 'success');
+    window.assistant.closeModal('settingsModal');
 }
 
 function testClaudeConnection() {
