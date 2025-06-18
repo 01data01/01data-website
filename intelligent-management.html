@@ -423,14 +423,27 @@
             console.log('👤 User parameter found:', !!userParam);
             console.log('📄 User parameter length:', userParam ? userParam.length : 0);
             
+            // Debug: show raw parameter
+            if (userParam) {
+                console.log('🔍 Raw user parameter:', userParam);
+                console.log('🔍 First 100 chars:', userParam.substring(0, 100));
+            }
+            
             if (userParam) {
                 try {
-                    const user = JSON.parse(decodeURIComponent(userParam));
-                    console.log('Parsed user data from main website:', user);
+                    console.log('🔍 Attempting to decode user parameter...');
+                    const decodedParam = decodeURIComponent(userParam);
+                    console.log('🔍 Decoded parameter:', decodedParam);
+                    console.log('🔍 Decoded first 100 chars:', decodedParam.substring(0, 100));
+                    
+                    console.log('🔍 Attempting to parse JSON...');
+                    const user = JSON.parse(decodedParam);
+                    console.log('✅ Parsed user data from main website:', user);
                     
                     // Validate user data
                     if (!user.email || !user.name) {
-                        console.error('Invalid user data: missing email or name');
+                        console.error('❌ Invalid user data: missing email or name');
+                        console.log('🔍 Available user properties:', Object.keys(user));
                         return false;
                     }
                     
@@ -441,30 +454,52 @@
                         image: user.picture || user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4db6ac&color=fff`
                     };
                     
-                    console.log('Converted user data:', userData);
+                    console.log('✅ Converted user data:', userData);
                     
                     // Store user data for future sessions (store in multiple formats for compatibility)
                     localStorage.setItem('userData', JSON.stringify(userData));
                     localStorage.setItem('intelligent_user', JSON.stringify(user)); // Store original format too
-                    console.log('Stored user data in localStorage');
+                    console.log('✅ Stored user data in localStorage');
                     
                     // Auto-authenticate the user
-                    console.log('Calling authenticateUser...');
+                    console.log('🚀 Calling authenticateUser...');
                     authenticateUser(userData);
                     
                     // Clean up the URL to remove user data for security and cleaner appearance
                     const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
                     window.history.replaceState({}, document.title, cleanUrl);
-                    console.log('URL cleaned, authentication complete');
+                    console.log('✅ URL cleaned, authentication complete');
                     
                     return true;
                 } catch (e) {
-                    console.error('Error parsing user data from URL:', e);
-                    console.error('Raw user parameter:', userParam);
-                    console.error('Error details:', e.message);
+                    console.error('❌ Error parsing user data from URL:', e);
+                    console.error('❌ Raw user parameter:', userParam);
+                    console.error('❌ Error details:', e.message);
+                    console.error('❌ Error stack:', e.stack);
+                    
+                    // Try alternative decoding methods
+                    try {
+                        console.log('🔍 Trying alternative decoding...');
+                        const altDecoded = unescape(userParam);
+                        console.log('🔍 Alternative decoded:', altDecoded);
+                        const altUser = JSON.parse(altDecoded);
+                        console.log('✅ Alternative parsing successful:', altUser);
+                        
+                        if (altUser.email && altUser.name) {
+                            const userData = {
+                                email: altUser.email,
+                                name: altUser.name,
+                                image: altUser.picture || altUser.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(altUser.name)}&background=4db6ac&color=fff`
+                            };
+                            authenticateUser(userData);
+                            return true;
+                        }
+                    } catch (altError) {
+                        console.error('❌ Alternative decoding also failed:', altError);
+                    }
                 }
             } else {
-                console.log('No user parameter found in URL');
+                console.log('ℹ️ No user parameter found in URL');
             }
             return false;
         }
@@ -473,58 +508,76 @@
         function authenticateUser(userData) {
             console.log('🚀 Starting authenticateUser for:', userData.email);
             
-            // Check if required DOM elements exist
-            const signInScreen = document.getElementById('signInScreen');
-            const app = document.getElementById('app');
-            const userName = document.getElementById('userName');
-            const userAvatar = document.getElementById('userAvatar');
-            
-            console.log('DOM elements check:');
-            console.log('- signInScreen:', !!signInScreen);
-            console.log('- app:', !!app);
-            console.log('- userName:', !!userName);
-            console.log('- userAvatar:', !!userAvatar);
-            
-            if (!signInScreen || !app || !userName || !userAvatar) {
-                console.error('❌ Required DOM elements not found! Authentication cannot proceed.');
-                return;
-            }
-            
-            // Update UI with user data
-            console.log('📝 Updating UI with user data...');
-            userName.textContent = userData.name;
-            userAvatar.src = userData.image;
-            
-            // Hide sign-in screen and show app
-            console.log('🔄 Switching from sign-in screen to app...');
-            signInScreen.style.display = 'none';
-            app.style.display = 'block';
-            
-            console.log('✅ UI updated successfully');
-            
-            // Initialize Claude API
-            console.log('🔧 Initializing Claude API...');
-            initializeClaudeAPI(userData.email);
-            
-            // Initialize the assistant
-            console.log('🤖 Initializing assistant with user data:', userData);
-            if (typeof IntelligentAssistant !== 'undefined') {
-                IntelligentAssistant.init(userData);
-                console.log('✅ Assistant initialized');
-            } else {
-                console.warn('⚠️ IntelligentAssistant not available yet, will retry...');
-                // Retry after a short delay
-                setTimeout(() => {
-                    if (typeof IntelligentAssistant !== 'undefined') {
-                        IntelligentAssistant.init(userData);
-                        console.log('✅ Assistant initialized (retry)');
-                    } else {
-                        console.error('❌ IntelligentAssistant still not available');
+            // Wait a bit to ensure all scripts are loaded
+            setTimeout(() => {
+                // Check if required DOM elements exist
+                const signInScreen = document.getElementById('signInScreen');
+                const app = document.getElementById('app');
+                const userName = document.getElementById('userName');
+                const userAvatar = document.getElementById('userAvatar');
+                
+                console.log('DOM elements check:');
+                console.log('- signInScreen:', !!signInScreen);
+                console.log('- app:', !!app);
+                console.log('- userName:', !!userName);
+                console.log('- userAvatar:', !!userAvatar);
+                
+                if (!signInScreen || !app || !userName || !userAvatar) {
+                    console.error('❌ Required DOM elements not found! Authentication cannot proceed.');
+                    // Try to show sign-in screen as fallback
+                    if (signInScreen) {
+                        signInScreen.style.display = 'block';
                     }
-                }, 1000);
-            }
-            
-            console.log('🎉 Authentication completed successfully!');
+                    return;
+                }
+                
+                // Update UI with user data
+                console.log('📝 Updating UI with user data...');
+                userName.textContent = userData.name;
+                userAvatar.src = userData.image;
+                
+                // Hide sign-in screen and show app
+                console.log('🔄 Switching from sign-in screen to app...');
+                signInScreen.style.display = 'none';
+                app.style.display = 'block';
+                
+                console.log('✅ UI updated successfully');
+                
+                // Initialize Claude API
+                console.log('🔧 Initializing Claude API...');
+                try {
+                    initializeClaudeAPI(userData.email);
+                } catch (error) {
+                    console.warn('⚠️ Claude API initialization failed:', error);
+                }
+                
+                // Initialize the assistant with multiple retry attempts
+                console.log('🤖 Initializing assistant with user data:', userData);
+                let retryCount = 0;
+                const maxRetries = 5;
+                
+                function tryInitializeAssistant() {
+                    if (typeof IntelligentAssistant !== 'undefined') {
+                        try {
+                            IntelligentAssistant.init(userData);
+                            console.log('✅ Assistant initialized successfully');
+                        } catch (error) {
+                            console.error('❌ Assistant initialization failed:', error);
+                        }
+                    } else {
+                        retryCount++;
+                        if (retryCount < maxRetries) {
+                            console.warn(`⚠️ IntelligentAssistant not available yet, retry ${retryCount}/${maxRetries}...`);
+                            setTimeout(tryInitializeAssistant, 500 * retryCount);
+                        } else {
+                            console.error('❌ IntelligentAssistant failed to load after maximum retries');
+                        }
+                    }
+                }
+                
+                tryInitializeAssistant();
+                console.log('🎉 Authentication flow completed!');
+            }, 100); // Small delay to ensure DOM is ready
         }
 
         // Initialize the application
