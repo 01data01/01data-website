@@ -4189,14 +4189,25 @@
                 timestamp: new Date().toISOString()
             };
 
-            // Store user session for Personal Assistant
+            // Store user session for Personal Assistant (multiple keys for compatibility)
             localStorage.setItem('intelligent_user', JSON.stringify(userSession));
+            localStorage.setItem('userData', JSON.stringify({
+                email: currentUser.email,
+                name: currentUser.name,
+                image: currentUser.picture
+            }));
 
-            // Open the client-side Intelligent Management system
-            const assistantUrl = `intelligent-management.html?user=${encodeURIComponent(JSON.stringify(userSession))}`;
-            window.open(assistantUrl, '_blank');
-            
-            showNotification('Opening Intelligent Management System...', 'success');
+            try {
+                // Try the URL parameter approach first
+                const assistantUrl = `intelligent-management.html?user=${encodeURIComponent(JSON.stringify(userSession))}`;
+                window.open(assistantUrl, '_blank');
+                showNotification('Opening Intelligent Management System...', 'success');
+            } catch (error) {
+                console.error('Error opening intelligent management:', error);
+                // Fallback: open without URL parameter (will use localStorage)
+                window.open('intelligent-management.html', '_blank');
+                showNotification('Opening Intelligent Management System...', 'success');
+            }
         }
 
 

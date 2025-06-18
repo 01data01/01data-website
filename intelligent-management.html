@@ -415,16 +415,24 @@
 
         // Function to handle automatic authentication from main website
         function checkForPassedUserData() {
-            console.log('Checking for passed user data...');
-            console.log('Current URL:', window.location.href);
+            console.log('🔍 Checking for passed user data...');
+            console.log('📍 Current URL:', window.location.href);
+            console.log('🔍 Full search parameters:', window.location.search);
             
             const userParam = getUrlParameter('user');
-            console.log('User parameter:', userParam);
+            console.log('👤 User parameter found:', !!userParam);
+            console.log('📄 User parameter length:', userParam ? userParam.length : 0);
             
             if (userParam) {
                 try {
                     const user = JSON.parse(decodeURIComponent(userParam));
                     console.log('Parsed user data from main website:', user);
+                    
+                    // Validate user data
+                    if (!user.email || !user.name) {
+                        console.error('Invalid user data: missing email or name');
+                        return false;
+                    }
                     
                     // Convert to expected format
                     const userData = {
@@ -435,8 +443,9 @@
                     
                     console.log('Converted user data:', userData);
                     
-                    // Store user data for future sessions
+                    // Store user data for future sessions (store in multiple formats for compatibility)
                     localStorage.setItem('userData', JSON.stringify(userData));
+                    localStorage.setItem('intelligent_user', JSON.stringify(user)); // Store original format too
                     console.log('Stored user data in localStorage');
                     
                     // Auto-authenticate the user
@@ -452,6 +461,7 @@
                 } catch (e) {
                     console.error('Error parsing user data from URL:', e);
                     console.error('Raw user parameter:', userParam);
+                    console.error('Error details:', e.message);
                 }
             } else {
                 console.log('No user parameter found in URL');
@@ -542,16 +552,27 @@
             }
             
             console.log('🔍 Step 2: Checking for existing localStorage session...');
-            // Check for existing Google Sign-In session
-            const storedUserData = localStorage.getItem('userData');
+            console.log('🔑 Available localStorage keys:', Object.keys(localStorage));
+            console.log('📦 Checking for userData:', !!localStorage.getItem('userData'));
+            console.log('🧠 Checking for intelligent_user:', !!localStorage.getItem('intelligent_user'));
+            console.log('👤 Checking for 01data_user:', !!localStorage.getItem('01data_user'));
+            
+            // Check for existing Google Sign-In session - check multiple possible keys
+            const storedUserData = localStorage.getItem('userData') || localStorage.getItem('intelligent_user') || localStorage.getItem('01data_user');
             if (storedUserData) {
                 try {
                     const user = JSON.parse(storedUserData);
-                    console.log('✅ Found existing user session:', user.email);
+                    console.log('✅ Found existing user session:', user.email || user.name);
                     
-                    // Authenticate with existing session
+                    // Convert to expected format if needed
+                    const userData = {
+                        email: user.email,
+                        name: user.name,
+                        image: user.picture || user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4db6ac&color=fff`
+                    };
+                    
                     console.log('🔄 Authenticating with existing session...');
-                    authenticateUser(user);
+                    authenticateUser(userData);
                 } catch (e) {
                     console.error('❌ Error parsing stored user data:', e);
                     // Show sign-in screen
