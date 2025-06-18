@@ -24,6 +24,12 @@ class IntelligentAssistant {
         // Initialize Claude API if available
         if (window.ClaudeAPI) {
             window.assistant.claudeAPI = new ClaudeAPI();
+            
+            // Set user email for automatic API key assignment
+            if (userData.email) {
+                window.assistant.claudeAPI.setUserEmail(userData.email);
+            }
+            
             console.log('Claude API initialized on assistant instance');
             
             // Add AI methods to the assistant

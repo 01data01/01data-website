@@ -5,16 +5,46 @@
 
 class ClaudeAPI {
     constructor() {
-        this.apiKey = localStorage.getItem('claude_api_key') || null;
-        this.baseUrl = 'https://api.anthropic.com/v1';
-        this.model = 'claude-3-5-sonnet-20241022';
-        this.maxTokens = 4000; // Increased for longer responses
-        this.mockMode = false; // Force disable mock mode
+        this.apiKey = null; // Will be assigned automatically by backend
+        this.userEmail = null;
+        this.baseUrl = '/.netlify/functions'; // Use Netlify Functions
+        this.mockMode = false;
+        
+        console.log('Claude API initialized with Netlify Functions');
     }
 
-    setApiKey(key) {
-        this.apiKey = key;
-        localStorage.setItem('claude_api_key', key);
+    setUserEmail(email) {
+        this.userEmail = email;
+        this.initializeUserAPI();
+    }
+
+    async initializeUserAPI() {
+        if (!this.userEmail) return;
+
+        try {
+            const response = await fetch(`${this.baseUrl}/assign-api-key`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userEmail: this.userEmail
+                })
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                this.apiKey = data.apiKey;
+                console.log(`API key assigned for ${this.userEmail}:`, data.isNewUser ? 'New user' : 'Existing user');
+                return data;
+            } else {
+                throw new Error(data.error);
+            }
+        } catch (error) {
+            console.error('Error initializing user API:', error);
+            throw error;
+        }
     }
 
     enableMockMode(enabled = true) {
@@ -164,25 +194,34 @@ class ClaudeAPI {
     }
 
     async processMessage(message, context = {}) {
-        if (!this.apiKey) {
-            return "Please configure your Claude API key in settings to enable AI features.";
+        if (!this.userEmail) {
+            return "Please sign in to use the AI assistant.";
         }
 
-        const prompt = this.buildChatPrompt(message, context);
-        
+        if (!this.apiKey) {
+            await this.initializeUserAPI();
+        }
+
         try {
-            const response = await this.makeRequest('messages', {
-                model: this.model,
-                max_tokens: 2000, // Increased for longer responses
-                messages: [
-                    {
-                        role: 'user',
-                        content: prompt
-                    }
-                ]
+            const response = await fetch(`${this.baseUrl}/claude-chat`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userEmail: this.userEmail,
+                    message: message,
+                    apiKey: this.apiKey
+                })
             });
 
-            return response.content[0].text;
+            const data = await response.json();
+            
+            if (response.ok) {
+                return data.response;
+            } else {
+                throw new Error(data.error || 'Chat request failed');
+            }
         } catch (error) {
             console.error('Error processing message with Claude:', error);
             return `Error: ${error.message}`;
@@ -258,28 +297,21 @@ class ClaudeAPI {
 
     // Test API connection
     async testConnection() {
-        if (!this.apiKey) {
-            return { success: false, error: 'No API key configured' };
-        }
-
-        // Validate API key format
-        if (!this.apiKey.startsWith('sk-ant-')) {
-            return { success: false, error: 'Invalid API key format. Claude API keys should start with "sk-ant-"' };
+        if (!this.userEmail) {
+            return { success: false, error: 'Please sign in first' };
         }
 
         try {
-            const response = await this.makeRequest('messages', {
-                model: this.model,
-                max_tokens: 50,
-                messages: [
-                    {
-                        role: 'user',
-                        content: 'Say hello and confirm you are Claude AI'
-                    }
-                ]
-            });
+            const testResponse = await this.processMessage('Hello, can you confirm you are Claude AI?');
+            
+            if (testResponse.includes('Error:')) {
+                return { success: false, error: testResponse };
+            }
 
-            return { success: true, message: 'Claude API connected successfully! Response: ' + response.content[0].text };
+            return { 
+                success: true, 
+                message: 'Claude AI connected successfully! Your API key has been automatically assigned.' 
+            };
         } catch (error) {
             console.error('Connection test failed:', error);
             return { success: false, error: error.message };
