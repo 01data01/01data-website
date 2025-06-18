@@ -72,6 +72,11 @@ class IntelligentAssistant {
 
         // Settings
         document.getElementById('settingsBtn').addEventListener('click', () => {
+            // Load current API key into the form
+            const savedApiKey = localStorage.getItem('claude_api_key');
+            if (savedApiKey) {
+                document.getElementById('claudeApiKey').value = savedApiKey;
+            }
             this.showModal('settingsModal');
         });
 
@@ -867,8 +872,41 @@ function saveSettings() {
     const apiKey = document.getElementById('claudeApiKey').value;
     if (apiKey) {
         localStorage.setItem('claude_api_key', apiKey);
+        
+        // If the assistant has Claude API integration, set it up
+        if (window.assistant && window.assistant.setupClaudeAPI) {
+            window.assistant.setupClaudeAPI();
+        } else if (window.assistant && window.assistant.claudeAPI) {
+            window.assistant.claudeAPI.setApiKey(apiKey);
+            window.assistant.testAIConnection();
+        }
+        
         window.assistant.showNotification('Settings saved successfully!', 'success');
         window.assistant.closeModal('settingsModal');
+    } else {
+        window.assistant.showNotification('Please enter a valid API key', 'warning');
+    }
+}
+
+function testClaudeConnection() {
+    if (!window.assistant) {
+        alert('Assistant not initialized');
+        return;
+    }
+    
+    const apiKey = document.getElementById('claudeApiKey').value;
+    if (!apiKey) {
+        window.assistant.showNotification('Please enter an API key first', 'warning');
+        return;
+    }
+    
+    // Temporarily set the API key for testing
+    if (window.assistant.claudeAPI) {
+        window.assistant.claudeAPI.setApiKey(apiKey);
+        window.assistant.testAIConnection();
+    } else {
+        window.assistant.showNotification('Claude API not available', 'error');
+        console.error('Claude API integration not found on assistant object');
     }
 }
 

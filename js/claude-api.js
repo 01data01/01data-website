@@ -301,18 +301,27 @@ Respond only with the JSON array.`;
 
 // Enhanced IntelligentAssistant integration
 if (window.IntelligentAssistant) {
-    // Extend the IntelligentAssistant class with Claude API functionality
-    const originalClass = window.IntelligentAssistant;
+    // Store the original class
+    const OriginalIntelligentAssistant = window.IntelligentAssistant;
     
-    class EnhancedIntelligentAssistant extends originalClass {
+    // Create enhanced version
+    class EnhancedIntelligentAssistant extends OriginalIntelligentAssistant {
         constructor() {
             super();
             this.claudeAPI = new ClaudeAPI();
+            console.log('Enhanced IntelligentAssistant initialized with Claude API');
         }
 
         async parseTaskWithAI(text) {
+            console.log('parseTaskWithAI called with:', text);
             try {
+                if (!this.claudeAPI.apiKey) {
+                    console.log('No API key found, falling back to local parsing');
+                    return this.parseTaskLocally(text);
+                }
+                
                 const task = await this.claudeAPI.parseTask(text, new Date());
+                console.log('AI parsing successful:', task);
                 return task;
             } catch (error) {
                 console.error('AI parsing failed, falling back to local parsing:', error);
@@ -321,14 +330,21 @@ if (window.IntelligentAssistant) {
         }
 
         async processWithAI(message) {
+            console.log('processWithAI called with:', message);
             try {
+                if (!this.claudeAPI.apiKey) {
+                    return "Please configure your Claude API key in settings to enable AI features.";
+                }
+                
                 const context = {
                     tasks: this.tasks,
                     projects: this.projects,
                     currentDate: new Date()
                 };
                 
-                return await this.claudeAPI.processMessage(message, context);
+                const response = await this.claudeAPI.processMessage(message, context);
+                console.log('AI processing successful:', response);
+                return response;
             } catch (error) {
                 console.error('AI processing failed:', error);
                 return "I apologize, but I'm having trouble connecting to the AI service. Please check your API key in settings or try again later.";
@@ -337,33 +353,62 @@ if (window.IntelligentAssistant) {
 
         async updateAISuggestions() {
             const container = document.getElementById('aiSuggestions');
+            if (!container) return;
             
             // Try to get AI-powered suggestions
             try {
-                const aiSuggestions = await this.claudeAPI.generateSuggestions(this.tasks, new Date());
-                
-                if (aiSuggestions.length > 0) {
-                    container.innerHTML = '';
-                    aiSuggestions.forEach(suggestion => {
-                        const suggestionElement = document.createElement('div');
-                        suggestionElement.className = 'suggestion-item';
-                        suggestionElement.innerHTML = `
-                            <div class="suggestion-icon">${suggestion.icon || '💡'}</div>
-                            <div class="suggestion-content">
-                                <div class="suggestion-title">${suggestion.title}</div>
-                                <div class="suggestion-description">${suggestion.description}</div>
-                            </div>
-                        `;
-                        container.appendChild(suggestionElement);
-                    });
-                    return;
+                if (this.claudeAPI.apiKey) {
+                    const aiSuggestions = await this.claudeAPI.generateSuggestions(this.tasks, new Date());
+                    
+                    if (aiSuggestions.length > 0) {
+                        container.innerHTML = '';
+                        aiSuggestions.forEach(suggestion => {
+                            const suggestionElement = document.createElement('div');
+                            suggestionElement.className = 'suggestion-item';
+                            suggestionElement.innerHTML = `
+                                <div class="suggestion-icon">${suggestion.icon || '💡'}</div>
+                                <div class="suggestion-content">
+                                    <div class="suggestion-title">${suggestion.title}</div>
+                                    <div class="suggestion-description">${suggestion.description}</div>
+                                </div>
+                            `;
+                            container.appendChild(suggestionElement);
+                        });
+                        return;
+                    }
                 }
             } catch (error) {
                 console.error('Failed to get AI suggestions:', error);
             }
             
             // Fallback to local suggestions
-            super.updateAISuggestions();
+            if (super.updateAISuggestions) {
+                super.updateAISuggestions();
+            } else {
+                // Direct implementation if super method doesn't exist
+                this.generateLocalSuggestions();
+            }
+        }
+
+        generateLocalSuggestions() {
+            const container = document.getElementById('aiSuggestions');
+            if (!container) return;
+            
+            const suggestions = this.generateSuggestions();
+            container.innerHTML = '';
+
+            suggestions.forEach(suggestion => {
+                const suggestionElement = document.createElement('div');
+                suggestionElement.className = 'suggestion-item';
+                suggestionElement.innerHTML = `
+                    <div class="suggestion-icon">${suggestion.icon}</div>
+                    <div class="suggestion-content">
+                        <div class="suggestion-title">${suggestion.title}</div>
+                        <div class="suggestion-description">${suggestion.description}</div>
+                    </div>
+                `;
+                container.appendChild(suggestionElement);
+            });
         }
 
         async testAIConnection() {
@@ -371,16 +416,31 @@ if (window.IntelligentAssistant) {
             
             if (result.success) {
                 this.showNotification('AI connection successful!', 'success');
+                console.log('Claude API connection test passed');
             } else {
                 this.showNotification(`AI connection failed: ${result.error}`, 'error');
+                console.error('Claude API connection test failed:', result.error);
             }
             
             return result;
+        }
+
+        // Override the settings save to include API key setup
+        setupClaudeAPI() {
+            const apiKey = document.getElementById('claudeApiKey')?.value;
+            if (apiKey) {
+                this.claudeAPI.setApiKey(apiKey);
+                console.log('Claude API key configured');
+                this.testAIConnection();
+            }
         }
     }
     
     // Replace the global class
     window.IntelligentAssistant = EnhancedIntelligentAssistant;
+    console.log('IntelligentAssistant class enhanced with Claude API');
+} else {
+    console.error('IntelligentAssistant base class not found');
 }
 
 // Export for use in other modules
