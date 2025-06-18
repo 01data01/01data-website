@@ -1,0 +1,14 @@
+# API Keys and Sensitive Data
+data/api-keys.json
+.env
+.env.local
+
+# Node modules
+node_modules/
+
+# Netlify
+.netlify/
+
+# OS generated files
+.DS_Store
+Thumbs.db

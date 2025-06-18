@@ -1,0 +1,4211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01data - Transform Your Data Into Insights</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMZY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root {
+            --primary-color: #2c5f5d;
+            --accent-color: #4db6ac;
+            --accent-dark: #26a69a;
+            --text-light: rgba(44, 95, 93, 0.8);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --gradient-bg: radial-gradient(ellipse at center, #f0fffe 0%, #e8f8f5 40%, #e1f5fe 100%);
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Custom Cursor System */
+        * {
+            cursor: none !important;
+        }
+        
+        #custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 32px;
+            height: 32px;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease-out;
+        }
+        
+        .cursor-brain {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(145deg, rgba(77, 182, 172, 0.9), rgba(64, 224, 208, 0.8));
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            box-shadow: 
+                0 0 10px rgba(77, 182, 172, 0.6),
+                inset 0 1px 2px rgba(255,255,255,0.3);
+            animation: cursorBrainPulse 2s ease-in-out infinite;
+        }
+        
+        .cursor-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.4), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+        
+        .cursor-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+        }
+        
+        .cursor-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            border-radius: 1px;
+            animation: cursorNeuralFlow 1.8s ease-in-out infinite;
+        }
+        
+        .cursor-neural-line:nth-child(1) {
+            width: 6px;
+            height: 1px;
+            top: 4px;
+            left: 2px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+        
+        .cursor-neural-line:nth-child(2) {
+            width: 5px;
+            height: 1px;
+            top: 7px;
+            left: 6px;
+            transform: rotate(-30deg);
+            animation-delay: 0.3s;
+        }
+        
+        .cursor-neural-line:nth-child(3) {
+            width: 4px;
+            height: 1px;
+            top: 11px;
+            left: 3px;
+            transform: rotate(60deg);
+            animation-delay: 0.6s;
+        }
+        
+        .cursor-neural-line:nth-child(4) {
+            width: 6px;
+            height: 1px;
+            top: 9px;
+            left: 9px;
+            transform: rotate(-45deg);
+            animation-delay: 0.9s;
+        }
+        
+        .cursor-particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            pointer-events: none;
+        }
+        
+        .cursor-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, rgba(77, 182, 172, 0.8), rgba(64, 224, 208, 0.6));
+            border-radius: 50%;
+            opacity: 0;
+            animation: cursorParticleOrbit 3s ease-in-out infinite;
+        }
+        
+        .cursor-particle:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .cursor-particle:nth-child(2) {
+            animation-delay: 0.6s;
+        }
+        
+        .cursor-particle:nth-child(3) {
+            animation-delay: 1.2s;
+        }
+        
+        .cursor-particle:nth-child(4) {
+            animation-delay: 1.8s;
+        }
+        
+        .cursor-particle:nth-child(5) {
+            animation-delay: 2.4s;
+        }
+        
+        .cursor-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(77, 182, 172, 0.4);
+            border-radius: 50%;
+            animation: cursorRingRotate 4s linear infinite;
+        }
+        
+        .cursor-ring::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 2px;
+            background: rgba(64, 224, 208, 0.8);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(64, 224, 208, 0.6);
+        }
+        
+        .cursor-data-stream {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .cursor-stream-line {
+            position: absolute;
+            width: 20px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(77, 182, 172, 0.6), transparent);
+            animation: cursorStreamFlow 2s ease-in-out infinite;
+        }
+        
+        .cursor-stream-line:nth-child(1) {
+            top: 15px;
+            left: 10px;
+            transform: rotate(30deg);
+            animation-delay: 0s;
+        }
+        
+        .cursor-stream-line:nth-child(2) {
+            top: 25px;
+            left: 20px;
+            transform: rotate(-45deg);
+            animation-delay: 0.4s;
+        }
+        
+        .cursor-stream-line:nth-child(3) {
+            top: 35px;
+            left: 15px;
+            transform: rotate(60deg);
+            animation-delay: 0.8s;
+        }
+        
+        /* Cursor States */
+        #custom-cursor.hover {
+            transform: scale(1.3);
+        }
+        
+        #custom-cursor.hover .cursor-brain {
+            animation-duration: 1s;
+            box-shadow: 
+                0 0 20px rgba(77, 182, 172, 0.8),
+                inset 0 1px 2px rgba(255,255,255,0.5);
+        }
+        
+        #custom-cursor.hover .cursor-neural-line {
+            animation-duration: 0.8s;
+        }
+        
+        #custom-cursor.hover .cursor-particle {
+            animation-duration: 1.5s;
+        }
+        
+        #custom-cursor.hover .cursor-data-stream {
+            opacity: 1;
+        }
+        
+        #custom-cursor.click {
+            transform: scale(0.8);
+        }
+        
+        #custom-cursor.click .cursor-brain {
+            background: linear-gradient(145deg, rgba(64, 224, 208, 1), rgba(77, 182, 172, 0.9));
+            box-shadow: 
+                0 0 25px rgba(64, 224, 208, 1),
+                inset 0 1px 2px rgba(255,255,255,0.7);
+        }
+        
+        #custom-cursor.click .cursor-ring {
+            animation-duration: 1s;
+        }
+        
+        #custom-cursor.text {
+            transform: scale(1.1);
+        }
+        
+        #custom-cursor.text .cursor-brain {
+            border-radius: 20%;
+            background: linear-gradient(145deg, rgba(38, 166, 154, 0.9), rgba(77, 182, 172, 0.8));
+        }
+        
+        #custom-cursor.text::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.8);
+            animation: cursorTextBlink 1s ease-in-out infinite;
+        }
+        
+        /* Cursor Animations */
+        @keyframes cursorBrainPulse {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.9;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes cursorNeuralFlow {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.8; transform: scaleX(1); }
+        }
+        
+        @keyframes cursorParticleOrbit {
+            0% { 
+                opacity: 0; 
+                transform: rotate(0deg) translateX(15px) rotate(0deg) scale(0.5);
+            }
+            50% { 
+                opacity: 1; 
+                transform: rotate(180deg) translateX(15px) rotate(-180deg) scale(1);
+            }
+            100% { 
+                opacity: 0; 
+                transform: rotate(360deg) translateX(15px) rotate(-360deg) scale(0.5);
+            }
+        }
+        
+        @keyframes cursorRingRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        @keyframes cursorStreamFlow {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.7; transform: scaleX(1); }
+        }
+        
+        @keyframes cursorTextBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Cursor Trail Effect */
+        .cursor-trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, rgba(77, 182, 172, 0.6), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            animation: cursorTrailFade 0.8s ease-out forwards;
+        }
+        
+        @keyframes cursorTrailFade {
+            from { 
+                opacity: 0.8; 
+                transform: scale(1); 
+            }
+            to { 
+                opacity: 0; 
+                transform: scale(0.3); 
+            }
+        }
+        
+        /* Accessibility - Fallback for reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            #custom-cursor {
+                display: none !important;
+            }
+            
+            * {
+                cursor: auto !important;
+            }
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: var(--gradient-bg);
+            color: var(--primary-color);
+            line-height: 1.6;
+        }
+        
+        /* Animation Canvas */
+        #animation-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        
+        #animation-container canvas {
+            display: block;
+            pointer-events: auto;
+        }
+        
+        .content-overlay {
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* Utility Classes */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 0;
+            backdrop-filter: blur(20px);
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 100;
+            transition: background 0.3s ease;
+        }
+        
+        nav.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Executive Intelligence Platform Logo */
+        .logo-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            border-radius: 12px;
+            background: linear-gradient(145deg, rgba(77, 182, 172, 0.2) 0%, rgba(38, 166, 154, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(77, 182, 172, 0.3);
+            box-shadow: 
+                0 8px 16px rgba(44, 95, 93, 0.2),
+                inset 0 1px 0 rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--accent-color) 0%, var(--accent-dark) 50%, #40e0d0 100%);
+            opacity: 0.15;
+            border-radius: 12px;
+            animation: logoPulse 4s ease-in-out infinite;
+        }
+
+        .logo-brain-container {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            z-index: 2;
+        }
+
+        .logo-brain {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, var(--accent-color), var(--accent-dark), #40e0d0);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            box-shadow: 
+                0 4px 8px rgba(77, 182, 172, 0.4),
+                inset 0 1px 2px rgba(255,255,255,0.2);
+            animation: logoBrainGlow 3s ease-in-out infinite alternate;
+        }
+
+        .logo-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.2), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+
+        .logo-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+        }
+
+        .logo-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            border-radius: 1px;
+            animation: logoNeuralPulse 2s ease-in-out infinite;
+        }
+
+        .logo-neural-line:nth-child(1) {
+            width: 9px;
+            height: 1px;
+            top: 6px;
+            left: 3px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .logo-neural-line:nth-child(2) {
+            width: 7px;
+            height: 1px;
+            top: 10px;
+            left: 9px;
+            transform: rotate(-30deg);
+            animation-delay: 0.5s;
+        }
+
+        .logo-neural-line:nth-child(3) {
+            width: 6px;
+            height: 1px;
+            top: 15px;
+            left: 4px;
+            transform: rotate(60deg);
+            animation-delay: 1s;
+        }
+
+        .logo-neural-line:nth-child(4) {
+            width: 8px;
+            height: 1px;
+            top: 12px;
+            left: 13px;
+            transform: rotate(-45deg);
+            animation-delay: 1.5s;
+        }
+
+        .logo-data-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .logo-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, var(--accent-color), #40e0d0);
+            border-radius: 50%;
+            opacity: 0;
+            animation: logoParticleFloat 3s ease-in-out infinite;
+        }
+
+        .logo-particle:nth-child(1) {
+            top: 20%;
+            left: 80%;
+            animation-delay: 0s;
+        }
+
+        .logo-particle:nth-child(2) {
+            top: 60%;
+            left: 85%;
+            animation-delay: 0.8s;
+        }
+
+        .logo-particle:nth-child(3) {
+            top: 40%;
+            left: 90%;
+            animation-delay: 1.6s;
+        }
+
+        .logo-dashboard-elements {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 12px;
+            height: 12px;
+            opacity: 0.7;
+        }
+
+        .logo-chart-bars {
+            display: flex;
+            align-items: end;
+            height: 6px;
+            gap: 1px;
+        }
+
+        .logo-bar {
+            width: 1.5px;
+            background: linear-gradient(to top, var(--accent-color), #40e0d0);
+            border-radius: 1px;
+            animation: logoBarGrow 2s ease-in-out infinite;
+        }
+
+        .logo-bar:nth-child(1) {
+            height: 60%;
+            animation-delay: 0s;
+        }
+
+        .logo-bar:nth-child(2) {
+            height: 100%;
+            animation-delay: 0.3s;
+        }
+
+        .logo-bar:nth-child(3) {
+            height: 40%;
+            animation-delay: 0.6s;
+        }
+
+        .logo-bar:nth-child(4) {
+            height: 80%;
+            animation-delay: 0.9s;
+        }
+
+        .logo-trend-line {
+            margin-top: 2px;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            border-radius: 0.5px;
+            animation: logoTrendPulse 3s ease-in-out infinite;
+        }
+
+        .logo-floating-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 54px;
+            height: 54px;
+            border: 1px solid rgba(77, 182, 172, 0.4);
+            border-radius: 50%;
+            animation: logoRingRotate 20s linear infinite;
+            pointer-events: none;
+        }
+
+        .logo-floating-ring::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, var(--accent-color), #40e0d0);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(77, 182, 172, 0.8);
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.25; }
+        }
+
+        @keyframes logoBrainGlow {
+            0% { 
+                box-shadow: 
+                    0 4px 8px rgba(77, 182, 172, 0.4),
+                    inset 0 1px 2px rgba(255,255,255,0.2);
+            }
+            100% { 
+                box-shadow: 
+                    0 6px 12px rgba(77, 182, 172, 0.6),
+                    inset 0 1px 2px rgba(255,255,255,0.3);
+            }
+        }
+
+        @keyframes logoNeuralPulse {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.8; transform: scaleX(1); }
+        }
+
+        @keyframes logoParticleFloat {
+            0% { 
+                opacity: 0; 
+                transform: translateY(0px) translateX(0px); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: translateY(-6px) translateX(-3px); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-12px) translateX(-6px); 
+            }
+        }
+
+        @keyframes logoBarGrow {
+            0%, 100% { transform: scaleY(0.6); }
+            50% { transform: scaleY(1); }
+        }
+
+        @keyframes logoTrendPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes logoRingRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .logo-container:hover .logo-brain {
+            animation-duration: 1s;
+        }
+
+        .logo-container:hover .logo-neural-line {
+            animation-duration: 0.8s;
+        }
+
+        .logo-container:hover .logo-floating-ring {
+            animation-duration: 8s;
+        }
+        
+        .nav-center {
+            display: flex;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+        
+        .nav-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .cta-button {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 15px rgba(77, 182, 172, 0.3);
+            margin-left: 30px;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.4);
+        }
+
+        /* Authentication Buttons */
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+            margin-left: 30px;
+        }
+
+        .auth-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 20px;
+        }
+
+        .auth-button:hover::before {
+            opacity: 1;
+        }
+
+        .auth-button svg {
+            transition: transform 0.3s ease;
+        }
+
+        .auth-button:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* Sign In Button */
+        .auth-button.sign-in {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            color: var(--primary-color);
+            border: 1px solid rgba(77, 182, 172, 0.3);
+            box-shadow: 0 4px 15px rgba(77, 182, 172, 0.2);
+        }
+
+        .auth-button.sign-in::before {
+            background: linear-gradient(135deg, rgba(77, 182, 172, 0.1), rgba(38, 166, 154, 0.05));
+        }
+
+        .auth-button.sign-in:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
+            border-color: rgba(77, 182, 172, 0.5);
+        }
+
+        /* New User Button */
+        .auth-button.new-user {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 15px rgba(77, 182, 172, 0.3);
+        }
+
+        .auth-button.new-user::before {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(64, 224, 208, 0.1));
+        }
+
+        .auth-button.new-user:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.4);
+        }
+
+        /* User Profile Display */
+        .user-profile {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-left: 30px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(77, 182, 172, 0.3);
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+        }
+
+        /* Intelligent Management Button */
+        .intelligent-management-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            margin-left: 15px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark), #40e0d0);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .intelligent-management-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(64, 224, 208, 0.15) 100%);
+            animation: intelligentPulse 3s ease-in-out infinite;
+        }
+
+        .intelligent-management-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
+        }
+
+        .intelligent-management-btn:hover .mgmt-brain {
+            animation-duration: 0.8s;
+        }
+
+        .intelligent-management-btn:hover .mgmt-neural-line {
+            animation-duration: 0.6s;
+        }
+
+        .mgmt-icon {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mgmt-brain {
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(64, 224, 208, 0.8));
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            animation: mgmtBrainGlow 2s ease-in-out infinite alternate;
+        }
+
+        .mgmt-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.4), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+
+        .mgmt-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+        }
+
+        .mgmt-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            border-radius: 1px;
+            animation: mgmtNeuralPulse 1.5s ease-in-out infinite;
+        }
+
+        .mgmt-neural-line:nth-child(1) {
+            width: 6px;
+            height: 1px;
+            top: 4px;
+            left: 2px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .mgmt-neural-line:nth-child(2) {
+            width: 5px;
+            height: 1px;
+            top: 7px;
+            left: 6px;
+            transform: rotate(-30deg);
+            animation-delay: 0.3s;
+        }
+
+        .mgmt-neural-line:nth-child(3) {
+            width: 4px;
+            height: 1px;
+            top: 10px;
+            left: 3px;
+            transform: rotate(60deg);
+            animation-delay: 0.6s;
+        }
+
+        .mgmt-neural-line:nth-child(4) {
+            width: 6px;
+            height: 1px;
+            top: 8px;
+            left: 9px;
+            transform: rotate(-45deg);
+            animation-delay: 0.9s;
+        }
+
+        @keyframes intelligentPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes mgmtBrainGlow {
+            0% { 
+                box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 0 10px rgba(64, 224, 208, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes mgmtNeuralPulse {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 1; transform: scaleX(1); }
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid rgba(77, 182, 172, 0.5);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.85rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .user-email {
+            color: var(--text-light);
+            font-size: 0.75rem;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 12px;
+            transition: background 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .logout-btn:hover {
+            background: rgba(77, 182, 172, 0.1);
+        }
+        
+        /* Section Base */
+        section {
+            padding: 100px 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+        
+        .section-header h2 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 24px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .section-header p {
+            font-size: 1.25rem;
+            color: var(--text-light);
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            padding: 60px 40px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            animation: fadeInUp 1s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color), var(--accent-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+            color: var(--text-light);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+            color: white;
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(64, 224, 208, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
+        }
+
+        /* Animated Intelligence Button */
+        .btn-intelligence {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark), #40e0d0);
+            color: white;
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 220px;
+            justify-content: center;
+        }
+
+        .btn-intelligence::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(64, 224, 208, 0.15) 100%);
+            animation: btnIntelligencePulse 3s ease-in-out infinite;
+        }
+
+        .btn-intelligence-icon {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-intelligence-brain {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(64, 224, 208, 0.8));
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            animation: btnBrainGlow 2s ease-in-out infinite alternate;
+        }
+
+        .btn-intelligence-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.4), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+
+        .btn-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            border-radius: 1px;
+            animation: btnNeuralPulse 1.5s ease-in-out infinite;
+        }
+
+        .btn-neural-line:nth-child(1) {
+            width: 8px;
+            height: 1px;
+            top: 5px;
+            left: 2px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .btn-neural-line:nth-child(2) {
+            width: 6px;
+            height: 1px;
+            top: 8px;
+            left: 8px;
+            transform: rotate(-30deg);
+            animation-delay: 0.3s;
+        }
+
+        .btn-neural-line:nth-child(3) {
+            width: 5px;
+            height: 1px;
+            top: 12px;
+            left: 3px;
+            transform: rotate(60deg);
+            animation-delay: 0.6s;
+        }
+
+        .btn-neural-line:nth-child(4) {
+            width: 7px;
+            height: 1px;
+            top: 10px;
+            left: 11px;
+            transform: rotate(-45deg);
+            animation-delay: 0.9s;
+        }
+
+        .btn-data-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 30px;
+        }
+
+        .btn-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.8), rgba(64, 224, 208, 0.6));
+            border-radius: 50%;
+            opacity: 0;
+            animation: btnParticleFloat 2.5s ease-in-out infinite;
+        }
+
+        .btn-particle:nth-child(1) {
+            top: 20%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .btn-particle:nth-child(2) {
+            top: 60%;
+            left: 85%;
+            animation-delay: 0.6s;
+        }
+
+        .btn-particle:nth-child(3) {
+            top: 80%;
+            left: 25%;
+            animation-delay: 1.2s;
+        }
+
+        .btn-particle:nth-child(4) {
+            top: 30%;
+            left: 75%;
+            animation-delay: 1.8s;
+        }
+
+        .btn-mini-chart {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            width: 16px;
+            height: 8px;
+            opacity: 0.7;
+        }
+
+        .btn-chart-bars {
+            display: flex;
+            align-items: end;
+            height: 6px;
+            gap: 1px;
+        }
+
+        .btn-chart-bar {
+            width: 2px;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.6), rgba(64, 224, 208, 0.8));
+            border-radius: 1px;
+            animation: btnChartGrow 1.8s ease-in-out infinite;
+        }
+
+        .btn-chart-bar:nth-child(1) {
+            height: 60%;
+            animation-delay: 0s;
+        }
+
+        .btn-chart-bar:nth-child(2) {
+            height: 100%;
+            animation-delay: 0.2s;
+        }
+
+        .btn-chart-bar:nth-child(3) {
+            height: 40%;
+            animation-delay: 0.4s;
+        }
+
+        .btn-chart-bar:nth-child(4) {
+            height: 80%;
+            animation-delay: 0.6s;
+        }
+
+        .btn-trend-line {
+            margin-top: 1px;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: btnTrendPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes btnIntelligencePulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes btnBrainGlow {
+            0% { 
+                box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 0 12px rgba(64, 224, 208, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes btnNeuralPulse {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 1; transform: scaleX(1); }
+        }
+
+        @keyframes btnParticleFloat {
+            0% { 
+                opacity: 0; 
+                transform: translateY(0px) translateX(0px) scale(0.5); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: translateY(-8px) translateX(-4px) scale(1); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-16px) translateX(-8px) scale(0.5); 
+            }
+        }
+
+        @keyframes btnChartGrow {
+            0%, 100% { transform: scaleY(0.6); opacity: 0.6; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+
+        @keyframes btnTrendPulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        .btn-intelligence:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 35px rgba(77, 182, 172, 0.5);
+        }
+
+        .btn-intelligence:hover .btn-intelligence-brain {
+            animation-duration: 0.8s;
+        }
+
+        .btn-intelligence:hover .btn-neural-line {
+            animation-duration: 0.6s;
+        }
+
+        .btn-intelligence:hover .btn-particle {
+            animation-duration: 1.5s;
+        }
+
+        .btn-intelligence:active {
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1), rgba(135, 206, 235, 0.15));
+            color: var(--primary-color);
+            border: 2px solid rgba(77, 182, 172, 0.3);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 200px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.2);
+        }
+        
+        .btn-secondary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(135, 206, 235, 0.1) 100%);
+            animation: btnServicesPulse 4s ease-in-out infinite;
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15), rgba(135, 206, 235, 0.2));
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.3);
+        }
+
+        /* Animated Services Button */
+        .btn-services {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1), rgba(135, 206, 235, 0.15));
+            color: var(--primary-color);
+            border: 2px solid rgba(77, 182, 172, 0.3);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 200px;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.2);
+        }
+
+        .btn-services::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(135, 206, 235, 0.1) 100%);
+            animation: btnServicesPulse 4s ease-in-out infinite;
+        }
+
+        .btn-services-icon {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-services-network {
+            position: relative;
+            width: 20px;
+            height: 20px;
+        }
+
+        .btn-network-node {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, rgba(77, 182, 172, 0.8), rgba(135, 206, 235, 0.9));
+            border-radius: 50%;
+            animation: btnNodePulse 2s ease-in-out infinite;
+        }
+
+        .btn-network-node:nth-child(1) {
+            top: 2px;
+            left: 8px;
+            animation-delay: 0s;
+        }
+
+        .btn-network-node:nth-child(2) {
+            top: 8px;
+            left: 2px;
+            animation-delay: 0.3s;
+        }
+
+        .btn-network-node:nth-child(3) {
+            top: 8px;
+            left: 14px;
+            animation-delay: 0.6s;
+        }
+
+        .btn-network-node:nth-child(4) {
+            top: 14px;
+            left: 8px;
+            animation-delay: 0.9s;
+        }
+
+        .btn-network-connections {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .btn-connection-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(77, 182, 172, 0.6), transparent);
+            animation: btnConnectionFlow 3s ease-in-out infinite;
+        }
+
+        .btn-connection-line:nth-child(1) {
+            width: 10px;
+            height: 1px;
+            top: 4px;
+            left: 5px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .btn-connection-line:nth-child(2) {
+            width: 10px;
+            height: 1px;
+            top: 10px;
+            left: 9px;
+            transform: rotate(-45deg);
+            animation-delay: 0.5s;
+        }
+
+        .btn-connection-line:nth-child(3) {
+            width: 8px;
+            height: 1px;
+            top: 10px;
+            left: 3px;
+            transform: rotate(45deg);
+            animation-delay: 1s;
+        }
+
+        .btn-services-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 30px;
+        }
+
+        .btn-services-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(45deg, rgba(135, 206, 235, 0.7), rgba(255, 255, 255, 0.8));
+            border-radius: 50%;
+            opacity: 0;
+            animation: btnServicesParticleFlow 3s ease-in-out infinite;
+        }
+
+        .btn-services-particle:nth-child(1) {
+            top: 25%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .btn-services-particle:nth-child(2) {
+            top: 75%;
+            left: 20%;
+            animation-delay: 0.7s;
+        }
+
+        .btn-services-particle:nth-child(3) {
+            top: 50%;
+            left: 80%;
+            animation-delay: 1.4s;
+        }
+
+        .btn-services-particle:nth-child(4) {
+            top: 30%;
+            left: 70%;
+            animation-delay: 2.1s;
+        }
+
+        .btn-analytics-display {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            width: 18px;
+            height: 10px;
+            opacity: 0.6;
+        }
+
+        .btn-analytics-graph {
+            position: relative;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, transparent, rgba(135, 206, 235, 0.3), transparent);
+            border-radius: 4px;
+            animation: btnAnalyticsGlow 2.5s ease-in-out infinite;
+        }
+
+        .btn-analytics-points {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(77, 182, 172, 0.8) 20%, 
+                rgba(135, 206, 235, 0.9) 40%, 
+                rgba(77, 182, 172, 0.7) 60%, 
+                rgba(135, 206, 235, 0.8) 80%, 
+                transparent 100%);
+            animation: btnDataFlow 2s ease-in-out infinite;
+        }
+
+        .btn-analytics-indicators {
+            position: absolute;
+            top: -2px;
+            width: 100%;
+            height: 1px;
+        }
+
+        .btn-indicator-dot {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(135, 206, 235, 0.9);
+            border-radius: 50%;
+            animation: btnIndicatorBlink 1.8s ease-in-out infinite;
+        }
+
+        .btn-indicator-dot:nth-child(1) {
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .btn-indicator-dot:nth-child(2) {
+            left: 45%;
+            animation-delay: 0.3s;
+        }
+
+        .btn-indicator-dot:nth-child(3) {
+            left: 75%;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes btnServicesPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes btnNodePulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 0.7;
+                box-shadow: 0 0 4px rgba(135, 206, 235, 0.3);
+            }
+            50% { 
+                transform: scale(1.3); 
+                opacity: 1;
+                box-shadow: 0 0 8px rgba(135, 206, 235, 0.6);
+            }
+        }
+
+        @keyframes btnConnectionFlow {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.7; transform: scaleX(1); }
+        }
+
+        @keyframes btnServicesParticleFlow {
+            0% { 
+                opacity: 0; 
+                transform: translateX(0px) translateY(0px) scale(0.5); 
+            }
+            30% { 
+                opacity: 1; 
+                transform: translateX(20px) translateY(-5px) scale(1); 
+            }
+            70% { 
+                opacity: 0.8; 
+                transform: translateX(40px) translateY(-10px) scale(0.8); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateX(60px) translateY(-15px) scale(0.3); 
+            }
+        }
+
+        @keyframes btnAnalyticsGlow {
+            0%, 100% { 
+                opacity: 0.4; 
+                background: linear-gradient(90deg, transparent, rgba(135, 206, 235, 0.3), transparent);
+            }
+            50% { 
+                opacity: 0.8; 
+                background: linear-gradient(90deg, transparent, rgba(135, 206, 235, 0.6), transparent);
+            }
+        }
+
+        @keyframes btnDataFlow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes btnIndicatorBlink {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .btn-services:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.15), rgba(135, 206, 235, 0.2));
+            border-color: var(--accent-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(135, 206, 235, 0.4);
+        }
+
+        .btn-services:hover .btn-network-node {
+            animation-duration: 1s;
+        }
+
+        .btn-services:hover .btn-connection-line {
+            animation-duration: 1.5s;
+        }
+
+        .btn-services:hover .btn-services-particle {
+            animation-duration: 2s;
+        }
+
+        .btn-services:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Services Section */
+        .services {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(240, 255, 254, 0.12) 50%, rgba(225, 245, 254, 0.08) 100%);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .services::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(77, 182, 172, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(38, 166, 154, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(128, 203, 196, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .services .container {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+        
+        .service-card {
+            padding: 45px 35px;
+            border-radius: 24px;
+            transition: var(--transition-smooth);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 
+                0 8px 32px rgba(44, 95, 93, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+        
+        .service-card:nth-child(1) { animation-delay: 0.1s; }
+        .service-card:nth-child(2) { animation-delay: 0.2s; }
+        .service-card:nth-child(3) { animation-delay: 0.3s; }
+        .service-card:nth-child(4) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) { animation-delay: 0.5s; }
+        .service-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(77, 182, 172, 0.05) 0%, rgba(38, 166, 154, 0.02) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: 24px;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-color: rgba(77, 182, 172, 0.4);
+        }
+        
+        .service-card:hover::before {
+            opacity: 1;
+        }
+        
+        .service-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 24px auto;
+            display: block;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .service-icon svg {
+            width: 100%;
+            height: 100%;
+            transition: var(--transition-smooth);
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+        }
+        
+        /* Service Color Palette - Professional & Inspiring */
+        .service-card:nth-child(1) .service-icon svg { fill: #1e40af; } /* Deep Blue - Trust */
+        .service-card:nth-child(1):hover .service-icon svg { 
+            fill: #2563eb; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(30, 64, 175, 0.3));
+        }
+        .service-card:nth-child(1):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(2) .service-icon svg { fill: #059669; } /* Emerald Green - Growth */
+        .service-card:nth-child(2):hover .service-icon svg { 
+            fill: #10b981; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(5, 150, 105, 0.3));
+        }
+        .service-card:nth-child(2):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(16, 185, 129, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(3) .service-icon svg { fill: #7c3aed; } /* Deep Purple - Innovation */
+        .service-card:nth-child(3):hover .service-icon svg { 
+            fill: #a855f7; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(124, 58, 237, 0.3));
+        }
+        .service-card:nth-child(3):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(168, 85, 247, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(4) .service-icon svg { fill: #0891b2; } /* Professional Cyan - Research */
+        .service-card:nth-child(4):hover .service-icon svg { 
+            fill: #0ea5e9; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(8, 145, 178, 0.3));
+        }
+        .service-card:nth-child(4):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(5) .service-icon svg { fill: #dc2626; } /* Crimson Red - Solutions */
+        .service-card:nth-child(5):hover .service-icon svg { 
+            fill: #f87171; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(220, 38, 38, 0.3));
+        }
+        .service-card:nth-child(5):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(248, 113, 113, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+        
+        .service-card:nth-child(6) .service-icon svg { fill: #87ceeb; } /* Light Blue - Executive Intelligence */
+        .service-card:nth-child(6):hover .service-icon svg { 
+            fill: #98fb98; 
+            transform: scale(1.15) rotate(5deg);
+            filter: drop-shadow(0 8px 16px rgba(152, 251, 152, 0.4));
+        }
+        .service-card:nth-child(6):hover {
+            box-shadow: 0 20px 60px rgba(44, 95, 93, 0.15), 0 8px 32px rgba(173, 216, 230, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+        }
+        
+        .service-card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+            color: var(--primary-color);
+            letter-spacing: -0.3px;
+            line-height: 1.3;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .service-card:hover h3 {
+            color: #1a4a47;
+        }
+        
+        .service-card p {
+            color: rgba(44, 95, 93, 0.85);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 3;
+        }
+        
+        .service-card:hover p {
+            color: rgba(44, 95, 93, 0.95);
+        }
+        
+        /* Icon Animations */
+        .service-card:nth-child(1) .service-icon svg circle {
+            animation: dataPulse 2s ease-in-out infinite;
+        }
+        .service-card:nth-child(1) .service-icon svg circle:nth-child(2) { animation-delay: 0.2s; }
+        .service-card:nth-child(1) .service-icon svg circle:nth-child(3) { animation-delay: 0.4s; }
+        .service-card:nth-child(1) .service-icon svg circle:nth-child(4) { animation-delay: 0.6s; }
+        .service-card:nth-child(1) .service-icon svg circle:nth-child(5) { animation-delay: 0.8s; }
+        
+        @keyframes dataPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+        
+        .service-card:nth-child(2) .service-icon svg path {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: drawChart 3s ease-in-out infinite;
+        }
+        
+        @keyframes drawChart {
+            0% { stroke-dashoffset: 100; }
+            50% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -100; }
+        }
+        
+        .service-card:nth-child(3) .service-icon svg path {
+            opacity: 0;
+            animation: networkPulse 2.5s ease-in-out infinite;
+        }
+        .service-card:nth-child(3) .service-icon svg path:nth-child(5) { animation-delay: 0.1s; }
+        .service-card:nth-child(3) .service-icon svg path:nth-child(6) { animation-delay: 0.2s; }
+        .service-card:nth-child(3) .service-icon svg path:nth-child(7) { animation-delay: 0.3s; }
+        .service-card:nth-child(3) .service-icon svg path:nth-child(8) { animation-delay: 0.4s; }
+        .service-card:nth-child(3) .service-icon svg circle {
+            animation: nodePulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes networkPulse {
+            0%, 70% { opacity: 0; }
+            10%, 60% { opacity: 0.7; }
+        }
+        
+        @keyframes nodePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .service-card:nth-child(4) .service-icon svg circle:last-child {
+            transform-origin: center;
+            animation: magnifySearch 3s ease-in-out infinite;
+        }
+        .service-card:nth-child(4) .service-icon svg path:last-child {
+            animation: magnifyMove 3s ease-in-out infinite;
+        }
+        
+        @keyframes magnifySearch {
+            0%, 100% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            75% { transform: scale(0.95); }
+        }
+        
+        @keyframes magnifyMove {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(2px) translateY(-2px); }
+            50% { transform: translateX(-1px) translateY(2px); }
+            75% { transform: translateX(1px) translateY(-1px); }
+        }
+        
+        /* Custom Solutions - Neural Network Animations */
+        .service-card:nth-child(5) .service-icon svg .neuron {
+            animation: neuronFire 2.5s ease-in-out infinite;
+        }
+        
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(1) { animation-delay: 0s; }
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(2) { animation-delay: 0.3s; }
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(3) { animation-delay: 0.6s; }
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(4) { animation-delay: 0.9s; }
+        .service-card:nth-child(5) .service-icon svg .neuron:nth-child(5) { animation-delay: 1.2s; }
+        
+        .service-card:nth-child(5) .service-icon svg .connection {
+            stroke-dasharray: 20;
+            animation: neuralFlow 3s ease-in-out infinite;
+        }
+        
+        .service-card:nth-child(5) .service-icon svg .connection:nth-child(6) { animation-delay: 0.2s; }
+        .service-card:nth-child(5) .service-icon svg .connection:nth-child(7) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) .service-icon svg .connection:nth-child(8) { animation-delay: 0.6s; }
+        .service-card:nth-child(5) .service-icon svg .connection:nth-child(9) { animation-delay: 0.8s; }
+        
+        .service-card:nth-child(5) .service-icon svg .prediction-arrow {
+            animation: predictionFlow 2s ease-in-out infinite;
+        }
+        
+        .service-card:nth-child(5) .service-icon svg .brain-waves {
+            animation: brainActivity 3s ease-in-out infinite;
+        }
+        
+        @keyframes neuronFire {
+            0%, 70% { opacity: 0.6; transform: scale(1); }
+            10%, 30% { opacity: 1; transform: scale(1.3); }
+            100% { opacity: 0.6; transform: scale(1); }
+        }
+        
+        @keyframes neuralFlow {
+            0%, 100% { stroke-dashoffset: 20; opacity: 0.3; }
+            50% { stroke-dashoffset: 0; opacity: 0.9; }
+        }
+        
+        @keyframes predictionFlow {
+            0%, 100% { transform: translateX(0); opacity: 0.7; }
+            50% { transform: translateX(8px); opacity: 1; }
+        }
+        
+        @keyframes brainActivity {
+            0%, 100% { opacity: 0.4; }
+            33% { opacity: 0.8; }
+            66% { opacity: 0.6; }
+        }
+        
+        /* Executive Intelligence Dashboard - Data flow and intelligence */
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(4) {
+            animation: chartUpdate 3s ease-in-out infinite;
+        }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(6),
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(7),
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(8),
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(9) {
+            animation: barChart 2.5s ease-in-out infinite;
+        }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(6) { animation-delay: 0.1s; }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(7) { animation-delay: 0.2s; }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(8) { animation-delay: 0.3s; }
+        .service-card:nth-child(6) .service-icon svg rect:nth-child(9) { animation-delay: 0.4s; }
+        
+        .service-card:nth-child(6) .service-icon svg circle {
+            animation: intelligencePulse 2s ease-in-out infinite;
+        }
+        
+        .service-card:nth-child(6) .service-icon svg path {
+            animation: dataFlow 3s ease-in-out infinite;
+        }
+        .service-card:nth-child(6) .service-icon svg path:nth-child(15) { animation-delay: 0.5s; }
+        .service-card:nth-child(6) .service-icon svg path:nth-child(16) { animation-delay: 1s; }
+        .service-card:nth-child(6) .service-icon svg path:nth-child(17) { animation-delay: 1.5s; }
+        
+        .service-card:nth-child(6) .service-icon svg ellipse {
+            animation: databaseActivity 2.5s ease-in-out infinite;
+        }
+        .service-card:nth-child(6) .service-icon svg ellipse:nth-child(19) { animation-delay: 0.2s; }
+        .service-card:nth-child(6) .service-icon svg ellipse:nth-child(20) { animation-delay: 0.4s; }
+        .service-card:nth-child(6) .service-icon svg ellipse:nth-child(21) { animation-delay: 0.6s; }
+        
+        @keyframes chartUpdate {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; transform: scale(1.02); }
+        }
+        
+        @keyframes barChart {
+            0%, 100% { opacity: 0.7; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.1); }
+        }
+        
+        @keyframes intelligencePulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+        
+        @keyframes dataFlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.9; }
+        }
+        
+        @keyframes databaseActivity {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; stroke-width: 2; }
+        }
+        
+        .service-card:hover .service-icon svg * {
+            animation-play-state: paused;
+        }
+
+        /* Executive Intelligence Platform Animated Logo */
+        .eip-animated-logo {
+            position: relative;
+            width: 72px;
+            height: 72px;
+            margin: 0 auto;
+        }
+
+        .eip-logo-icon {
+            width: 72px;
+            height: 72px;
+            position: relative;
+            border-radius: 16px;
+            background: linear-gradient(145deg, rgba(173, 216, 230, 0.3) 0%, rgba(224, 255, 255, 0.2) 50%, rgba(240, 255, 240, 0.15) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(173, 216, 230, 0.4);
+            box-shadow: 
+                0 10px 20px rgba(173, 216, 230, 0.25),
+                inset 0 1px 0 rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            animation: eipLogoPulse 4s ease-in-out infinite;
+        }
+
+        .eip-logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, #add8e6 0%, #e0ffff 30%, #f0fff0 70%, #98fb98 100%);
+            opacity: 0.2;
+            border-radius: 16px;
+            animation: eipLogoPulse 4s ease-in-out infinite;
+        }
+
+        .eip-brain-container {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            z-index: 2;
+        }
+
+        .eip-brain {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #add8e6, #e0ffff, #98fb98);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            box-shadow: 
+                0 6px 12px rgba(173, 216, 230, 0.5),
+                inset 0 1px 2px rgba(255,255,255,0.4);
+            animation: eipBrainGlow 3s ease-in-out infinite alternate;
+        }
+
+        .eip-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.6), rgba(240,255,240,0.3), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+
+        .eip-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28px;
+            height: 28px;
+        }
+
+        .eip-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), rgba(152,251,152,0.6), transparent);
+            border-radius: 1px;
+            animation: eipNeuralPulse 2s ease-in-out infinite;
+        }
+
+        .eip-neural-line:nth-child(1) {
+            width: 10px;
+            height: 1px;
+            top: 7px;
+            left: 4px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .eip-neural-line:nth-child(2) {
+            width: 8px;
+            height: 1px;
+            top: 12px;
+            left: 10px;
+            transform: rotate(-30deg);
+            animation-delay: 0.5s;
+        }
+
+        .eip-neural-line:nth-child(3) {
+            width: 7px;
+            height: 1px;
+            top: 18px;
+            left: 5px;
+            transform: rotate(60deg);
+            animation-delay: 1s;
+        }
+
+        .eip-neural-line:nth-child(4) {
+            width: 9px;
+            height: 1px;
+            top: 15px;
+            left: 15px;
+            transform: rotate(-45deg);
+            animation-delay: 1.5s;
+        }
+
+        .eip-dashboard-elements {
+            position: absolute;
+            bottom: 6px;
+            right: 6px;
+            width: 16px;
+            height: 16px;
+            opacity: 0.8;
+        }
+
+        .eip-chart-bars {
+            display: flex;
+            align-items: end;
+            height: 8px;
+            gap: 1px;
+        }
+
+        .eip-bar {
+            width: 2px;
+            background: linear-gradient(to top, #add8e6, #98fb98, #e0ffff);
+            border-radius: 1px;
+            animation: eipBarGrow 2.5s ease-in-out infinite;
+        }
+
+        .eip-bar:nth-child(1) {
+            height: 60%;
+            animation-delay: 0s;
+        }
+
+        .eip-bar:nth-child(2) {
+            height: 100%;
+            animation-delay: 0.3s;
+        }
+
+        .eip-bar:nth-child(3) {
+            height: 40%;
+            animation-delay: 0.6s;
+        }
+
+        .eip-bar:nth-child(4) {
+            height: 80%;
+            animation-delay: 0.9s;
+        }
+
+        .eip-trend-line {
+            margin-top: 2px;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #98fb98, #add8e6, transparent);
+            border-radius: 0.5px;
+            animation: eipTrendPulse 3s ease-in-out infinite;
+        }
+
+        .eip-data-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .eip-particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: linear-gradient(45deg, #98fb98, #add8e6, #e0ffff);
+            border-radius: 50%;
+            opacity: 0;
+            animation: eipParticleFloat 3.5s ease-in-out infinite;
+        }
+
+        .eip-particle:nth-child(1) {
+            top: 20%;
+            left: 85%;
+            animation-delay: 0s;
+        }
+
+        .eip-particle:nth-child(2) {
+            top: 65%;
+            left: 90%;
+            animation-delay: 1s;
+        }
+
+        .eip-particle:nth-child(3) {
+            top: 45%;
+            left: 95%;
+            animation-delay: 2s;
+        }
+
+        .eip-intelligence-indicators {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 12px;
+            height: 12px;
+        }
+
+        .eip-indicator {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(152, 251, 152, 0.9);
+            border-radius: 50%;
+            animation: eipIndicatorBlink 2s ease-in-out infinite;
+        }
+
+        .eip-indicator:nth-child(1) {
+            top: 0;
+            left: 0;
+            animation-delay: 0s;
+        }
+
+        .eip-indicator:nth-child(2) {
+            top: 0;
+            right: 0;
+            animation-delay: 0.7s;
+        }
+
+        .eip-indicator:nth-child(3) {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 1.4s;
+        }
+
+        .eip-floating-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 68px;
+            height: 68px;
+            border: 1px solid rgba(173, 216, 230, 0.5);
+            border-radius: 50%;
+            animation: eipRingRotate 25s linear infinite;
+            pointer-events: none;
+        }
+
+        .eip-floating-ring::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: linear-gradient(45deg, #98fb98, #add8e6);
+            border-radius: 50%;
+            box-shadow: 0 0 6px rgba(152, 251, 152, 0.8);
+        }
+
+        /* EIP Animations */
+        @keyframes eipLogoPulse {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes eipBrainGlow {
+            0% { 
+                box-shadow: 
+                    0 6px 12px rgba(173, 216, 230, 0.5),
+                    inset 0 1px 2px rgba(255,255,255,0.4);
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 
+                    0 8px 16px rgba(152, 251, 152, 0.6),
+                    inset 0 1px 2px rgba(255,255,255,0.5);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes eipNeuralPulse {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 0.9; transform: scaleX(1); }
+        }
+
+        @keyframes eipBarGrow {
+            0%, 100% { transform: scaleY(0.7); opacity: 0.7; }
+            50% { transform: scaleY(1); opacity: 1; }
+        }
+
+        @keyframes eipTrendPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes eipParticleFloat {
+            0% { 
+                opacity: 0; 
+                transform: translateY(0px) translateX(0px); 
+            }
+            50% { 
+                opacity: 1; 
+                transform: translateY(-8px) translateX(-4px); 
+            }
+            100% { 
+                opacity: 0; 
+                transform: translateY(-16px) translateX(-8px); 
+            }
+        }
+
+        @keyframes eipIndicatorBlink {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        @keyframes eipRingRotate {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Hover effects for EIP logo */
+        .service-card:hover .eip-brain {
+            animation-duration: 1.5s;
+        }
+
+        .service-card:hover .eip-neural-line {
+            animation-duration: 1s;
+        }
+
+        .service-card:hover .eip-floating-ring {
+            animation-duration: 12s;
+        }
+
+        .service-card:hover .eip-particle {
+            animation-duration: 2s;
+        }
+        
+        /* About Section */
+        .about {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+        }
+        
+        .about-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px 40px;
+            border-radius: 20px;
+        }
+        
+        .about-text p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            color: rgba(44, 95, 93, 0.9);
+            text-align: justify;
+        }
+        
+        .about-text p:last-child {
+            margin-bottom: 0;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        /* Contact Section */
+        .contact-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 60px 40px;
+            border-radius: 20px;
+        }
+        
+        .contact h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .contact p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: var(--text-light);
+        }
+        
+        .contact-email {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: var(--transition-smooth);
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
+        }
+        
+        .contact-email:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
+        }
+        
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            background: rgba(44, 95, 93, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        footer p {
+            color: var(--text-light);
+        }
+        
+        /* Loading Screen */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            z-index: 200;
+            animation: pulse 2s infinite;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        /* Google Authentication Modal */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(44, 95, 93, 0.4), rgba(77, 182, 172, 0.3));
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .auth-modal.show {
+            display: flex;
+        }
+
+        .auth-modal-content {
+            background: linear-gradient(145deg, 
+                rgba(255, 255, 255, 0.95) 0%, 
+                rgba(255, 255, 255, 0.9) 50%, 
+                rgba(248, 250, 252, 0.95) 100%);
+            backdrop-filter: blur(25px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-radius: 32px;
+            padding: 50px 40px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 
+                0 25px 80px rgba(0, 0, 0, 0.15),
+                0 15px 40px rgba(0, 0, 0, 0.1),
+                inset 0 2px 0 rgba(255, 255, 255, 1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+            position: relative;
+            animation: modalSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .auth-modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+                rgba(77, 182, 172, 0.03) 0%, 
+                transparent 30%, 
+                rgba(64, 224, 208, 0.02) 70%, 
+                transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            border-radius: 32px;
+        }
+
+        .auth-modal-content:hover::before {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalSlideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(-40px) scale(0.85) rotateX(10deg); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1) rotateX(0deg); 
+            }
+        }
+
+        .auth-modal-header {
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .auth-modal h3 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .auth-modal p {
+            color: rgba(44, 95, 93, 0.8);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .google-signin-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 18px 28px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(248, 249, 250, 0.9));
+            border: 2px solid rgba(218, 220, 224, 0.8);
+            border-radius: 20px;
+            color: #3c4043;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 25px;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.12),
+                0 4px 10px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+
+        .google-signin-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(66, 133, 244, 0.05), rgba(52, 168, 83, 0.05), rgba(251, 188, 5, 0.05), rgba(234, 67, 53, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 20px;
+        }
+
+        .google-signin-btn:hover::before {
+            opacity: 1;
+        }
+
+        .google-signin-btn:hover {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(248, 249, 250, 0.95));
+            border-color: rgba(189, 193, 198, 0.9);
+            box-shadow: 
+                0 12px 35px rgba(0, 0, 0, 0.18),
+                0 6px 15px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .google-signin-btn:active {
+            transform: translateY(-1px) scale(0.98);
+            transition: all 0.1s ease;
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            border: 1px solid rgba(77, 182, 172, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            color: rgba(44, 95, 93, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            z-index: 3;
+        }
+
+        .modal-close:hover {
+            background: linear-gradient(145deg, rgba(77, 182, 172, 0.15), rgba(77, 182, 172, 0.05));
+            border-color: rgba(77, 182, 172, 0.4);
+            color: var(--accent-color);
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 4px 15px rgba(77, 182, 172, 0.3);
+        }
+
+        .auth-divider {
+            margin: 30px 0;
+            text-align: center;
+            position: relative;
+            color: rgba(44, 95, 93, 0.6);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(77, 182, 172, 0.1) 20%, 
+                rgba(77, 182, 172, 0.3) 50%, 
+                rgba(77, 182, 172, 0.1) 80%, 
+                transparent 100%);
+            border-radius: 1px;
+        }
+
+        .auth-divider span {
+            background: linear-gradient(145deg, 
+                rgba(255, 255, 255, 0.95), 
+                rgba(248, 250, 252, 0.9));
+            padding: 0 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .privacy-note {
+            font-size: 0.85rem;
+            color: rgba(44, 95, 93, 0.8);
+            line-height: 1.5;
+            margin-top: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(145deg, rgba(248, 250, 252, 0.8), rgba(255, 255, 255, 0.6));
+            border-radius: 16px;
+            border: 1px solid rgba(228, 230, 235, 0.8);
+            backdrop-filter: blur(5px);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        .privacy-note a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .privacy-note a:hover {
+            color: var(--accent-dark);
+            text-decoration: underline;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-center .nav-links { display: none; }
+            .cta-button { 
+                margin-left: 0;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+
+            .auth-buttons {
+                margin-left: 0;
+                gap: 8px;
+            }
+
+            .auth-button {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+
+            .auth-button svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .user-profile {
+                margin-left: 0;
+                padding: 6px 12px;
+            }
+
+            .user-avatar {
+                width: 28px;
+                height: 28px;
+            }
+
+            .user-info {
+                font-size: 0.75rem;
+            }
+
+            .user-email {
+                font-size: 0.65rem;
+            }
+
+            .logout-btn {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+            }
+
+            .auth-modal-content {
+                padding: 30px 20px;
+                max-width: 350px;
+            }
+
+            .auth-modal h3 {
+                font-size: 1.5rem;
+            }
+
+            .google-signin-btn {
+                padding: 14px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .nav-container {
+                justify-content: space-between;
+            }
+            
+            .logo-container {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 10px;
+            }
+            
+            .logo-brain-container {
+                width: 30px;
+                height: 30px;
+            }
+            
+            .logo-floating-ring {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .hero h1 { font-size: 2.5rem; }
+            .hero-content { padding: 40px 20px; }
+            .hero-buttons { 
+                flex-direction: column; 
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .btn-intelligence {
+                min-width: 200px;
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            
+            .btn-intelligence-icon {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .btn-intelligence-brain {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .btn-services {
+                min-width: 180px;
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+            
+            .btn-services-icon {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .btn-services-network {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .services-grid { 
+                grid-template-columns: 1fr; 
+                gap: 25px;
+                margin-top: 40px;
+            }
+            
+            .service-card {
+                padding: 35px 25px;
+                margin: 0 10px;
+            }
+            
+            .service-card:hover {
+                transform: translateY(-8px) scale(1.01);
+            }
+            
+            .service-icon {
+                width: 64px;
+                height: 64px;
+                margin-bottom: 20px;
+            }
+            
+            .service-card h3 {
+                font-size: 1.4rem;
+                margin-bottom: 16px;
+            }
+            
+            .service-card p {
+                font-size: 1rem;
+                line-height: 1.6;
+            }
+            
+            .section-header h2 {
+                font-size: 2.2rem;
+                margin-bottom: 20px;
+            }
+            
+            .section-header p {
+                font-size: 1.1rem;
+                padding: 0 10px;
+            }
+            
+            .about-content { padding: 30px 20px; }
+            .about-text p { font-size: 1rem; text-align: left; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div id="custom-cursor">
+        <div class="cursor-brain">
+            <div class="cursor-neural-paths">
+                <div class="cursor-neural-line"></div>
+                <div class="cursor-neural-line"></div>
+                <div class="cursor-neural-line"></div>
+                <div class="cursor-neural-line"></div>
+            </div>
+        </div>
+        <div class="cursor-particles">
+            <div class="cursor-particle"></div>
+            <div class="cursor-particle"></div>
+            <div class="cursor-particle"></div>
+            <div class="cursor-particle"></div>
+            <div class="cursor-particle"></div>
+        </div>
+        <div class="cursor-ring"></div>
+        <div class="cursor-data-stream">
+            <div class="cursor-stream-line"></div>
+            <div class="cursor-stream-line"></div>
+            <div class="cursor-stream-line"></div>
+        </div>
+    </div>
+
+    <div id="animation-container">
+        <div id="loading">Initializing Data Visualization...</div>
+    </div>
+    
+    <div class="content-overlay">
+        <nav id="navbar">
+            <div class="nav-container">
+                <div class="logo-container">
+                    <div class="logo-floating-ring"></div>
+                    <div class="logo-icon">
+                        <div class="logo-brain-container">
+                            <div class="logo-brain">
+                                <div class="logo-neural-paths">
+                                    <div class="logo-neural-line"></div>
+                                    <div class="logo-neural-line"></div>
+                                    <div class="logo-neural-line"></div>
+                                    <div class="logo-neural-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="logo-dashboard-elements">
+                            <div class="logo-chart-bars">
+                                <div class="logo-bar"></div>
+                                <div class="logo-bar"></div>
+                                <div class="logo-bar"></div>
+                                <div class="logo-bar"></div>
+                            </div>
+                            <div class="logo-trend-line"></div>
+                        </div>
+                        <div class="logo-data-particles">
+                            <div class="logo-particle"></div>
+                            <div class="logo-particle"></div>
+                            <div class="logo-particle"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="nav-center">
+                    <ul class="nav-links">
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="auth-buttons">
+                    <button id="signInBtn" class="auth-button sign-in">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        Sign In
+                    </button>
+                    <button id="newUserBtn" class="auth-button new-user">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 4V6C15 7.1 14.1 8 13 8H11C9.9 8 9 7.1 9 6V4L3 7V9H9V23H11V16H13V23H15V9H21Z"/>
+                        </svg>
+                        New User
+                    </button>
+                </div>
+                <div class="user-profile" id="userProfile">
+                    <img class="user-avatar" id="userAvatar" src="" alt="User Avatar">
+                    <div class="user-info">
+                        <div class="user-name" id="userName"></div>
+                        <div class="user-email" id="userEmail"></div>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn">Sign Out</button>
+                </div>
+                
+                <!-- Intelligent Management Button (appears when user is signed in) -->
+                <a href="#" class="intelligent-management-btn" id="intelligentManagementBtn" style="display: none;" onclick="openIntelligentManagement()">
+                    <div class="mgmt-icon">
+                        <div class="mgmt-brain">
+                            <div class="mgmt-neural-paths">
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <span>Intelligent Management</span>
+                </a>
+            </div>
+        </nav>
+        
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1>Transform Data Into Insights</h1>
+                <p class="hero-subtitle">Advanced Statistical Analysis • Advanced Data Visualization • Research Excellence</p>
+                <p class="hero-description">
+                    We turn complex datasets into actionable insights through advanced statistical analysis, 
+                    data visualization, and research manuscript preparation.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="btn btn-intelligence">
+                        <div class="btn-intelligence-icon">
+                            <div class="btn-intelligence-brain">
+                                <div class="btn-neural-paths">
+                                    <div class="btn-neural-line"></div>
+                                    <div class="btn-neural-line"></div>
+                                    <div class="btn-neural-line"></div>
+                                    <div class="btn-neural-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span>Start Your Project</span>
+                        <div class="btn-data-particles">
+                            <div class="btn-particle"></div>
+                            <div class="btn-particle"></div>
+                            <div class="btn-particle"></div>
+                            <div class="btn-particle"></div>
+                        </div>
+                        <div class="btn-mini-chart">
+                            <div class="btn-chart-bars">
+                                <div class="btn-chart-bar"></div>
+                                <div class="btn-chart-bar"></div>
+                                <div class="btn-chart-bar"></div>
+                                <div class="btn-chart-bar"></div>
+                            </div>
+                            <div class="btn-trend-line"></div>
+                        </div>
+                    </a>
+                    <a href="#services" class="btn btn-services">
+                        <div class="btn-services-icon">
+                            <div class="btn-services-network">
+                                <div class="btn-network-node"></div>
+                                <div class="btn-network-node"></div>
+                                <div class="btn-network-node"></div>
+                                <div class="btn-network-node"></div>
+                                <div class="btn-network-connections">
+                                    <div class="btn-connection-line"></div>
+                                    <div class="btn-connection-line"></div>
+                                    <div class="btn-connection-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <span>Our Services</span>
+                        <div class="btn-services-particles">
+                            <div class="btn-services-particle"></div>
+                            <div class="btn-services-particle"></div>
+                            <div class="btn-services-particle"></div>
+                            <div class="btn-services-particle"></div>
+                        </div>
+                        <div class="btn-analytics-display">
+                            <div class="btn-analytics-graph">
+                                <div class="btn-analytics-points"></div>
+                                <div class="btn-analytics-indicators">
+                                    <div class="btn-indicator-dot"></div>
+                                    <div class="btn-indicator-dot"></div>
+                                    <div class="btn-indicator-dot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <section class="services" id="services">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Our Expertise</h2>
+                    <p>Comprehensive data solutions tailored to your research and business needs</p>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="15" y="70" width="8" height="20" rx="2"/>
+                                <rect x="30" y="55" width="8" height="35" rx="2"/>
+                                <rect x="45" y="40" width="8" height="50" rx="2"/>
+                                <rect x="60" y="30" width="8" height="60" rx="2"/>
+                                <rect x="75" y="45" width="8" height="45" rx="2"/>
+                                <path d="M10 25 L25 20 L40 15 L55 10 L70 15 L85 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <circle cx="25" cy="20" r="3"/>
+                                <circle cx="40" cy="15" r="3"/>
+                                <circle cx="55" cy="10" r="3"/>
+                                <circle cx="70" cy="15" r="3"/>
+                                <circle cx="85" cy="12" r="3"/>
+                            </svg>
+                        </div>
+                        <h3>Advanced Statistical Analysis</h3>
+                        <p>Rigorous statistical modeling and hypothesis testing. We provide comprehensive analysis with clear interpretations and actionable recommendations.</p>
+                    </div>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="10" y="10" width="80" height="50" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <path d="M15 45 L30 35 L45 25 L60 30 L75 20 L85 25" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                                <circle cx="30" cy="35" r="2.5"/>
+                                <circle cx="45" cy="25" r="2.5"/>
+                                <circle cx="60" cy="30" r="2.5"/>
+                                <circle cx="75" cy="20" r="2.5"/>
+                                <rect x="15" y="70" width="25" height="20" rx="2"/>
+                                <circle cx="27.5" cy="80" r="6"/>
+                                <path d="M21.5 80 L27.5 74 L33.5 80 Z"/>
+                                <rect x="50" y="70" width="35" height="20" rx="2"/>
+                                <rect x="55" y="75" width="6" height="10" rx="1"/>
+                                <rect x="65" y="77" width="6" height="8" rx="1"/>
+                                <rect x="75" y="74" width="6" height="11" rx="1"/>
+                            </svg>
+                        </div>
+                        <h3>Advanced Data Visualization</h3>
+                        <p>Create compelling visualizations that tell your data's story. Interactive dashboards and publication-ready figures that communicate insights clearly.</p>
+                    </div>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="20" cy="25" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="20" cy="50" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="20" cy="75" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="50" cy="20" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="50" cy="40" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="50" cy="60" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="50" cy="80" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="80" cy="35" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <circle cx="80" cy="65" r="6" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <path d="M26 25 L44 20" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 25 L44 40" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 50 L44 40" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 50 L44 60" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 75 L44 60" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M26 75 L44 80" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M56 20 L74 35" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M56 40 L74 35" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M56 60 L74 65" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <path d="M56 80 L74 65" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                                <circle cx="20" cy="25" r="2"/>
+                                <circle cx="50" cy="40" r="2"/>
+                                <circle cx="80" cy="35" r="2"/>
+                            </svg>
+                        </div>
+                        <h3>Predictive AI/ML Models</h3>
+                        <p>Advanced machine learning and artificial intelligence solutions for predictive analytics. We develop custom models for forecasting, classification, and pattern recognition to drive data-driven decision making.</p>
+                    </div>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="15" y="15" width="50" height="65" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                                <line x1="22" y1="25" x2="50" y2="25" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="22" y1="35" x2="58" y2="35" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="22" y1="45" x2="55" y2="45" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="22" y1="55" x2="52" y2="55" stroke="currentColor" stroke-width="1.5"/>
+                                <line x1="22" y1="65" x2="45" y2="65" stroke="currentColor" stroke-width="1.5"/>
+                                <circle cx="65" cy="50" r="12" fill="none" stroke="currentColor" stroke-width="2.5"/>
+                                <path d="M74 59 L85 70" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                <circle cx="65" cy="50" r="6" fill="currentColor" opacity="0.3"/>
+                                <path d="M60 45 L70 55" stroke="currentColor" stroke-width="1.5"/>
+                                <path d="M70 45 L60 55" stroke="currentColor" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+                        <h3>Research Consulting</h3>
+                        <p>Expert guidance on research design, methodology, and data strategy. We help you make informed decisions from project conception to publication.</p>
+                    </div>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Neural Network Neurons -->
+                                <circle class="neuron" cx="20" cy="30" r="4"/>
+                                <circle class="neuron" cx="20" cy="50" r="4"/>
+                                <circle class="neuron" cx="20" cy="70" r="4"/>
+                                
+                                <circle class="neuron" cx="50" cy="25" r="4"/>
+                                <circle class="neuron" cx="50" cy="40" r="4"/>
+                                <circle class="neuron" cx="50" cy="55" r="4"/>
+                                <circle class="neuron" cx="50" cy="70" r="4"/>
+                                
+                                <circle class="neuron" cx="80" cy="45" r="4"/>
+                                <circle class="neuron" cx="80" cy="60" r="4"/>
+                                
+                                <!-- Neural Connections -->
+                                <line class="connection" x1="24" y1="30" x2="46" y2="25" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="30" x2="46" y2="40" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="50" x2="46" y2="40" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="50" x2="46" y2="55" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="70" x2="46" y2="55" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="24" y1="70" x2="46" y2="70" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                
+                                <line class="connection" x1="54" y1="25" x2="76" y2="45" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="54" y1="40" x2="76" y2="45" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="54" y1="55" x2="76" y2="60" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                <line class="connection" x1="54" y1="70" x2="76" y2="60" stroke="currentColor" 
+                                      stroke-width="1" stroke-dasharray="2,2"/>
+                                
+                                <!-- Prediction Arrow -->
+                                <path class="prediction-arrow" d="M85 52 L95 52 M92 49 L95 52 L92 55" 
+                                      stroke="currentColor" stroke-width="2"/>
+                                
+                                <!-- AI Brain Waves -->
+                                <path class="brain-waves" d="M15 15 Q25 10 35 15 Q45 20 55 15" 
+                                      stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.6"/>
+                                
+                                <!-- ML Algorithm Symbol -->
+                                <text x="30" y="10" font-size="8" fill="currentColor" font-weight="bold">ML</text>
+                                
+                                <!-- Prediction Accuracy -->
+                                <text x="70" y="25" font-size="6" fill="currentColor">98.7%</text>
+                                
+                                <!-- Deep Learning Layers Indicator -->
+                                <rect x="5" y="85" width="90" height="2" opacity="0.4" rx="1"/>
+                                <rect x="10" y="88" width="80" height="2" opacity="0.4" rx="1"/>
+                                <rect x="15" y="91" width="70" height="2" opacity="0.4" rx="1"/>
+                                <text x="35" y="98" font-size="6" fill="currentColor">Deep Learning</text>
+                            </svg>
+                        </div>
+                        <h3>Custom Solutions</h3>
+                        <p>Tailored data solutions for unique challenges. We architect custom analytical frameworks, algorithms, and methodologies that perfectly match your specific requirements and deliver innovative results.</p>
+                    </div>
+                    <div class="service-card glass">
+                        <div class="service-icon">
+                            <div class="eip-animated-logo">
+                                <div class="eip-floating-ring"></div>
+                                <div class="eip-logo-icon">
+                                    <div class="eip-brain-container">
+                                        <div class="eip-brain">
+                                            <div class="eip-neural-paths">
+                                                <div class="eip-neural-line"></div>
+                                                <div class="eip-neural-line"></div>
+                                                <div class="eip-neural-line"></div>
+                                                <div class="eip-neural-line"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="eip-dashboard-elements">
+                                        <div class="eip-chart-bars">
+                                            <div class="eip-bar"></div>
+                                            <div class="eip-bar"></div>
+                                            <div class="eip-bar"></div>
+                                            <div class="eip-bar"></div>
+                                        </div>
+                                        <div class="eip-trend-line"></div>
+                                    </div>
+                                    <div class="eip-data-particles">
+                                        <div class="eip-particle"></div>
+                                        <div class="eip-particle"></div>
+                                        <div class="eip-particle"></div>
+                                    </div>
+                                    <div class="eip-intelligence-indicators">
+                                        <div class="eip-indicator"></div>
+                                        <div class="eip-indicator"></div>
+                                        <div class="eip-indicator"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h3>Executive Intelligence Platform</h3>
+                        <p>AI-powered executive command center that transforms your enterprise SQL databases into strategic intelligence. Delivers instant insights with natural language queries like "What drove our 23% revenue spike last week?" - empowering C-suite leaders with real-time competitive intelligence and predictive business analytics.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="about" id="about">
+            <div class="container">
+                <div class="section-header">
+                    <h2>About</h2>
+                    <p>Your trusted partner in data-driven decision making</p>
+                </div>
+                <div class="about-content glass">
+                    <div class="about-text">
+                        <p>Based in the United States of America, we have advanced data analysis expertise dedicated to providing custom solutions for researchers, businesses, and organizations worldwide. We combine cutting-edge statistical methodologies with practical insights to help our clients unlock the full potential of their data.</p>
+                        <p>Our team of experienced data scientists and statisticians brings years of expertise in transforming complex datasets into actionable intelligence. Whether you're conducting academic research, making business decisions, or seeking to understand patterns in your data, we provide tailored solutions that meet your unique requirements.</p>
+                        <p>We believe that every dataset contains valuable insights waiting to be discovered. Our mission is to help you uncover, understand, and communicate those insights with precision and clarity.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="contact" id="contact">
+            <div class="container">
+                <div class="contact-content glass">
+                    <h2>Ready to Transform Your Data?</h2>
+                    <p>Let's discuss how we can help you unlock insights from your data and achieve your research goals.</p>
+                    <a href="mailto:support@01data.org" class="contact-email">support@01data.org</a>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <div class="container">
+                <p>&copy; 2025 01data.org - Professional Data Analysis & Research Services</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="auth-modal-header">
+                <h3 id="modalTitle">Sign In to 01data</h3>
+                <p id="modalDescription">Access your personalized data analytics dashboard</p>
+            </div>
+            
+            <button class="google-signin-btn" id="googleSignInBtn">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                <span id="googleBtnText">Continue with Google</span>
+            </button>
+            
+            <div class="auth-divider">
+                <span>Secure authentication powered by Google</span>
+            </div>
+            
+            <div class="privacy-note">
+                By signing in, you agree to our <a href="#privacy">Privacy Policy</a> and <a href="#terms">Terms of Service</a>. Your data is protected and never shared without your consent.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Custom Cursor System
+        let cursor = document.getElementById('custom-cursor');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        // Smooth cursor following
+        function updateCursor() {
+            const ease = 0.15;
+            cursorX += (mouseX - cursorX) * ease;
+            cursorY += (mouseY - cursorY) * ease;
+            
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            
+            requestAnimationFrame(updateCursor);
+        }
+
+        // Mouse tracking
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        // Cursor state management
+        const clickableElements = document.querySelectorAll('a, button, [role="button"], input, textarea, select');
+        const textElements = document.querySelectorAll('input[type="text"], input[type="email"], input[type="search"], textarea');
+
+        clickableElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('hover');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('hover');
+            });
+            
+            el.addEventListener('mousedown', () => {
+                cursor.classList.add('click');
+            });
+            
+            el.addEventListener('mouseup', () => {
+                cursor.classList.remove('click');
+            });
+        });
+
+        textElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('text');
+            });
+            
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('text');
+            });
+        });
+
+        // Cursor trail effect
+        let trails = [];
+        let trailCount = 0;
+        const maxTrails = 8;
+
+        function createTrail() {
+            if (trailCount < maxTrails) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.style.left = cursorX - 4 + 'px';
+                trail.style.top = cursorY - 4 + 'px';
+                
+                document.body.appendChild(trail);
+                trails.push(trail);
+                trailCount++;
+
+                setTimeout(() => {
+                    if (trail.parentNode) {
+                        trail.parentNode.removeChild(trail);
+                        trails = trails.filter(t => t !== trail);
+                        trailCount--;
+                    }
+                }, 800);
+            }
+        }
+
+        // Create trails periodically during movement
+        let lastMoveTime = 0;
+        let isMoving = false;
+
+        document.addEventListener('mousemove', () => {
+            const now = Date.now();
+            if (now - lastMoveTime > 100) { // Create trail every 100ms
+                createTrail();
+                lastMoveTime = now;
+            }
+            
+            if (!isMoving) {
+                isMoving = true;
+                setTimeout(() => {
+                    isMoving = false;
+                }, 50);
+            }
+        });
+
+        // Initialize cursor animation
+        updateCursor();
+
+        // Optimized Three.js Animation
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true, 
+            alpha: true,
+            powerPreference: "high-performance"
+        });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0);
+        document.getElementById('animation-container').appendChild(renderer.domElement);
+
+        // Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+        const directionalLight = new THREE.DirectionalLight(0x4db6ac, 1.2);
+        directionalLight.position.set(20, 20, 10);
+        scene.add(directionalLight);
+        const pointLight = new THREE.PointLight(0x26a69a, 0.8, 200);
+        pointLight.position.set(-30, -30, -10);
+        scene.add(pointLight);
+        scene.fog = new THREE.Fog(0xf0fffe, 50, 200);
+
+        // Particle system
+        const particles = new THREE.Group();
+        const dataElements = [];
+        const particleCount = 30;
+        const graphCount = 15;
+
+        // Create simple charts
+        function createChart(type, size = 48) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.height = size;
+            
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(0, 0, size, size);
+            ctx.strokeStyle = 'rgba(44, 95, 93, 0.6)';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(2, 2, size - 4, size - 4);
+            
+            const colors = ['#4db6ac', '#26a69a', '#80cbc4'];
+            
+            switch(type) {
+                case 'line':
+                    ctx.strokeStyle = colors[0];
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        const x = 6 + (i / 4) * (size - 12);
+                        const y = 6 + Math.random() * (size - 12);
+                        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                    break;
+                case 'bar':
+                    for (let i = 0; i < 3; i++) {
+                        const x = 8 + i * (size - 16) / 3;
+                        const h = Math.random() * (size - 16) + 4;
+                        ctx.fillStyle = colors[i];
+                        ctx.fillRect(x, size - h - 6, (size - 16) / 4, h);
+                    }
+                    break;
+                case 'pie':
+                    const centerX = size / 2, centerY = size / 2, radius = size * 0.2;
+                    let angle = 0;
+                    [0.5, 0.3, 0.2].forEach((segment, i) => {
+                        const sliceAngle = segment * Math.PI * 2;
+                        ctx.fillStyle = colors[i];
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.arc(centerX, centerY, radius, angle, angle + sliceAngle);
+                        ctx.closePath();
+                        ctx.fill();
+                        angle += sliceAngle;
+                    });
+                    break;
+            }
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // Create elements
+        const graphTypes = ['line', 'bar', 'pie'];
+        
+        for (let i = 0; i < graphCount; i++) {
+            const texture = createChart(graphTypes[Math.floor(Math.random() * 3)]);
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.5 });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.setScalar(1.2 + Math.random() * 0.8);
+            sprite.position.set(
+                (Math.random() - 0.5) * 80,
+                (Math.random() - 0.5) * 80,
+                (Math.random() - 0.5) * 80
+            );
+            sprite.userData = {
+                speed: 0.3 + Math.random() * 0.3,
+                amplitude: 1 + Math.random(),
+                phase: Math.random() * Math.PI * 2,
+                initialPos: sprite.position.clone()
+            };
+            particles.add(sprite);
+            dataElements.push(sprite);
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.height = 24;
+            ctx.fillStyle = `hsl(${160 + Math.random() * 40}, 60%, ${50 + Math.random() * 30}%)`;
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(Math.floor(Math.random() * 10), 12, 16);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.SpriteMaterial({ map: texture, transparent: true, opacity: 0.4 });
+            const sprite = new THREE.Sprite(material);
+            sprite.scale.setScalar(0.6);
+            sprite.position.set(
+                (Math.random() - 0.5) * 60,
+                (Math.random() - 0.5) * 60,
+                (Math.random() - 0.5) * 60
+            );
+            sprite.userData = {
+                speed: 0.4 + Math.random() * 0.4,
+                amplitude: 1 + Math.random(),
+                phase: Math.random() * Math.PI * 2,
+                initialPos: sprite.position.clone()
+            };
+            particles.add(sprite);
+            dataElements.push(sprite);
+        }
+
+        scene.add(particles);
+        camera.position.set(0, 0, 40);
+
+        // Animation variables
+        let mouse = new THREE.Vector2();
+        let mouseTarget = new THREE.Vector2();
+        let time = 0;
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.006;
+
+            dataElements.forEach((element) => {
+                const { speed, amplitude, phase, initialPos } = element.userData;
+                element.position.x = initialPos.x + Math.sin(time * speed + phase) * amplitude;
+                element.position.y = initialPos.y + Math.cos(time * speed * 0.7 + phase) * amplitude;
+                element.position.z = initialPos.z + Math.sin(time * speed * 0.5 + phase) * amplitude * 0.5;
+            });
+
+            mouseTarget.lerp(mouse, 0.02);
+            camera.position.x += (mouseTarget.x * 3 - camera.position.x) * 0.02;
+            camera.position.y += (mouseTarget.y * 3 - camera.position.y) * 0.02;
+            camera.position.z = 40 + Math.sin(time * 0.1) * 2;
+            camera.lookAt(0, 0, 0);
+
+            particles.rotation.y += 0.0005;
+            particles.rotation.x += 0.0002;
+            pointLight.position.x = Math.sin(time * 0.5) * 20;
+
+            renderer.render(scene, camera);
+        }
+
+        // Event listeners
+        document.addEventListener('mousemove', (e) => {
+            mouse.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        window.addEventListener('scroll', () => {
+            document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Logo interactions
+        const logoContainer = document.querySelector('.logo-container');
+        const logoBrain = document.querySelector('.logo-brain');
+        
+        if (logoContainer && logoBrain) {
+            logoContainer.addEventListener('mouseenter', () => {
+                logoBrain.style.transform = 'scale(1.1)';
+                logoBrain.style.transition = 'transform 0.3s ease';
+            });
+            
+            logoContainer.addEventListener('mouseleave', () => {
+                logoBrain.style.transform = 'scale(1)';
+            });
+
+            // Add click interaction
+            logoContainer.addEventListener('click', () => {
+                logoBrain.style.animation = 'logoBrainGlow 0.5s ease-in-out';
+                setTimeout(() => {
+                    logoBrain.style.animation = 'logoBrainGlow 3s ease-in-out infinite alternate';
+                }, 500);
+            });
+        }
+
+        // Google Authentication System
+        let currentUser = null;
+        const GOOGLE_CLIENT_ID = '336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com'; // Replace with your real Google Client ID from Google Cloud Console
+
+        // For demo purposes, we'll simulate Google Sign-In
+        let isGoogleApiLoaded = false;
+
+        // Initialize Google Sign-In
+        function initializeGoogleAuth() {
+            if (typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.initialize({
+                    client_id: GOOGLE_CLIENT_ID,
+                    callback: handleGoogleSignIn,
+                    auto_select: false,
+                    cancel_on_tap_outside: false
+                });
+                isGoogleApiLoaded = true;
+                console.log('Google Sign-In initialized');
+            } else {
+                console.log('Google Sign-In API not available - using demo mode');
+                // For demo purposes when Google API is not available
+                isGoogleApiLoaded = false;
+            }
+        }
+
+        // Demo function for testing without Google API
+        function simulateGoogleSignIn(isNewUser = false) {
+            const demoUser = {
+                id: 'demo_' + Date.now(),
+                name: isNewUser ? 'New User Demo' : 'Demo User',
+                email: isNewUser ? 'newuser@example.com' : 'demo@example.com',
+                picture: 'https://via.placeholder.com/96/4db6ac/ffffff?text=' + (isNewUser ? 'NU' : 'DU'),
+                token: 'demo_token_' + Date.now()
+            };
+
+            currentUser = demoUser;
+            displayUserProfile(currentUser);
+            closeAuthModal();
+            
+            localStorage.setItem('01data_user', JSON.stringify(currentUser));
+            console.log('Demo user signed in:', currentUser);
+            
+            // Show success message
+            showNotification(isNewUser ? 'Welcome to 01data!' : 'Welcome back!', 'success');
+        }
+
+        // Handle successful Google sign-in
+        function handleGoogleSignIn(response) {
+            try {
+                const credential = response.credential;
+                const payload = JSON.parse(atob(credential.split('.')[1]));
+                
+                currentUser = {
+                    id: payload.sub,
+                    name: payload.name,
+                    email: payload.email,
+                    picture: payload.picture,
+                    token: credential
+                };
+
+                displayUserProfile(currentUser);
+                closeAuthModal();
+                
+                // Store user data in localStorage
+                localStorage.setItem('01data_user', JSON.stringify(currentUser));
+                
+                console.log('User signed in:', currentUser);
+                
+                // You can add additional logic here, such as:
+                // - Sending user data to your backend
+                // - Redirecting to a dashboard
+                // - Loading personalized content
+                
+            } catch (error) {
+                console.error('Error handling Google sign-in:', error);
+                alert('Sign-in failed. Please try again.');
+            }
+        }
+
+        // Display user profile in navigation
+        function displayUserProfile(user) {
+            const authButtons = document.querySelector('.auth-buttons');
+            const userProfile = document.getElementById('userProfile');
+            const intelligentManagementBtn = document.getElementById('intelligentManagementBtn');
+            const userName = document.getElementById('userName');
+            const userEmail = document.getElementById('userEmail');
+            const userAvatar = document.getElementById('userAvatar');
+
+            authButtons.style.display = 'none';
+            userProfile.style.display = 'flex';
+            intelligentManagementBtn.style.display = 'inline-flex';
+            
+            userName.textContent = user.name;
+            userEmail.textContent = user.email;
+            userAvatar.src = user.picture;
+            userAvatar.alt = user.name;
+        }
+
+        // Show authentication modal
+        function showAuthModal(isNewUser = false) {
+            const modal = document.getElementById('authModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDescription = document.getElementById('modalDescription');
+            const googleBtnText = document.getElementById('googleBtnText');
+
+            if (isNewUser) {
+                modalTitle.textContent = 'Welcome to 01data';
+                modalDescription.textContent = 'Create your account to access advanced data analytics tools';
+                googleBtnText.textContent = 'Sign up with Google';
+            } else {
+                modalTitle.textContent = 'Sign In to 01data';
+                modalDescription.textContent = 'Access your personalized data analytics dashboard';
+                googleBtnText.textContent = 'Continue with Google';
+            }
+
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close authentication modal
+        function closeAuthModal() {
+            const modal = document.getElementById('authModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        // Sign out user
+        function signOutUser() {
+            currentUser = null;
+            localStorage.removeItem('01data_user');
+            
+            const authButtons = document.querySelector('.auth-buttons');
+            const userProfile = document.getElementById('userProfile');
+            const intelligentManagementBtn = document.getElementById('intelligentManagementBtn');
+            
+            authButtons.style.display = 'flex';
+            userProfile.style.display = 'none';
+            intelligentManagementBtn.style.display = 'none';
+            
+            // Sign out from Google
+            if (typeof google !== 'undefined') {
+                google.accounts.id.disableAutoSelect();
+            }
+            
+            console.log('User signed out');
+            showNotification('Signed out successfully', 'info');
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <span class="notification-message">${message}</span>
+                    <button class="notification-close">&times;</button>
+                </div>
+            `;
+
+            // Add styles for notification
+            const style = document.createElement('style');
+            style.textContent = `
+                .notification {
+                    position: fixed;
+                    top: 100px;
+                    right: 30px;
+                    padding: 16px 24px;
+                    border-radius: 16px;
+                    backdrop-filter: blur(20px);
+                    border: 1px solid rgba(77, 182, 172, 0.3);
+                    box-shadow: 0 10px 30px rgba(44, 95, 93, 0.2);
+                    z-index: 2000;
+                    animation: notificationSlideIn 0.4s ease;
+                    max-width: 350px;
+                    font-weight: 500;
+                }
+                .notification-success {
+                    background: linear-gradient(145deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+                    color: #065f46;
+                }
+                .notification-info {
+                    background: linear-gradient(145deg, rgba(77, 182, 172, 0.15), rgba(38, 166, 154, 0.1));
+                    color: var(--primary-color);
+                }
+                .notification-content {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                }
+                .notification-close {
+                    background: none;
+                    border: none;
+                    font-size: 1.2rem;
+                    cursor: pointer;
+                    color: inherit;
+                    opacity: 0.6;
+                    padding: 4px;
+                    border-radius: 50%;
+                    transition: opacity 0.3s ease;
+                }
+                .notification-close:hover {
+                    opacity: 1;
+                }
+                @keyframes notificationSlideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.body.appendChild(notification);
+
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                notification.style.animation = 'notificationSlideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 4000);
+
+            // Close button handler
+            notification.querySelector('.notification-close').addEventListener('click', () => {
+                notification.style.animation = 'notificationSlideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            });
+        }
+
+        // Track which type of signup was requested
+        let pendingSignInType = 'signin';
+
+        // Check for existing user session
+        function checkExistingSession() {
+            const savedUser = localStorage.getItem('01data_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    displayUserProfile(currentUser);
+                } catch (error) {
+                    console.error('Error loading saved user:', error);
+                    localStorage.removeItem('01data_user');
+                }
+            }
+        }
+
+        // Event listeners for authentication
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Google Auth when the page loads
+            setTimeout(initializeGoogleAuth, 1000);
+            
+            // Check for existing user session
+            checkExistingSession();
+
+            // Sign In button
+            document.getElementById('signInBtn').addEventListener('click', () => {
+                pendingSignInType = 'signin';
+                showAuthModal(false);
+            });
+
+            // New User button
+            document.getElementById('newUserBtn').addEventListener('click', () => {
+                pendingSignInType = 'newuser';
+                showAuthModal(true);
+            });
+
+            // Modal close button
+            document.getElementById('modalClose').addEventListener('click', closeAuthModal);
+
+            // Close modal when clicking outside
+            document.getElementById('authModal').addEventListener('click', (e) => {
+                if (e.target.id === 'authModal') {
+                    closeAuthModal();
+                }
+            });
+
+            // Google Sign-In button
+            document.getElementById('googleSignInBtn').addEventListener('click', () => {
+                const button = document.getElementById('googleSignInBtn');
+                const originalText = button.querySelector('span').textContent;
+                
+                // Show loading state
+                button.querySelector('span').textContent = 'Connecting...';
+                button.style.opacity = '0.7';
+                button.style.pointerEvents = 'none';
+
+                setTimeout(() => {
+                    if (isGoogleApiLoaded && typeof google !== 'undefined') {
+                        // Use real Google Sign-In
+                        try {
+                            google.accounts.id.prompt((notification) => {
+                                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                                    // Fallback to demo if Google Sign-In fails
+                                    console.log('Google Sign-In not available, using demo mode');
+                                    showNotification('Google Sign-In temporarily unavailable. Using demo mode.', 'info');
+                                    simulateGoogleSignIn(pendingSignInType === 'newuser');
+                                }
+                            });
+                        } catch (error) {
+                            console.error('Google Sign-In error:', error);
+                            showNotification('Authentication issue detected. Please check domain configuration.', 'info');
+                            simulateGoogleSignIn(pendingSignInType === 'newuser');
+                        }
+                    } else {
+                        // Use demo sign-in for testing
+                        console.log('Google API not loaded, using demo mode');
+                        showNotification('Demo authentication mode active.', 'info');
+                        simulateGoogleSignIn(pendingSignInType === 'newuser');
+                    }
+
+                    // Reset button state
+                    button.querySelector('span').textContent = originalText;
+                    button.style.opacity = '1';
+                    button.style.pointerEvents = 'auto';
+                }, 1000);
+            });
+
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', signOutUser);
+
+            // Close modal on Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeAuthModal();
+                }
+            });
+        });
+
+        // Open Intelligent Management System
+        function openIntelligentManagement() {
+            if (!currentUser) {
+                showNotification('Please sign in to access Intelligent Management', 'warning');
+                return;
+            }
+
+            // Create user session data for the Personal Assistant
+            const userSession = {
+                id: currentUser.sub,
+                name: currentUser.name,
+                email: currentUser.email,
+                picture: currentUser.picture,
+                timestamp: new Date().toISOString()
+            };
+
+            // Store user session for Personal Assistant
+            localStorage.setItem('intelligent_user', JSON.stringify(userSession));
+
+            // Open the client-side Intelligent Management system
+            const assistantUrl = `intelligent-management.html?user=${encodeURIComponent(JSON.stringify(userSession))}`;
+            window.open(assistantUrl, '_blank');
+            
+            showNotification('Opening Intelligent Management System...', 'success');
+        }
+
+
+        // Initialize
+        setTimeout(() => {
+            document.getElementById('loading').style.display = 'none';
+        }, 1500);
+
+        animate();
+    </script>
+</body>
+</html>
