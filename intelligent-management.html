@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Management - 01data</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/intelligent-management.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMWY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-brain">
+                <div class="loading-neural-paths">
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                </div>
+            </div>
+            <h2>Initializing Intelligent Management</h2>
+            <p>Setting up your AI-powered workspace...</p>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-container">
+                    <div class="mgmt-icon">
+                        <div class="mgmt-brain">
+                            <div class="mgmt-neural-paths">
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h1>Intelligent Management</h1>
+                </div>
+                <nav class="main-nav">
+                    <button class="nav-btn active" data-view="dashboard">
+                        <span class="nav-icon">📊</span>
+                        Dashboard
+                    </button>
+                    <button class="nav-btn" data-view="tasks">
+                        <span class="nav-icon">✅</span>
+                        Tasks
+                    </button>
+                    <button class="nav-btn" data-view="calendar">
+                        <span class="nav-icon">📅</span>
+                        Calendar
+                    </button>
+                    <button class="nav-btn" data-view="projects">
+                        <span class="nav-icon">📋</span>
+                        Projects
+                    </button>
+                    <button class="nav-btn" data-view="ai-chat">
+                        <span class="nav-icon">🤖</span>
+                        AI Assistant
+                    </button>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="user-info" id="userInfo">
+                    <img class="user-avatar" id="userAvatar" src="" alt="">
+                    <span class="user-name" id="userName"></span>
+                </div>
+                <button class="settings-btn" id="settingsBtn">⚙️</button>
+                <button class="back-btn" onclick="window.location.href='index.html'">← Back to 01data</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Dashboard View -->
+            <div id="dashboard-view" class="view active">
+                <div class="dashboard-grid">
+                    <!-- Quick Stats -->
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="dueTodayCount">0</div>
+                                <div class="stat-label">Due Today</div>
+                            </div>
+                        </div>
+                        <div class="stat-card urgent">
+                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="overdueCount">0</div>
+                                <div class="stat-label">Overdue</div>
+                            </div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="completedCount">0</div>
+                                <div class="stat-label">Completed</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <div class="stat-number" id="completionRate">0%</div>
+                                <div class="stat-label">Completion Rate</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Add Task -->
+                    <div class="quick-add-container">
+                        <h3>Quick Add Task</h3>
+                        <div class="quick-add-form">
+                            <input type="text" id="quickTaskInput" placeholder="What needs to be done? (Try: 'Meeting tomorrow at 2pm' or 'Call client next Friday')" />
+                            <button id="quickAddBtn" class="btn-primary">
+                                <span class="btn-icon">🤖</span>
+                                Add with AI
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Today's Tasks -->
+                    <div class="today-tasks-container">
+                        <h3>Today's Schedule</h3>
+                        <div id="todayTasksList" class="tasks-list">
+                            <!-- Tasks will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- AI Suggestions -->
+                    <div class="suggestions-container">
+                        <h3>AI Suggestions</h3>
+                        <div id="aiSuggestions" class="suggestions-list">
+                            <!-- AI suggestions will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks View -->
+            <div id="tasks-view" class="view">
+                <div class="view-header">
+                    <h2>All Tasks</h2>
+                    <div class="view-actions">
+                        <button class="filter-btn" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="pending">Pending</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                        <button class="btn-primary" id="addTaskBtn">+ Add Task</button>
+                    </div>
+                </div>
+                <div class="tasks-container">
+                    <div id="allTasksList" class="tasks-list">
+                        <!-- All tasks will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar View -->
+            <div id="calendar-view" class="view">
+                <div class="view-header">
+                    <h2>Calendar</h2>
+                    <div class="calendar-controls">
+                        <button id="prevMonth">‹</button>
+                        <span id="currentMonth"></span>
+                        <button id="nextMonth">›</button>
+                        <button id="todayBtn">Today</button>
+                    </div>
+                </div>
+                <div class="calendar-container">
+                    <div id="calendar" class="calendar-grid">
+                        <!-- Calendar will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects View -->
+            <div id="projects-view" class="view">
+                <div class="view-header">
+                    <h2>Projects</h2>
+                    <button class="btn-primary" id="addProjectBtn">+ New Project</button>
+                </div>
+                <div class="projects-container">
+                    <div id="projectsList" class="projects-list">
+                        <!-- Projects will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Chat View -->
+            <div id="ai-chat-view" class="view">
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <h2>AI Assistant</h2>
+                        <div class="chat-status">
+                            <span class="status-indicator online"></span>
+                            Claude AI Ready
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>Hello! I'm your AI assistant. I can help you manage tasks, schedule appointments, and organize your projects. Try saying something like:</p>
+                                <ul>
+                                    <li>"Schedule a meeting with the team tomorrow at 2pm"</li>
+                                    <li>"What do I have planned for next week?"</li>
+                                    <li>"Create a project for the new website redesign"</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" id="chatInput" placeholder="Ask me anything about your tasks and projects..." />
+                        <button id="sendChatBtn" class="btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add Task Modal -->
+    <div id="addTaskModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Task</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addTaskForm">
+                    <div class="form-group">
+                        <label for="taskTitle">Task Title *</label>
+                        <input type="text" id="taskTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription">Description</label>
+                        <textarea id="taskDescription" rows="3"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskDate">Due Date</label>
+                            <input type="date" id="taskDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="taskTime">Time</label>
+                            <input type="time" id="taskTime">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskPriority">Priority</label>
+                            <select id="taskPriority">
+                                <option value="low">Low</option>
+                                <option value="medium" selected>Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="taskProject">Project</label>
+                            <select id="taskProject">
+                                <option value="">No Project</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal('addTaskModal')">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Settings</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4>AI Assistant</h4>
+                    <div class="form-group">
+                        <label for="claudeApiKey">Claude API Key</label>
+                        <input type="password" id="claudeApiKey" placeholder="Enter your Claude API key">
+                        <small>Get your API key from <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></small>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h4>Data Management</h4>
+                    <div class="settings-actions">
+                        <button id="exportDataBtn" class="btn-secondary">Export Data</button>
+                        <button id="importDataBtn" class="btn-secondary">Import Data</button>
+                        <button id="clearDataBtn" class="btn-danger">Clear All Data</button>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notifications" class="notifications-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/intelligent-assistant.js"></script>
+    <script src="js/claude-api.js"></script>
+    <script src="js/calendar.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/projects.js"></script>
+    
+    <script>
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get user data from URL params or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            const userDataParam = urlParams.get('user');
+            
+            let userData = null;
+            
+            if (userDataParam) {
+                try {
+                    userData = JSON.parse(decodeURIComponent(userDataParam));
+                    localStorage.setItem('intelligent_user', JSON.stringify(userData));
+                } catch (e) {
+                    console.error('Error parsing user data from URL:', e);
+                }
+            } else {
+                // Try to get from localStorage
+                const stored = localStorage.getItem('intelligent_user');
+                if (stored) {
+                    try {
+                        userData = JSON.parse(stored);
+                    } catch (e) {
+                        console.error('Error parsing stored user data:', e);
+                    }
+                }
+            }
+            
+            if (userData) {
+                IntelligentAssistant.init(userData);
+            } else {
+                // Redirect back to main site for authentication
+                showNotification('Please sign in through the main 01data website', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
