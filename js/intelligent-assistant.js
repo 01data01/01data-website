@@ -20,6 +20,78 @@ class IntelligentAssistant {
     static init(userData) {
         window.assistant = new IntelligentAssistant();
         window.assistant.setUser(userData);
+        
+        // Initialize Claude API if available
+        if (window.ClaudeAPI) {
+            window.assistant.claudeAPI = new ClaudeAPI();
+            console.log('Claude API initialized on assistant instance');
+            
+            // Add AI methods to the assistant
+            window.assistant.parseTaskWithAI = async function(text) {
+                console.log('parseTaskWithAI called with:', text);
+                try {
+                    if (!this.claudeAPI.apiKey) {
+                        console.log('No API key found, falling back to local parsing');
+                        return this.parseTaskLocally(text);
+                    }
+                    
+                    const task = await this.claudeAPI.parseTask(text, new Date());
+                    console.log('AI parsing successful:', task);
+                    return task;
+                } catch (error) {
+                    console.error('AI parsing failed, falling back to local parsing:', error);
+                    return this.parseTaskLocally(text);
+                }
+            };
+            
+            window.assistant.processWithAI = async function(message) {
+                console.log('processWithAI called with:', message);
+                try {
+                    if (!this.claudeAPI.apiKey) {
+                        return "Please configure your Claude API key in settings to enable AI features.";
+                    }
+                    
+                    const context = {
+                        tasks: this.tasks,
+                        projects: this.projects,
+                        currentDate: new Date()
+                    };
+                    
+                    const response = await this.claudeAPI.processMessage(message, context);
+                    console.log('AI processing successful:', response);
+                    return response;
+                } catch (error) {
+                    console.error('AI processing failed:', error);
+                    return "I apologize, but I'm having trouble connecting to the AI service. Please check your API key in settings or try again later.";
+                }
+            };
+            
+            window.assistant.testAIConnection = async function() {
+                const result = await this.claudeAPI.testConnection();
+                
+                if (result.success) {
+                    this.showNotification('AI connection successful!', 'success');
+                    console.log('Claude API connection test passed');
+                } else {
+                    this.showNotification(`AI connection failed: ${result.error}`, 'error');
+                    console.error('Claude API connection test failed:', result.error);
+                }
+                
+                return result;
+            };
+            
+            window.assistant.setupClaudeAPI = function() {
+                const apiKey = document.getElementById('claudeApiKey')?.value;
+                if (apiKey) {
+                    this.claudeAPI.setApiKey(apiKey);
+                    console.log('Claude API key configured');
+                    this.testAIConnection();
+                }
+            };
+        } else {
+            console.warn('ClaudeAPI class not available');
+        }
+        
         window.assistant.initializeApp();
     }
 
@@ -889,24 +961,63 @@ function saveSettings() {
 }
 
 function testClaudeConnection() {
+    console.log('Test connection called');
+    console.log('Assistant object:', window.assistant);
+    console.log('ClaudeAPI class:', window.ClaudeAPI);
+    
     if (!window.assistant) {
         alert('Assistant not initialized');
         return;
     }
     
-    const apiKey = document.getElementById('claudeApiKey').value;
+    const apiKey = document.getElementById('claudeApiKey').value.trim();
     if (!apiKey) {
         window.assistant.showNotification('Please enter an API key first', 'warning');
         return;
     }
     
-    // Temporarily set the API key for testing
+    console.log('API key length:', apiKey.length);
+    console.log('Assistant has claudeAPI:', !!window.assistant.claudeAPI);
+    console.log('Assistant has testAIConnection:', !!window.assistant.testAIConnection);
+    
+    // Check if claudeAPI exists on assistant
     if (window.assistant.claudeAPI) {
         window.assistant.claudeAPI.setApiKey(apiKey);
-        window.assistant.testAIConnection();
+        if (window.assistant.testAIConnection) {
+            window.assistant.testAIConnection();
+        } else {
+            console.error('testAIConnection method not found');
+            window.assistant.showNotification('AI test method not available', 'error');
+        }
     } else {
-        window.assistant.showNotification('Claude API not available', 'error');
-        console.error('Claude API integration not found on assistant object');
+        // Try to initialize Claude API if it wasn't set up
+        if (window.ClaudeAPI) {
+            console.log('Initializing Claude API on assistant...');
+            window.assistant.claudeAPI = new window.ClaudeAPI();
+            window.assistant.claudeAPI.setApiKey(apiKey);
+            
+            // Add test method if missing
+            if (!window.assistant.testAIConnection) {
+                window.assistant.testAIConnection = async function() {
+                    const result = await this.claudeAPI.testConnection();
+                    
+                    if (result.success) {
+                        this.showNotification('AI connection successful!', 'success');
+                        console.log('Claude API connection test passed');
+                    } else {
+                        this.showNotification(`AI connection failed: ${result.error}`, 'error');
+                        console.error('Claude API connection test failed:', result.error);
+                    }
+                    
+                    return result;
+                };
+            }
+            
+            window.assistant.testAIConnection();
+        } else {
+            window.assistant.showNotification('ClaudeAPI class not loaded', 'error');
+            console.error('ClaudeAPI class not found globally');
+        }
     }
 }
 
