@@ -192,11 +192,18 @@
             <div id="calendar-view" class="view">
                 <div class="view-header">
                     <h2>Calendar</h2>
-                    <div class="calendar-controls">
-                        <button id="prevMonth">‹</button>
-                        <span id="currentMonth"></span>
-                        <button id="nextMonth">›</button>
-                        <button id="todayBtn">Today</button>
+                    <div class="calendar-header">
+                        <div class="calendar-view-switcher">
+                            <button class="view-btn active" data-view="month">Month</button>
+                            <button class="view-btn" data-view="week">Week</button>
+                            <button class="view-btn" data-view="day">Day</button>
+                        </div>
+                        <div class="calendar-controls">
+                            <button id="prevPeriod" class="nav-btn">‹</button>
+                            <span id="currentPeriod"></span>
+                            <button id="nextPeriod" class="nav-btn">›</button>
+                            <button id="todayBtn" class="today-btn">Today</button>
+                        </div>
                     </div>
                 </div>
                 <div class="calendar-container">
