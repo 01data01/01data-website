@@ -1,0 +1,1003 @@
+<!-- Recurring Task Modal -->
+<div id="recurring-task-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-[750px] shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-medium leading-6 text-gray-900">Add Recurring Task</h3>
+                <button type="button" 
+                        onclick="document.getElementById('recurring-task-modal').classList.add('hidden')"
+                        class="text-gray-500 hover:text-gray-700">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="mb-6">
+                <div class="flex justify-between mb-2">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center bg-blue-500 text-white">1</div>
+                        <span class="ml-2 font-medium text-blue-500">Task Details</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div id="step2Circle" class="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300 text-white">2</div>
+                        <span id="step2Text" class="ml-2 font-medium text-gray-400">Recurrence</span>
+                    </div>
+                    <div class="flex items-center">
+                        <div id="step3Circle" class="w-8 h-8 rounded-full flex items-center justify-center bg-gray-300 text-white">3</div>
+                        <span id="step3Text" class="ml-2 font-medium text-gray-400">Reminders</span>
+                    </div>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div id="progressBar" class="bg-blue-500 h-2 rounded-full" style="width: 33%"></div>
+                </div>
+            </div>
+
+            <form action="{{ url_for('add_recurring_task') }}" method="POST" id="recurringTaskForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="return_view" value="{{ active_view }}">
+                
+                <!-- Multi-step form container -->
+                <div class="form-steps">
+                    <!-- Step 1: Task Details Section -->
+                    <div id="step1" class="form-step">
+                        <div class="mb-6">
+                            <h4 class="text-md font-semibold mb-3 text-gray-700 border-b pb-2">Task Details</h4>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                                    Description <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" name="description" id="description" required
+                                       placeholder="Enter task description"
+                                       class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2" for="start_date">
+                                        Start Date <span class="text-red-500">*</span>
+                                    </label>
+                                    <input type="date" name="start_date" id="start_date" required
+                                           value="{{ now().strftime('%Y-%m-%d') }}"
+                                           class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="block text-gray-700 text-sm font-bold mb-2" for="time">
+                                        Time <span class="text-gray-400">(Optional)</span>
+                                    </label>
+                                    <input type="time" name="time" id="time"
+                                           class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="priority">Priority</label>
+                                <div class="flex gap-2">
+                                    <label class="priority-option">
+                                        <input type="radio" name="priority" value="1" class="hidden">
+                                        <div class="flex items-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-red-50 priority-1">
+                                            <div class="w-4 h-4 rounded-full bg-red-500"></div>
+                                            <span>High</span>
+                                        </div>
+                                    </label>
+                                    <label class="priority-option">
+                                        <input type="radio" name="priority" value="2" class="hidden" checked>
+                                        <div class="flex items-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-yellow-50 priority-2">
+                                            <div class="w-4 h-4 rounded-full bg-yellow-500"></div>
+                                            <span>Medium</span>
+                                        </div>
+                                    </label>
+                                    <label class="priority-option">
+                                        <input type="radio" name="priority" value="3" class="hidden">
+                                        <div class="flex items-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-green-50 priority-3">
+                                            <div class="w-4 h-4 rounded-full bg-green-500"></div>
+                                            <span>Low</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2" for="notes">Notes</label>
+                                <textarea name="notes" id="notes" rows="2"
+                                        class="shadow appearance-none border rounded w-full py-3 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500"
+                                        placeholder="Add additional notes here..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-end border-t pt-4">
+                            <button type="button" onclick="nextStep(1)" 
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded focus:outline-none focus:shadow-outline transition-colors duration-200 flex items-center">
+                                Next: Recurrence <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Recurrence Pattern Section -->
+                    <div id="step2" class="form-step hidden">
+                        <div class="mb-6">
+                            <h4 class="text-md font-semibold mb-3 text-gray-700 border-b pb-2">Recurrence Pattern</h4>
+                            
+                            <!-- Quick Templates -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Quick Templates</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" class="pattern-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyTemplate('daily')">Every day</button>
+                                    <button type="button" class="pattern-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyTemplate('weekdays')">Weekdays (Mon-Fri)</button>
+                                    <button type="button" class="pattern-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyTemplate('weekends')">Weekends</button>
+                                    <button type="button" class="pattern-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyTemplate('weekly')">Weekly</button>
+                                    <button type="button" class="pattern-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyTemplate('biweekly')">Every 2 weeks</button>
+                                    <button type="button" class="pattern-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyTemplate('monthly')">Monthly</button>
+                                    <button type="button" class="pattern-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyTemplate('yearly')">Yearly</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Frequency Selection -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Frequency</label>
+                                <div class="flex flex-wrap gap-4">
+                                    <label class="frequency-option">
+                                        <input type="radio" name="recurrence_type" id="rec_daily" value="daily" checked
+                                               class="hidden" onchange="showRecurrenceOptions('daily')">
+                                        <div class="flex items-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-blue-50">
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>Daily</span>
+                                        </div>
+                                    </label>
+                                    <label class="frequency-option">
+                                        <input type="radio" name="recurrence_type" id="rec_weekly" value="weekly"
+                                               class="hidden" onchange="showRecurrenceOptions('weekly')">
+                                        <div class="flex items-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-blue-50">
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                            </svg>
+                                            <span>Weekly</span>
+                                        </div>
+                                    </label>
+                                    <label class="frequency-option">
+                                        <input type="radio" name="recurrence_type" id="rec_monthly" value="monthly"
+                                               class="hidden" onchange="showRecurrenceOptions('monthly')">
+                                        <div class="flex items-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-blue-50">
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>Monthly</span>
+                                        </div>
+                                    </label>
+                                    <label class="frequency-option">
+                                        <input type="radio" name="recurrence_type" id="rec_yearly" value="yearly"
+                                               class="hidden" onchange="showRecurrenceOptions('yearly')">
+                                        <div class="flex items-center gap-2 border rounded-md p-3 cursor-pointer hover:bg-blue-50">
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                                            </svg>
+                                            <span>Yearly</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-gray-50 rounded-lg border">
+                                <!-- Daily options -->
+                                <div id="daily_options" class="recurrence-options">
+                                    <div class="flex items-center">
+                                        <span class="text-sm text-gray-700 mr-2">Repeat every</span>
+                                        <input type="number" name="interval" min="1" max="365" value="1" 
+                                               class="shadow appearance-none border rounded w-16 py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                        <span class="text-sm text-gray-700 ml-2">day(s)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Weekly options -->
+                                <div id="weekly_options" class="recurrence-options hidden">
+                                    <div class="flex items-center mb-3">
+                                        <span class="text-sm text-gray-700 mr-2">Repeat every</span>
+                                        <input type="number" name="week_interval" min="1" max="52" value="1" 
+                                               class="shadow appearance-none border rounded w-16 py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                        <span class="text-sm text-gray-700 ml-2">week(s) on:</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2">
+                                        <label class="weekday-option">
+                                            <input type="checkbox" id="weekday_0" name="week_days" value="0" class="hidden">
+                                            <div class="flex justify-center items-center w-12 h-12 rounded-full border-2 cursor-pointer hover:bg-blue-50 hover:border-blue-400">Mon</div>
+                                        </label>
+                                        <label class="weekday-option">
+                                            <input type="checkbox" id="weekday_1" name="week_days" value="1" class="hidden">
+                                            <div class="flex justify-center items-center w-12 h-12 rounded-full border-2 cursor-pointer hover:bg-blue-50 hover:border-blue-400">Tue</div>
+                                        </label>
+                                        <label class="weekday-option">
+                                            <input type="checkbox" id="weekday_2" name="week_days" value="2" class="hidden">
+                                            <div class="flex justify-center items-center w-12 h-12 rounded-full border-2 cursor-pointer hover:bg-blue-50 hover:border-blue-400">Wed</div>
+                                        </label>
+                                        <label class="weekday-option">
+                                            <input type="checkbox" id="weekday_3" name="week_days" value="3" class="hidden">
+                                            <div class="flex justify-center items-center w-12 h-12 rounded-full border-2 cursor-pointer hover:bg-blue-50 hover:border-blue-400">Thu</div>
+                                        </label>
+                                        <label class="weekday-option">
+                                            <input type="checkbox" id="weekday_4" name="week_days" value="4" class="hidden">
+                                            <div class="flex justify-center items-center w-12 h-12 rounded-full border-2 cursor-pointer hover:bg-blue-50 hover:border-blue-400">Fri</div>
+                                        </label>
+                                        <label class="weekday-option">
+                                            <input type="checkbox" id="weekday_5" name="week_days" value="5" class="hidden">
+                                            <div class="flex justify-center items-center w-12 h-12 rounded-full border-2 cursor-pointer hover:bg-blue-50 hover:border-blue-400">Sat</div>
+                                        </label>
+                                        <label class="weekday-option">
+                                            <input type="checkbox" id="weekday_6" name="week_days" value="6" class="hidden">
+                                            <div class="flex justify-center items-center w-12 h-12 rounded-full border-2 cursor-pointer hover:bg-blue-50 hover:border-blue-400">Sun</div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Monthly options -->
+                                <div id="monthly_options" class="recurrence-options hidden">
+                                    <div class="flex items-center mb-3">
+                                        <span class="text-sm text-gray-700 mr-2">Repeat every</span>
+                                        <input type="number" name="month_interval" min="1" max="12" value="1" 
+                                               class="shadow appearance-none border rounded w-16 py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                        <span class="text-sm text-gray-700 ml-2">month(s) on:</span>
+                                    </div>
+                                    
+                                    <div class="flex gap-4">
+                                        <label class="monthly-option">
+                                            <input type="radio" name="monthly_option" value="day_of_month" checked class="hidden">
+                                            <div class="flex gap-2 border p-3 rounded-md cursor-pointer hover:bg-blue-50">
+                                                <span class="text-sm text-gray-700">Day</span>
+                                                <input type="number" name="day_of_month" min="1" max="31" value="1" 
+                                                      class="shadow appearance-none border rounded w-16 py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                                <span class="text-sm text-gray-700">of the month</span>
+                                            </div>
+                                        </label>
+                                        
+                                        <label class="monthly-option">
+                                            <input type="radio" name="monthly_option" value="day_of_week" class="hidden">
+                                            <div class="flex gap-2 border p-3 rounded-md cursor-pointer hover:bg-blue-50">
+                                                <span class="text-sm text-gray-700">The</span>
+                                                <select name="week_number" class="shadow appearance-none border rounded py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                                    <option value="1">First</option>
+                                                    <option value="2">Second</option>
+                                                    <option value="3">Third</option>
+                                                    <option value="4">Fourth</option>
+                                                    <option value="5">Last</option>
+                                                </select>
+                                                <select name="day_of_week" class="shadow appearance-none border rounded py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                                    <option value="0">Monday</option>
+                                                    <option value="1">Tuesday</option>
+                                                    <option value="2">Wednesday</option>
+                                                    <option value="3">Thursday</option>
+                                                    <option value="4">Friday</option>
+                                                    <option value="5">Saturday</option>
+                                                    <option value="6">Sunday</option>
+                                                </select>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Yearly options -->
+                                <div id="yearly_options" class="recurrence-options hidden">
+                                    <div class="flex items-center mb-3">
+                                        <span class="text-sm text-gray-700 mr-2">Repeat every</span>
+                                        <input type="number" name="year_interval" min="1" max="10" value="1" 
+                                               class="shadow appearance-none border rounded w-16 py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                        <span class="text-sm text-gray-700 ml-2">year(s)</span>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 gap-4 mt-2">
+                                        <div>
+                                            <label class="block text-gray-700 text-sm font-bold mb-2" for="month_of_year">Month</label>
+                                            <select name="month_of_year" id="month_of_year"
+                                                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                                <option value="1">January</option>
+                                                <option value="2">February</option>
+                                                <option value="3">March</option>
+                                                <option value="4">April</option>
+                                                <option value="5">May</option>
+                                                <option value="6">June</option>
+                                                <option value="7">July</option>
+                                                <option value="8">August</option>
+                                                <option value="9">September</option>
+                                                <option value="10">October</option>
+                                                <option value="11">November</option>
+                                                <option value="12">December</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-gray-700 text-sm font-bold mb-2" for="yearly_day">Day</label>
+                                            <input type="number" name="yearly_day" id="yearly_day" min="1" max="31" value="1"
+                                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Range of Recurrence -->
+                            <div class="mt-6">
+                                <h4 class="text-md font-semibold mb-3 text-gray-700">Range of Recurrence</h4>
+                                
+                                <div class="space-y-3 flex flex-col gap-4">
+                                    <label class="end-option">
+                                        <input type="radio" name="end_type" id="end_never" value="never" checked class="hidden" onchange="showEndOptions('never')">
+                                        <div class="flex items-center gap-2 border p-3 rounded-md cursor-pointer hover:bg-blue-50">
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                            </svg>
+                                            <span class="text-sm text-gray-700">No end date</span>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="end-option">
+                                        <input type="radio" name="end_type" id="end_after" value="after_count" class="hidden" onchange="showEndOptions('after_count')">
+                                        <div class="flex items-center gap-2 border p-3 rounded-md cursor-pointer hover:bg-blue-50">
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                            </svg>
+                                            <span class="text-sm text-gray-700">End after</span>
+                                            <input type="number" name="end_count" id="end_count" min="1" max="999" value="10" disabled
+                                                   class="shadow appearance-none border rounded w-20 py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                            <span class="text-sm text-gray-700">occurrences</span>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="end-option">
+                                        <input type="radio" name="end_type" id="end_on_date" value="on_date" class="hidden" onchange="showEndOptions('on_date')">
+                                        <div class="flex items-center gap-2 border p-3 rounded-md cursor-pointer hover:bg-blue-50">
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span class="text-sm text-gray-700">End by</span>
+                                            <input type="date" name="end_date" id="end_date" disabled
+                                                   class="shadow appearance-none border rounded py-2 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step Navigation -->
+                        <div class="flex justify-between border-t pt-4">
+                            <button type="button" onclick="prevStep(2)" 
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded focus:outline-none focus:shadow-outline transition-colors duration-200 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Back
+                            </button>
+                            <button type="button" onclick="nextStep(2)" 
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded focus:outline-none focus:shadow-outline transition-colors duration-200 flex items-center">
+                                Next: Reminders <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Reminders Section -->
+                    <div id="step3" class="form-step hidden">
+                        <div class="mb-6">
+                            <h4 class="text-md font-semibold mb-3 text-gray-700 border-b pb-2">Reminders</h4>
+                            
+                            <!-- Quick Templates -->
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Quick Templates</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <button type="button" class="reminder-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyReminderTemplate('30min')">30 minutes before</button>
+                                    <button type="button" class="reminder-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyReminderTemplate('1hour')">1 hour before</button>
+                                    <button type="button" class="reminder-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyReminderTemplate('1day')">1 day before</button>
+                                    <button type="button" class="reminder-template px-3 py-2 border rounded-md text-sm hover:bg-blue-50 hover:border-blue-300" 
+                                            onclick="applyReminderTemplate('custom')">Custom</button>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-gray-50 rounded-lg border mb-4">
+                                <div class="mb-4">
+                                    <p class="text-sm text-gray-500">Add reminders for each occurrence of this task. You can add up to 5 reminders.</p>
+                                </div>
+                                
+                                <div id="rec-reminders-container" class="space-y-3">
+                                    <div class="reminder-field p-3 border rounded-md">
+                                        <div class="flex gap-2 items-center">
+                                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                            </svg>
+                                            <div class="flex flex-1 gap-2">
+                                                <input type="number" name="reminder_amount_1" min="1" max="999" value="30"
+                                                       class="shadow appearance-none border rounded w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                                <select name="reminder_unit_1"
+                                                        class="shadow appearance-none border rounded flex-1 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                                                    <option value="minutes">Minutes</option>
+                                                    <option value="hours">Hours</option>
+                                                    <option value="days">Days</option>
+                                                </select>
+                                                <span class="text-sm text-gray-700 self-center">before the task</span>
+                                            </div>
+                                            <button type="button" onclick="this.closest('.reminder-field').remove(); updateRecReminderButtons();"
+                                                    class="text-red-500 hover:text-red-700">
+                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <button type="button" onclick="addRecReminderField()"
+                                            class="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800"
+                                            id="rec-add-reminder-btn">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                        </svg>
+                                        Add Another Reminder
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Task Summary -->
+                            <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <h5 class="font-medium text-blue-800 mb-2">Task Summary</h5>
+                                <div id="taskSummary" class="text-sm text-blue-700">
+                                    <!-- Will be filled via JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between border-t pt-4">
+                            <button type="button" onclick="prevStep(3)" 
+                                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded focus:outline-none focus:shadow-outline transition-colors duration-200 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Back
+                            </button>
+                            <button type="submit"
+                                    class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded focus:outline-none focus:shadow-outline transition-colors duration-200 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Create Recurring Task
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Multi-step form navigation
+function nextStep(currentStep) {
+    const nextStepNum = currentStep + 1;
+    document.getElementById(`step${currentStep}`).classList.add('hidden');
+    document.getElementById(`step${nextStepNum}`).classList.remove('hidden');
+    
+    // Update progress bar and indicators
+    document.getElementById('progressBar').style.width = `${33 * nextStepNum}%`;
+    
+    // Update all previous steps to active state
+    for (let i = 1; i <= currentStep; i++) {
+        document.getElementById(`step${i}Circle`).classList.remove('bg-gray-300');
+        document.getElementById(`step${i}Circle`).classList.add('bg-blue-500');
+        document.getElementById(`step${i}Text`).classList.remove('text-gray-400');
+        document.getElementById(`step${i}Text`).classList.add('text-blue-500');
+    }
+    
+    // Update current step to active
+    document.getElementById(`step${nextStepNum}Circle`).classList.remove('bg-gray-300');
+    document.getElementById(`step${nextStepNum}Circle`).classList.add('bg-blue-500');
+    document.getElementById(`step${nextStepNum}Text`).classList.remove('text-gray-400');
+    document.getElementById(`step${nextStepNum}Text`).classList.add('text-blue-500');
+    
+    // Update task summary if going to step 3
+    if (nextStepNum === 3) {
+        updateTaskSummary();
+    }
+}
+
+function prevStep(currentStep) {
+    const prevStepNum = currentStep - 1;
+    document.getElementById(`step${currentStep}`).classList.add('hidden');
+    document.getElementById(`step${prevStepNum}`).classList.remove('hidden');
+    
+    // Update progress bar
+    document.getElementById('progressBar').style.width = `${33 * prevStepNum}%`;
+    
+    // Update current step to inactive
+    document.getElementById(`step${currentStep}Circle`).classList.remove('bg-blue-500');
+    document.getElementById(`step${currentStep}Circle`).classList.add('bg-gray-300');
+    document.getElementById(`step${currentStep}Text`).classList.remove('text-blue-500');
+    document.getElementById(`step${currentStep}Text`).classList.add('text-gray-400');
+}
+
+// Show/hide recurrence options based on selection
+function showRecurrenceOptions(type) {
+    // Hide all options first
+    document.querySelectorAll('.recurrence-options').forEach(el => {
+        el.classList.add('hidden');
+    });
+    
+    // Show the selected option
+    document.getElementById(`${type}_options`).classList.remove('hidden');
+    
+    // Update frequency option styling
+    document.querySelectorAll('.frequency-option div').forEach(el => {
+        el.classList.remove('bg-blue-50', 'border-blue-400');
+        el.classList.add('hover:bg-blue-50');
+    });
+    
+    // Highlight selected option
+    document.querySelector(`#rec_${type}`).nextElementSibling.classList.add('bg-blue-50', 'border-blue-400');
+    
+    // Update form field names for the selected type
+    if (type === 'daily') {
+        document.querySelector('input[name="interval"]').name = 'interval';
+    } else if (type === 'weekly') {
+        document.querySelector('input[name="week_interval"]').name = 'interval';
+    } else if (type === 'monthly') {
+        document.querySelector('input[name="month_interval"]').name = 'interval';
+    } else if (type === 'yearly') {
+        document.querySelector('input[name="year_interval"]').name = 'interval';
+    }
+}
+
+// Show/hide end options based on selection
+function showEndOptions(type) {
+    // Reset all options
+    document.getElementById('end_count').disabled = true;
+    document.getElementById('end_date').disabled = true;
+    
+    // Update all end option styling
+    document.querySelectorAll('.end-option div').forEach(el => {
+        el.classList.remove('bg-blue-50', 'border-blue-400');
+        el.classList.add('hover:bg-blue-50');
+    });
+    
+    // Highlight selected option
+    document.querySelector(`#end_${type === 'after_count' ? 'after' : type === 'on_date' ? 'on_date' : 'never'}`).nextElementSibling.classList.add('bg-blue-50', 'border-blue-400');
+    
+    // Enable the selected option
+    if (type === 'after_count') {
+        document.getElementById('end_count').disabled = false;
+    } else if (type === 'on_date') {
+        document.getElementById('end_date').disabled = false;
+    }
+}
+
+// Add a new reminder field
+let recReminderCount = 1;
+
+function addRecReminderField() {
+    if (recReminderCount >= 5) return;
+    
+    recReminderCount++;
+    const container = document.getElementById('rec-reminders-container');
+    const newField = document.createElement('div');
+    newField.className = 'reminder-field p-3 border rounded-md';
+    newField.innerHTML = `
+        <div class="flex gap-2 items-center">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <div class="flex flex-1 gap-2">
+                <input type="number" name="reminder_amount_${recReminderCount}" min="1" max="999" value="30"
+                       class="shadow appearance-none border rounded w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                <select name="reminder_unit_${recReminderCount}"
+                        class="shadow appearance-none border rounded flex-1 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+                </select>
+                <span class="text-sm text-gray-700 self-center">before the task</span>
+            </div>
+            <button type="button" onclick="this.closest('.reminder-field').remove(); updateRecReminderButtons();"
+                    class="text-red-500 hover:text-red-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </button>
+        </div>
+    `;
+    container.appendChild(newField);
+    updateRecReminderButtons();
+}
+
+function updateRecReminderButtons() {
+    const fields = document.querySelectorAll('#rec-reminders-container .reminder-field');
+    recReminderCount = fields.length;
+    const addButton = document.getElementById('rec-add-reminder-btn');
+    addButton.style.display = recReminderCount >= 5 ? 'none' : 'inline-flex';
+}
+
+// Apply quick templates for recurrence patterns
+function applyTemplate(template) {
+    switch(template) {
+        case 'daily':
+            document.getElementById('rec_daily').checked = true;
+            showRecurrenceOptions('daily');
+            document.querySelector('input[name="interval"]').value = 1;
+            break;
+            
+        case 'weekdays':
+            document.getElementById('rec_weekly').checked = true;
+            showRecurrenceOptions('weekly');
+            document.querySelector('input[name="week_interval"]').value = 1;
+            // Uncheck all days first
+            document.querySelectorAll('input[name="week_days"]').forEach(cb => cb.checked = false);
+            // Check Monday through Friday (0-4)
+            for (let i = 0; i <= 4; i++) {
+                document.getElementById(`weekday_${i}`).checked = true;
+                document.getElementById(`weekday_${i}`).nextElementSibling.classList.add('bg-blue-50', 'border-blue-400');
+            }
+            break;
+            
+        case 'weekends':
+            document.getElementById('rec_weekly').checked = true;
+            showRecurrenceOptions('weekly');
+            document.querySelector('input[name="week_interval"]').value = 1;
+            // Uncheck all days first
+            document.querySelectorAll('input[name="week_days"]').forEach(cb => cb.checked = false);
+            // Check Saturday and Sunday (5-6)
+            document.getElementById('weekday_5').checked = true;
+            document.getElementById('weekday_6').checked = true;
+            document.getElementById('weekday_5').nextElementSibling.classList.add('bg-blue-50', 'border-blue-400');
+            document.getElementById('weekday_6').nextElementSibling.classList.add('bg-blue-50', 'border-blue-400');
+            break;
+            
+        case 'weekly':
+            document.getElementById('rec_weekly').checked = true;
+            showRecurrenceOptions('weekly');
+            document.querySelector('input[name="week_interval"]').value = 1;
+            // Uncheck all days first
+            document.querySelectorAll('input[name="week_days"]').forEach(cb => cb.checked = false);
+            // Check current day
+            const today = new Date();
+            const weekday = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+            // Convert to our weekday format (0 = Monday, 6 = Sunday)
+            const adjustedWeekday = weekday === 0 ? 6 : weekday - 1;
+            document.getElementById(`weekday_${adjustedWeekday}`).checked = true;
+            document.getElementById(`weekday_${adjustedWeekday}`).nextElementSibling.classList.add('bg-blue-50', 'border-blue-400');
+            break;
+            
+        case 'biweekly':
+            document.getElementById('rec_weekly').checked = true;
+            showRecurrenceOptions('weekly');
+            document.querySelector('input[name="week_interval"]').value = 2;
+            // Uncheck all days first
+            document.querySelectorAll('input[name="week_days"]').forEach(cb => cb.checked = false);
+            // Check current day
+            const todayBi = new Date();
+            const weekdayBi = todayBi.getDay();
+            const adjustedWeekdayBi = weekdayBi === 0 ? 6 : weekdayBi - 1;
+            document.getElementById(`weekday_${adjustedWeekdayBi}`).checked = true;
+            document.getElementById(`weekday_${adjustedWeekdayBi}`).nextElementSibling.classList.add('bg-blue-50', 'border-blue-400');
+            break;
+            
+        case 'monthly':
+            document.getElementById('rec_monthly').checked = true;
+            showRecurrenceOptions('monthly');
+            document.querySelector('input[name="month_interval"]').value = 1;
+            // Set current day of month
+            document.querySelector('input[name="day_of_month"]').value = new Date().getDate();
+            break;
+            
+        case 'yearly':
+            document.getElementById('rec_yearly').checked = true;
+            showRecurrenceOptions('yearly');
+            document.querySelector('input[name="year_interval"]').value = 1;
+            // Set current month and day
+            const todayYear = new Date();
+            document.getElementById('month_of_year').value = todayYear.getMonth() + 1;
+            document.getElementById('yearly_day').value = todayYear.getDate();
+            break;
+    }
+    
+    // Highlight the selected template button
+    document.querySelectorAll('.pattern-template').forEach(btn => {
+        btn.classList.remove('bg-blue-100', 'border-blue-300');
+    });
+    document.querySelector(`.pattern-template[onclick="applyTemplate('${template}')"]`).classList.add('bg-blue-100', 'border-blue-300');
+}
+
+// Apply quick templates for reminders
+function applyReminderTemplate(template) {
+    // Clear existing reminders
+    const container = document.getElementById('rec-reminders-container');
+    container.innerHTML = '';
+    
+    // Add new reminder based on template
+    switch(template) {
+        case '30min':
+            addTemplatedReminder(30, 'minutes');
+            break;
+            
+        case '1hour':
+            addTemplatedReminder(1, 'hours');
+            break;
+            
+        case '1day':
+            addTemplatedReminder(1, 'days');
+            break;
+            
+        case 'custom':
+            // Just clear and let user add custom
+            addRecReminderField();
+            break;
+    }
+    
+    // Highlight the selected template button
+    document.querySelectorAll('.reminder-template').forEach(btn => {
+        btn.classList.remove('bg-blue-100', 'border-blue-300');
+    });
+    document.querySelector(`.reminder-template[onclick="applyReminderTemplate('${template}')"]`).classList.add('bg-blue-100', 'border-blue-300');
+}
+
+function addTemplatedReminder(amount, unit) {
+    recReminderCount = 1;
+    const container = document.getElementById('rec-reminders-container');
+    const newField = document.createElement('div');
+    newField.className = 'reminder-field p-3 border rounded-md';
+    newField.innerHTML = `
+        <div class="flex gap-2 items-center">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <div class="flex flex-1 gap-2">
+                <input type="number" name="reminder_amount_1" min="1" max="999" value="${amount}"
+                       class="shadow appearance-none border rounded w-20 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                <select name="reminder_unit_1"
+                        class="shadow appearance-none border rounded flex-1 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500">
+                    <option value="minutes" ${unit === 'minutes' ? 'selected' : ''}>Minutes</option>
+                    <option value="hours" ${unit === 'hours' ? 'selected' : ''}>Hours</option>
+                    <option value="days" ${unit === 'days' ? 'selected' : ''}>Days</option>
+                </select>
+                <span class="text-sm text-gray-700 self-center">before the task</span>
+            </div>
+            <button type="button" onclick="this.closest('.reminder-field').remove(); updateRecReminderButtons();"
+                    class="text-red-500 hover:text-red-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </button>
+        </div>
+    `;
+    container.appendChild(newField);
+    updateRecReminderButtons();
+}
+
+// Update task summary in step 3
+function updateTaskSummary() {
+    const summary = document.getElementById('taskSummary');
+    
+    // Get task details
+    const description = document.getElementById('description').value || '[Task Description]';
+    const priority = document.querySelector('input[name="priority"]:checked').value;
+    const priorityText = priority == 1 ? 'High' : priority == 2 ? 'Medium' : 'Low';
+    const startDate = document.getElementById('start_date').value;
+    const time = document.getElementById('time').value;
+    
+    // Get recurrence pattern
+    const recurrenceType = document.querySelector('input[name="recurrence_type"]:checked').value;
+    let recurrenceText = '';
+    
+    switch(recurrenceType) {
+        case 'daily':
+            const dailyInterval = document.querySelector('input[name="interval"]').value;
+            recurrenceText = dailyInterval == 1 ? 'Every day' : `Every ${dailyInterval} days`;
+            break;
+            
+        case 'weekly':
+            const weeklyInterval = document.querySelector('input[name="week_interval"]').value;
+            const weekDays = [...document.querySelectorAll('input[name="week_days"]:checked')].map(cb => {
+                const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                return dayNames[parseInt(cb.value)];
+            });
+            
+            if (weekDays.length === 0) {
+                recurrenceText = weeklyInterval == 1 ? 'Weekly (no days selected)' : `Every ${weeklyInterval} weeks (no days selected)`;
+            } else if (weekDays.length === 7) {
+                recurrenceText = weeklyInterval == 1 ? 'Every day' : `Every ${weeklyInterval} weeks on all days`;
+            } else if (weekDays.length <= 2) {
+                recurrenceText = weeklyInterval == 1 ? 
+                    `Weekly on ${weekDays.join(' and ')}` : 
+                    `Every ${weeklyInterval} weeks on ${weekDays.join(' and ')}`;
+            } else {
+                const lastDay = weekDays.pop();
+                recurrenceText = weeklyInterval == 1 ? 
+                    `Weekly on ${weekDays.join(', ')} and ${lastDay}` : 
+                    `Every ${weeklyInterval} weeks on ${weekDays.join(', ')} and ${lastDay}`;
+            }
+            break;
+            
+        case 'monthly':
+            const monthlyInterval = document.querySelector('input[name="month_interval"]').value;
+            const isOnDay = document.querySelector('input[name="monthly_option"][value="day_of_month"]').checked;
+            
+            if (isOnDay) {
+                const dayOfMonth = document.querySelector('input[name="day_of_month"]').value;
+                recurrenceText = monthlyInterval == 1 ? 
+                    `Monthly on day ${dayOfMonth}` : 
+                    `Every ${monthlyInterval} months on day ${dayOfMonth}`;
+            } else {
+                const weekNum = document.querySelector('select[name="week_number"]').value;
+                const weekNumText = weekNum == 1 ? 'first' : weekNum == 2 ? 'second' : weekNum == 3 ? 'third' : weekNum == 4 ? 'fourth' : 'last';
+                const dayOfWeek = document.querySelector('select[name="day_of_week"]').value;
+                const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                const dayText = dayNames[parseInt(dayOfWeek)];
+                
+                recurrenceText = monthlyInterval == 1 ? 
+                    `Monthly on the ${weekNumText} ${dayText}` : 
+                    `Every ${monthlyInterval} months on the ${weekNumText} ${dayText}`;
+            }
+            break;
+            
+        case 'yearly':
+            const yearlyInterval = document.querySelector('input[name="year_interval"]').value;
+            const monthVal = document.getElementById('month_of_year').value;
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthText = monthNames[parseInt(monthVal) - 1];
+            const yearlyDay = document.getElementById('yearly_day').value;
+            
+            recurrenceText = yearlyInterval == 1 ? 
+                `Yearly on ${monthText} ${yearlyDay}` : 
+                `Every ${yearlyInterval} years on ${monthText} ${yearlyDay}`;
+            break;
+    }
+    
+    // Get range of recurrence
+    const endType = document.querySelector('input[name="end_type"]:checked').value;
+    let endText = '';
+    
+    switch(endType) {
+        case 'never':
+            endText = 'No end date';
+            break;
+            
+        case 'after_count':
+            const count = document.getElementById('end_count').value;
+            endText = `Ends after ${count} occurrences`;
+            break;
+            
+        case 'on_date':
+            const endDate = document.getElementById('end_date').value;
+            endText = `Ends on ${endDate}`;
+            break;
+    }
+    
+    // Get reminders
+    const reminderFields = document.querySelectorAll('.reminder-field');
+    let reminderText = '';
+    
+    if (reminderFields.length === 0) {
+        reminderText = 'No reminders';
+    } else {
+        const reminders = Array.from(reminderFields).map((field, index) => {
+            const amount = field.querySelector(`input[name="reminder_amount_${index + 1}"]`).value;
+            const unit = field.querySelector(`select[name="reminder_unit_${index + 1}"]`).value;
+            return `${amount} ${unit} before`;
+        });
+        
+        if (reminders.length === 1) {
+            reminderText = `Reminder: ${reminders[0]}`;
+        } else {
+            reminderText = `Reminders: ${reminders.join(', ')}`;
+        }
+    }
+    
+    // Update the summary
+    summary.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4">
+            <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 mt-0.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span><span class="font-bold">Task:</span> ${description}</span>
+            </div>
+            <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 mt-0.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span><span class="font-bold">Priority:</span> ${priorityText}</span>
+            </div>
+            <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 mt-0.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span><span class="font-bold">Starts:</span> ${startDate}${time ? ' at ' + time : ''}</span>
+            </div>
+            <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 mt-0.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span><span class="font-bold">Repeats:</span> ${recurrenceText}</span>
+            </div>
+            <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 mt-0.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span><span class="font-bold">Duration:</span> ${endText}</span>
+            </div>
+            <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 mt-0.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span>${reminderText}</span>
+            </div>
+        </div>
+    `;
+}
+
+// Event listeners for styled form elements
+document.addEventListener('DOMContentLoaded', function() {
+    // Priority buttons styling
+    document.querySelectorAll('.priority-option input').forEach(radio => {
+        radio.addEventListener('change', function() {
+            // Reset all options
+            document.querySelectorAll('.priority-option div').forEach(div => {
+                div.classList.remove('bg-red-50', 'bg-yellow-50', 'bg-green-50', 'border-2', 'border-blue-500');
+            });
+            
+            // Style the selected option
+            const selectedDiv = this.nextElementSibling;
+            const priority = this.value;
+            
+            if (priority == 1) {
+                selectedDiv.classList.add('bg-red-50', 'border-2', 'border-blue-500');
+            } else if (priority == 2) {
+                selectedDiv.classList.add('bg-yellow-50', 'border-2', 'border-blue-500');
+            } else {
+                selectedDiv.classList.add('bg-green-50', 'border-2', 'border-blue-500');
+            }
+        });
+    });
+    
+    // Weekday buttons styling
+    document.querySelectorAll('.weekday-option input').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const div = this.nextElementSibling;
+            if (this.checked) {
+                div.classList.add('bg-blue-50', 'border-blue-400');
+            } else {
+                div.classList.remove('bg-blue-50', 'border-blue-400');
+            }
+        });
+    });
+    
+    // End option styling
+    document.querySelectorAll('.end-option input').forEach(radio => {
+        radio.addEventListener('change', function() {
+            // This will be handled by the showEndOptions function
+        });
+    });
+    
+    // Set the current weekday by default
+    const today = new Date();
+    const weekday = today.getDay(); // 0 = Sunday, 1 = Monday, ...
+    // Convert to our weekday format (0 = Monday, 6 = Sunday)
+    const adjustedWeekday = weekday === 0 ? 6 : weekday - 1;
+    document.getElementById(`weekday_${adjustedWeekday}`).checked = true;
+    document.getElementById(`weekday_${adjustedWeekday}`).nextElementSibling.classList.add('bg-blue-50', 'border-blue-400');
+    
+    // Set default end date (1 year from now)
+    const oneYearFromNow = new Date();
+    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+    document.getElementById('end_date').valueAsDate = oneYearFromNow;
+    
+    // Set the current month in yearly options
+    document.getElementById('month_of_year').value = today.getMonth() + 1;
+    
+    // Set the current day in monthly and yearly options
+    document.getElementById('day_of_month').value = today.getDate();
+    document.getElementById('yearly_day').value = today.getDate();
+    
+    // Initialize design states
+    showRecurrenceOptions('daily');
+    showEndOptions('never');
+});
+</script>

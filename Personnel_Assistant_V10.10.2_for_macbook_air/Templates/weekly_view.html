@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold">Week of {{ week_start.strftime('%B %d, %Y') }}</h2>
+        <div class="flex space-x-4">
+            <button onclick="document.getElementById('add-task-modal').classList.remove('hidden')" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                Add Task
+            </button>
+            <a href="{{ url_for('weekly_view', date=(week_start - timedelta(days=7)).strftime('%Y-%m-%d')) }}" 
+               class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">Previous Week</a>
+            <a href="{{ url_for('weekly_view', date=(week_start + timedelta(days=7)).strftime('%Y-%m-%d')) }}"
+               class="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">Next Week</a>
+        </div>
+    </div>
+
+    <!-- Weekly Calendar Grid -->
+    <div class="grid grid-cols-7 gap-4">
+        {% for day_offset in range(7) %}
+            {% set current_day = week_start + timedelta(days=day_offset) %}
+            {% set day_tasks = tasks.get(current_day.strftime('%Y-%m-%d'), []) %}
+            
+            <div class="border rounded-lg p-4">
+                <div class="font-semibold text-center mb-4 {% if current_day.date() == today.date() %}text-blue-600{% endif %}">
+                    {{ current_day.strftime('%A') }}<br>
+                    {{ current_day.strftime('%B %d') }}
+                </div>
+                
+                <div class="space-y-2">
+                    {% if day_tasks %}
+                        {% for task in day_tasks %}
+                            <div class="p-2 rounded {% if task.priority == 1 %}bg-red-50{% elif task.priority == 2 %}bg-yellow-50{% else %}bg-green-50{% endif %} hover:bg-opacity-90 cursor-pointer"
+                                 onclick="showTaskDetails('{{ task.id }}', '{{ task.description }}', '{{ task.due_date }}', '{{ task.time }}', {{ task.priority }}, {{ task.reminders|tojson|safe if task.reminders else 'null' }}, {{ task.notes|tojson|safe if task.notes else 'null' }})">
+                                <div class="text-sm font-medium {% if task.status == 'done' %}line-through text-gray-500{% endif %}">
+                                    {% if task.time %}{{ task.time }}{% else %}All Day{% endif %}
+                                    {% if task.priority == 1 %}⚡{% endif %}
+                                </div>
+                                <div class="text-sm {% if task.status == 'done' %}line-through text-gray-500{% endif %}">
+                                    {{ task.description }}
+                                </div>
+                                {% if task.notes %}
+                                <div class="text-xs text-gray-600 mt-1 line-clamp-2 whitespace-pre-wrap">
+                                    {{ task.notes }}
+                                </div>
+                                {% endif %}
+                                {% if task.reminders %}
+                                <div class="text-xs text-gray-600 mt-1">
+                                    🔔 {{ task.reminders|length }} reminder{{ 's' if task.reminders|length > 1 }}
+                                </div>
+                                {% endif %}
+                                <div class="flex items-center gap-1 mt-1">
+                                    <input type="checkbox" 
+                                           class="form-checkbox h-4 w-4 text-blue-600"
+                                           {% if task.status == 'done' %}checked{% endif %}
+                                           onchange="updateTaskStatus('{{ task.id }}', this.checked ? 'done' : 'todo'); event.stopPropagation();">
+                                    <span class="text-xs text-gray-600">Complete</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center text-gray-400 text-sm">No tasks</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+{% include 'task_modal.html' %}
+
+<!-- Task Details Modal -->
+{% include 'task_details_modal.html' %}
+
+<script>
+function updateTaskStatus(taskId, status) {
+    fetch(`/update-task-status/${taskId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+        },
+        body: JSON.stringify({ status: status })
+    }).then(response => {
+        if (response.ok) {
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}

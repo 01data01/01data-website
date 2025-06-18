@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex h-full">
+    <!-- Chat List Sidebar -->
+    <div class="w-64 bg-white border-r overflow-y-auto">
+        <!-- New Chat Button -->
+        <div class="p-4 border-b">
+            <button onclick="createNewChat()" 
+                    class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors duration-200">
+                New Chat
+            </button>
+        </div>
+        
+        <!-- Chat List -->
+        <div class="divide-y">
+            {% for chat in conversations %}
+            <a href="{{ url_for('chat', conversation_id=chat.id) }}" 
+               class="block p-4 hover:bg-gray-50 {% if chat.id == current_conversation_id %}bg-blue-50{% endif %}">
+                <div class="font-medium truncate">{{ chat.title }}</div>
+                <div class="text-sm text-gray-500">
+                    {{ chat.updated_at|datetime }}
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Trash Section -->
+        <div class="mt-4 p-4 border-t">
+            <div class="text-sm font-medium text-gray-700 mb-2">Trash</div>
+            {% for chat in deleted_conversations %}
+            <div class="p-2 hover:bg-gray-50 rounded">
+                <div class="flex items-center justify-between">
+                    <div class="truncate text-sm">{{ chat.title }}</div>
+                    <div class="flex space-x-2">
+                        <button onclick="recoverChat('{{ chat.id }}')" 
+                                class="text-blue-500 hover:text-blue-700">
+                            Recover
+                        </button>
+                        <button onclick="permanentlyDeleteChat('{{ chat.id }}')"
+                                class="text-red-500 hover:text-red-700">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Chat Area -->
+    <div class="flex-1 flex flex-col">
+        <!-- Chat Header -->
+        {% if current_conversation %}
+        <div class="bg-white border-b p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <h2 class="text-xl font-semibold" id="chat-title">{{ current_conversation.title }}</h2>
+                <button onclick="startTitleEdit()" class="text-gray-500 hover:text-blue-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                    </svg>
+                </button>
+            </div>
+            <button onclick="deleteChat('{{ current_conversation_id }}')"
+                    class="text-red-500 hover:text-red-700">
+                Move to Trash
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Messages Area -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-white">
+            {% if current_conversation %}
+                {% for message in current_conversation.messages %}
+                <div class="mb-4">
+                    <div class="flex items-start">
+                        <div class="flex-1 p-4 rounded-lg {{ 'bg-blue-50' if message.role == 'user' else 'bg-green-50' }}">
+                            <div class="font-bold {{ 'text-blue-600' if message.role == 'user' else 'text-green-600' }}">
+                                {{ 'You' if message.role == 'user' else 'Assistant' }}
+                            </div>
+                            <div class="ml-4 {{ 'text-gray-800' }} whitespace-pre-wrap">{{ message.content }}</div>
+                            <div class="ml-4 text-xs text-gray-500 mt-1">{{ message.timestamp|datetime }}</div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Input Area -->
+        {% if current_conversation %}
+        <div class="border-t bg-white p-4">
+            <form id="chat-form" class="flex gap-2">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="flex-1 relative">
+                    <textarea id="message-input" 
+                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y min-h-[44px]"
+                            placeholder="Ask me anything..."
+                            style="white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;"
+                            required></textarea>
+                </div>
+                <button type="submit" 
+                        class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center min-w-[100px] h-[44px]">
+                    <span class="button-text">Send</span>
+                    <span class="loading-spinner hidden">
+                        <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                    </span>
+                </button>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const submitButton = chatForm?.querySelector('button[type="submit"]');
+    let currentMessageDiv = null;
+
+    const setLoading = (isLoading) => {
+        if (submitButton) {
+            submitButton.disabled = isLoading;
+            submitButton.querySelector('.button-text').classList.toggle('hidden', isLoading);
+            submitButton.querySelector('.loading-spinner').classList.toggle('hidden', !isLoading);
+        }
+    };
+
+    const appendMessage = (role, content, timestamp = null) => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'mb-4';
+        messageDiv.innerHTML = `
+            <div class="flex items-start">
+                <div class="flex-1 p-4 rounded-lg ${role === 'user' ? 'bg-blue-50' : 'bg-green-50'}">
+                    <div class="font-bold ${role === 'user' ? 'text-blue-600' : 'text-green-600'}">${role === 'user' ? 'You' : 'Assistant'}</div>
+                    <div class="ml-4 text-gray-800 whitespace-pre-wrap">${content}</div>
+                    ${timestamp ? `<div class="ml-4 text-xs text-gray-500 mt-1">${timestamp}</div>` : ''}
+                </div>
+            </div>
+        `;
+        chatMessages?.appendChild(messageDiv);
+        scrollToBottom();
+        return messageDiv;
+    };
+
+    const scrollToBottom = () => {
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    };
+
+    if (messageInput) {
+        // Handle Shift+Enter for new lines
+        messageInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                if (e.shiftKey) {
+                    // Allow new line with Shift+Enter
+                    return;
+                } else {
+                    // Submit form on Enter without Shift
+                    e.preventDefault();
+                    chatForm.requestSubmit();
+                }
+            }
+        });
+
+        // Reset on form submit
+        chatForm.addEventListener('submit', () => {
+            setTimeout(() => {
+                messageInput.style.height = '44px';
+                messageInput.value = '';
+            }, 0);
+        });
+
+        // Handle paste events
+        messageInput.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const text = e.clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+        });
+    }
+
+    if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            const timestamp = new Date().toLocaleString();
+            appendMessage('user', message, timestamp);
+            currentMessageDiv = appendMessage('assistant', '', null);
+            messageInput.value = '';
+            setLoading(true);
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+                    },
+                    body: JSON.stringify({ 
+                        message,
+                        conversation_id: '{{ current_conversation_id if current_conversation_id else "" }}'
+                    })
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                const responseDiv = currentMessageDiv.querySelector('.ml-4');
+                let fullResponse = '';
+
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = JSON.parse(line.slice(6));
+                            if (data.error) {
+                                appendMessage('System', `Error: ${data.error}`);
+                            } else if (data.chunk) {
+                                fullResponse += data.chunk;
+                                responseDiv.innerHTML = fullResponse;
+                                scrollToBottom();
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                appendMessage('System', `Error: ${error.message}`);
+            } finally {
+                setLoading(false);
+                messageInput.focus();
+            }
+        });
+
+        // Focus input on page load
+        messageInput.focus();
+    }
+});
+
+// Chat Management Functions
+function createNewChat() {
+    // Check if there are messages in the current conversation
+    const chatMessages = document.getElementById('chat-messages');
+    const hasMessages = chatMessages && chatMessages.children.length > 0;
+    
+    if (hasMessages) {
+        if (confirm('Creating a new chat will end the current conversation. Are you sure you want to continue?')) {
+            window.location.href = '{{ url_for("create_chat") }}';
+        }
+    } else {
+        window.location.href = '{{ url_for("create_chat") }}';
+    }
+}
+
+function deleteChat(chatId) {
+    if (confirm('Move this chat to trash?')) {
+        fetch(`/chat/${chatId}/delete`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '{{ url_for("chat") }}';
+            }
+        });
+    }
+}
+
+function recoverChat(chatId) {
+    fetch(`/chat/${chatId}/recover`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+        }
+    }).then(response => {
+        if (response.ok) {
+            window.location.reload();
+        }
+    });
+}
+
+function permanentlyDeleteChat(chatId) {
+    if (confirm('Permanently delete this chat? This cannot be undone.')) {
+        fetch(`/chat/${chatId}/permanent-delete`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
+    }
+}
+
+function startTitleEdit() {
+    const titleElement = document.getElementById('chat-title');
+    const currentTitle = titleElement.textContent;
+    
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = currentTitle;
+    input.className = 'border rounded px-2 py-1 text-xl font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400';
+    
+    input.addEventListener('blur', finishTitleEdit);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            input.blur();
+        }
+    });
+    
+    titleElement.replaceWith(input);
+    input.focus();
+    input.select();
+}
+
+function finishTitleEdit(event) {
+    const input = event.target;
+    const newTitle = input.value.trim();
+    
+    if (newTitle) {
+        fetch('/chat/{{ current_conversation_id if current_conversation_id else "" }}/title', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            },
+            body: JSON.stringify({ title: newTitle })
+        }).then(response => {
+            if (response.ok) {
+                const titleElement = document.createElement('h2');
+                titleElement.id = 'chat-title';
+                titleElement.className = 'text-xl font-semibold';
+                titleElement.textContent = newTitle;
+                input.replaceWith(titleElement);
+            }
+        });
+    } else {
+        const titleElement = document.createElement('h2');
+        titleElement.id = 'chat-title';
+        titleElement.className = 'text-xl font-semibold';
+        titleElement.textContent = newTitle || 'Untitled Chat';
+        input.replaceWith(titleElement);
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-2 gap-8">
+    <!-- Todo List -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Todo</h2>
+            <button onclick="document.getElementById('add-task-modal').classList.remove('hidden')" 
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                Add Task
+            </button>
+        </div>
+
+        <div class="space-y-8">
+            {% if todo_tasks %}
+                {# Group tasks by date first #}
+                {% set grouped_tasks = {} %}
+                {% for task in todo_tasks %}
+                    {% if task.due_date not in grouped_tasks %}
+                        {% set _ = grouped_tasks.update({task.due_date: []}) %}
+                    {% endif %}
+                    {% set _ = grouped_tasks[task.due_date].append(task) %}
+                {% endfor %}
+
+                {# Display grouped tasks #}
+                {% for date in grouped_tasks|sort %}
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 bg-gray-100 p-2 rounded-lg">{{ date|format_date }}</h3>
+                        <div class="space-y-4 ml-2">
+                            {% for task in grouped_tasks[date] %}
+                                <div class="border rounded-lg p-4 {% if task.priority == 1 %}bg-red-50{% elif task.priority == 2 %}bg-yellow-50{% else %}bg-green-50{% endif %}">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-grow">
+                                            <div class="flex items-center space-x-2">
+                                                <input type="checkbox" 
+                                                       class="form-checkbox h-5 w-5 text-blue-600"
+                                                       onchange="updateTaskStatus('{{ task.id }}', 'done')">
+                                                <h3 class="text-lg font-semibold">
+                                                    {% if task.priority == 1 %}⚡{% endif %}
+                                                    {{ task.description }}
+                                                </h3>
+                                            </div>
+                                            {% if task.notes %}
+                                            <div class="ml-7 mt-2">
+                                                <p class="text-sm text-gray-600 whitespace-pre-wrap">{{ task.notes }}</p>
+                                            </div>
+                                            {% endif %}
+                                            <div class="ml-7 mt-2">
+                                                <p class="text-sm text-gray-600">
+                                                    {% if task.time %}at {{ task.time|format_time }}{% endif %}
+                                                </p>
+                                                {% if task.reminders %}
+                                                <p class="text-sm text-gray-600">
+                                                    🔔 Reminders: 
+                                                    {% for reminder in task.reminders %}
+                                                        {% if reminder >= 1440 %}
+                                                            {{ (reminder / 1440)|int }} day{% if (reminder / 1440)|int != 1 %}s{% endif %}
+                                                        {% elif reminder >= 60 %}
+                                                            {{ (reminder / 60)|int }} hour{% if (reminder / 60)|int != 1 %}s{% endif %}
+                                                        {% else %}
+                                                            {{ reminder }} minute{% if reminder != 1 %}s{% endif %}
+                                                        {% endif %}
+                                                        {% if not loop.last %}, {% endif %}
+                                                    {% endfor %}
+                                                    before
+                                                </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <button onclick="showTaskDetails('{{ task.id }}', '{{ task.description }}', '{{ task.due_date }}', '{{ task.time }}', {{ task.priority }}, {{ task.reminders|tojson|safe if task.reminders else 'null' }}, {{ task.notes|tojson|safe if task.notes else 'null' }})" 
+                                                    class="text-blue-500 hover:text-blue-700">
+                                                Edit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center text-gray-500">No todo tasks</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Done List -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Done</h2>
+        </div>
+
+        <div class="space-y-8"> 
+            {% if done_tasks %}
+                {# Group tasks by date first #}
+                {% set grouped_tasks = {} %}
+                {% for task in done_tasks %}
+                    {% if task.due_date not in grouped_tasks %}
+                        {% set _ = grouped_tasks.update({task.due_date: []}) %}
+                    {% endif %}
+                    {% set _ = grouped_tasks[task.due_date].append(task) %}
+                {% endfor %}
+
+                {# Display grouped tasks #}
+                {% for date in grouped_tasks|sort(reverse=true) %}
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2 bg-gray-100 p-2 rounded-lg">{{ date|format_date }}</h3>
+                        <div class="space-y-4 ml-2"> 
+                            {% for task in grouped_tasks[date] %}
+                                <div class="border rounded-lg p-4 bg-gray-50">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-grow">
+                                            <div class="flex items-center space-x-2">
+                                                <input type="checkbox" 
+                                                       class="form-checkbox h-5 w-5 text-blue-600"
+                                                       checked
+                                                       onchange="updateTaskStatus('{{ task.id }}', 'todo')">
+                                                <h3 class="text-lg font-semibold line-through text-gray-500">
+                                                    {% if task.priority == 1 %}⚡{% endif %}
+                                                    {{ task.description }}
+                                                </h3>
+                                            </div>
+                                            {% if task.notes %}
+                                            <div class="ml-7 mt-2">
+                                                <p class="text-sm text-gray-500 whitespace-pre-wrap line-through">{{ task.notes }}</p>
+                                            </div>
+                                            {% endif %}
+                                            <div class="ml-7 mt-2">
+                                                <p class="text-sm text-gray-500 line-through">
+                                                    {% if task.time %}at {{ task.time|format_time }}{% endif %}
+                                                </p>
+                                                {% if task.reminders %}
+                                                <p class="text-sm text-gray-500 line-through">
+                                                    🔔 {{ task.reminders|length }} reminder{{ 's' if task.reminders|length > 1 }}
+                                                </p>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="ml-4">
+                                            <button onclick="showTaskDetails('{{ task.id }}', '{{ task.description }}', '{{ task.due_date }}', '{{ task.time }}', {{ task.priority }}, {{ task.reminders|tojson|safe if task.reminders else 'null' }}, {{ task.notes|tojson|safe if task.notes else 'null' }})" 
+                                                    class="text-blue-500 hover:text-blue-700">
+                                                Edit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-center text-gray-500">No completed tasks</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add Task Modal -->
+{% include 'task_modal.html' %}
+
+<!-- Task Details Modal -->
+{% include 'task_details_modal.html' %}
+
+<script>
+function updateTaskStatus(taskId, status) {
+    fetch(`/update-task-status/${taskId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+        },
+        body: JSON.stringify({ status: status })
+    }).then(response => {
+        if (response.ok) {
+            location.reload();
+        }
+    });
+}
+</script>
+{% endblock %}
