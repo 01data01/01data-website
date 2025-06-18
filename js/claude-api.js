@@ -8,8 +8,8 @@ class ClaudeAPI {
         this.apiKey = localStorage.getItem('claude_api_key') || null;
         this.baseUrl = 'https://api.anthropic.com/v1';
         this.model = 'claude-3-5-sonnet-20241022';
-        this.maxTokens = 1000;
-        this.mockMode = localStorage.getItem('claude_mock_mode') === 'true';
+        this.maxTokens = 4000; // Increased for longer responses
+        this.mockMode = false; // Force disable mock mode
     }
 
     setApiKey(key) {
@@ -86,14 +86,7 @@ class ClaudeAPI {
     }
 
     getMockChatResponse(message) {
-        const responses = [
-            "I understand you're asking about: " + message + ". Let me help you with your task management!",
-            "That's a great question about " + message + ". I can help you organize your tasks and schedule.",
-            "I see you want to know about " + message + ". I'm here to assist with your productivity needs!",
-            "Thanks for asking about " + message + ". I can help you manage tasks, schedule appointments, and stay organized."
-        ];
-        
-        return responses[Math.floor(Math.random() * responses.length)];
+        return "Mock mode is disabled. This should not appear if using real Claude API.";
     }
 
     async parseTask(userInput, currentDate = new Date()) {
@@ -137,33 +130,7 @@ class ClaudeAPI {
         const dateStr = currentDate.toISOString().split('T')[0];
         const timeStr = currentDate.toTimeString().split(' ')[0];
         
-        return `You are a task parsing assistant. Parse the following user input into a structured task format.
-
-Current date and time: ${dateStr} ${timeStr}
-
-User input: "${userInput}"
-
-Please respond with a JSON object containing these fields:
-- title: The main task description (required)
-- description: Additional details (optional)
-- dueDate: Date in YYYY-MM-DD format (null if not specified)
-- dueTime: Time in HH:MM format (null if not specified)
-- priority: "high", "medium", or "low" (default: "medium")
-- category: Task category if identifiable (optional)
-
-Rules:
-1. Extract dates relative to current date ("today", "tomorrow", "next week", "Monday", etc.)
-2. Extract times in 24-hour format
-3. Identify priority from keywords like "urgent", "important", "asap", "low priority"
-4. Clean up the title by removing date/time references
-5. If you can't determine a field, use null or the default value
-
-Example inputs and outputs:
-- "Meeting with John tomorrow at 2pm" → {"title": "Meeting with John", "dueDate": "2024-01-16", "dueTime": "14:00", "priority": "medium"}
-- "Urgent: Call client about project" → {"title": "Call client about project", "priority": "high"}
-- "Buy groceries when I have time" → {"title": "Buy groceries", "priority": "low"}
-
-Respond only with the JSON object, no additional text.`;
+        return `Parse this task: "${userInput}" into JSON format with title, description, dueDate (${dateStr} format), dueTime (HH:MM), priority (high/medium/low). Current date: ${dateStr}. Respond only with JSON.`;
     }
 
     parseTaskResponse(content) {
@@ -197,15 +164,8 @@ Respond only with the JSON object, no additional text.`;
     }
 
     async processMessage(message, context = {}) {
-        if (!this.apiKey && !this.mockMode) {
+        if (!this.apiKey) {
             return "Please configure your Claude API key in settings to enable AI features.";
-        }
-
-        // Use mock mode for testing or when API is unavailable
-        if (this.mockMode || !this.apiKey) {
-            console.log('Using mock chat response for:', message);
-            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-            return this.getMockChatResponse(message);
         }
 
         const prompt = this.buildChatPrompt(message, context);
@@ -213,7 +173,7 @@ Respond only with the JSON object, no additional text.`;
         try {
             const response = await this.makeRequest('messages', {
                 model: this.model,
-                max_tokens: this.maxTokens,
+                max_tokens: 2000, // Increased for longer responses
                 messages: [
                     {
                         role: 'user',
@@ -225,35 +185,12 @@ Respond only with the JSON object, no additional text.`;
             return response.content[0].text;
         } catch (error) {
             console.error('Error processing message with Claude:', error);
-            
-            // Fallback to mock response on API failure
-            console.log('Falling back to mock chat response');
-            return this.getMockChatResponse(message);
+            return `Error: ${error.message}`;
         }
     }
 
     buildChatPrompt(message, context) {
-        const { tasks = [], projects = [], currentDate = new Date() } = context;
-        
-        const dateStr = currentDate.toISOString().split('T')[0];
-        const tasksSummary = this.buildTasksSummary(tasks, dateStr);
-        
-        return `You are an intelligent personal assistant helping with task and project management.
-
-Current date: ${dateStr}
-Current tasks summary: ${tasksSummary}
-
-User message: "${message}"
-
-Instructions:
-1. Be helpful, concise, and actionable
-2. If the user wants to create a task, suggest using the "Add Task" feature or natural language input
-3. If asked about tasks, provide relevant information from the context
-4. If asked about scheduling, reference their current tasks and suggest optimal timing
-5. Be proactive in suggesting improvements to their productivity
-6. Keep responses conversational and friendly
-
-Respond naturally and helpfully to assist with their task management needs.`;
+        return message; // Send user message directly to Claude without any restrictions
     }
 
     buildTasksSummary(tasks, currentDate) {
@@ -321,21 +258,8 @@ Respond naturally and helpfully to assist with their task management needs.`;
 
     // Test API connection
     async testConnection() {
-        // If mock mode is enabled, return success
-        if (this.mockMode) {
-            return { 
-                success: true, 
-                message: 'Mock mode enabled - AI features will use simulated responses for testing' 
-            };
-        }
-
         if (!this.apiKey) {
-            // Enable mock mode automatically if no API key
-            this.enableMockMode(true);
-            return { 
-                success: true, 
-                message: 'No API key found. Enabled mock mode for testing - AI features will use simulated responses' 
-            };
+            return { success: false, error: 'No API key configured' };
         }
 
         // Validate API key format
@@ -346,35 +270,19 @@ Respond naturally and helpfully to assist with their task management needs.`;
         try {
             const response = await this.makeRequest('messages', {
                 model: this.model,
-                max_tokens: 10,
+                max_tokens: 50,
                 messages: [
                     {
                         role: 'user',
-                        content: 'Hello'
+                        content: 'Say hello and confirm you are Claude AI'
                     }
                 ]
             });
 
-            return { success: true, message: 'Real Claude API connection successful!' };
+            return { success: true, message: 'Claude API connected successfully! Response: ' + response.content[0].text };
         } catch (error) {
             console.error('Connection test failed:', error);
-            
-            // Enable mock mode on failure
-            this.enableMockMode(true);
-            
-            // Check if it's a CORS error
-            if (error.message.includes('CORS') || error.message.includes('Network error')) {
-                return { 
-                    success: true, 
-                    message: 'CORS detected - Enabled mock mode for testing. Real API requires backend proxy.',
-                    warning: 'Direct browser requests to Claude API are blocked by CORS policy.'
-                };
-            }
-            
-            return { 
-                success: true, 
-                message: 'API connection failed - Enabled mock mode for testing. Error: ' + error.message 
-            };
+            return { success: false, error: error.message };
         }
     }
 
