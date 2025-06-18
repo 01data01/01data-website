@@ -7,13 +7,83 @@ const ENCODED_KEYS = [
   // Add more encoded keys...
 ].filter(key => !key.includes('PLACEHOLDER'));
 
-// Decode keys for use
-const API_KEYS = ENCODED_KEYS.map(encodedKey => {
+// Performance cache for decoded keys
+let cachedApiKeys = null;
+let lastCacheTime = 0;
+const CACHE_DURATION = 300000; // 5 minutes in milliseconds
+
+// Optimized validation patterns
+const API_KEY_PATTERN = /^sk-ant-[a-zA-Z0-9\-_]{95,}$/;
+const ENCODING_PATTERN = /^[A-Za-z0-9+/=]+$/;
+
+// Safe decoding function with enhanced error handling
+function safeDecodeKey(encodedKey) {
   try {
-    return Buffer.from(encodedKey, 'base64').toString('utf8');
-  } catch {
+    // Validate base64 format first
+    if (!encodedKey || typeof encodedKey !== 'string' || !ENCODING_PATTERN.test(encodedKey)) {
+      return null;
+    }
+    
+    // Attempt decoding
+    const decoded = Buffer.from(encodedKey, 'base64').toString('utf8');
+    
+    // Validate decoded key format
+    if (!decoded || !API_KEY_PATTERN.test(decoded)) {
+      return null;
+    }
+    
+    return decoded;
+  } catch (error) {
+    console.warn('Failed to decode API key:', error.message);
     return null;
   }
-}).filter(key => key && key.startsWith('sk-ant-'));
+}
 
-module.exports = { API_KEYS };
+// Optimized key validation
+function validateApiKey(key) {
+  return key && 
+         typeof key === 'string' && 
+         API_KEY_PATTERN.test(key) &&
+         key.length >= 95 && 
+         key.length <= 200; // Reasonable length bounds
+}
+
+// Get API keys with caching for performance
+function getApiKeys() {
+  const now = Date.now();
+  
+  // Return cached keys if still valid
+  if (cachedApiKeys && (now - lastCacheTime) < CACHE_DURATION) {
+    return cachedApiKeys;
+  }
+  
+  // Decode and validate keys
+  const decodedKeys = [];
+  
+  for (const encodedKey of ENCODED_KEYS) {
+    const decoded = safeDecodeKey(encodedKey);
+    if (decoded && validateApiKey(decoded)) {
+      decodedKeys.push(decoded);
+    }
+  }
+  
+  // Update cache
+  cachedApiKeys = decodedKeys;
+  lastCacheTime = now;
+  
+  // Log key statistics for monitoring
+  console.log(`Loaded ${decodedKeys.length} valid API keys from ${ENCODED_KEYS.length} encoded entries`);
+  
+  return decodedKeys;
+}
+
+// Get keys with immediate validation
+const API_KEYS = getApiKeys();
+
+// Export functions for runtime key management
+module.exports = { 
+  API_KEYS,
+  getApiKeys,
+  validateApiKey,
+  safeDecodeKey
+};
