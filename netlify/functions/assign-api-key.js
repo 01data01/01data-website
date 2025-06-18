@@ -1,16 +1,9 @@
 const fs = require('fs').promises;
 const path = require('path');
 
-// Cache for better performance in serverless environment
-let userDataCache = null;
-let cacheTimestamp = 0;
-const CACHE_DURATION = 60000; // 1 minute cache
-
 // Performance monitoring
 const metrics = {
   requests: 0,
-  cacheHits: 0,
-  cacheMisses: 0,
   errors: 0
 };
 
@@ -29,35 +22,19 @@ async function safeFileOperation(operation, retries = 3) {
   }
 }
 
-// Optimized user data loading with caching
+// Load user data from file
 async function loadUserData() {
-  const now = Date.now();
-  
-  // Return cached data if still valid
-  if (userDataCache && (now - cacheTimestamp) < CACHE_DURATION) {
-    metrics.cacheHits++;
-    return userDataCache;
-  }
-  
-  metrics.cacheMisses++;
-  
   try {
     const usersPath = path.join(process.cwd(), 'data', 'users.json');
     const usersData = await safeFileOperation(() => fs.readFile(usersPath, 'utf8'));
-    
-    userDataCache = JSON.parse(usersData);
-    cacheTimestamp = now;
-    
-    return userDataCache;
+    return JSON.parse(usersData);
   } catch (error) {
     // If file doesn't exist or is corrupted, return empty object
-    userDataCache = {};
-    cacheTimestamp = now;
-    return userDataCache;
+    return {};
   }
 }
 
-// Optimized user data saving with atomic writes
+// Save user data with atomic writes
 async function saveUserData(users) {
   try {
     const usersPath = path.join(process.cwd(), 'data', 'users.json');
@@ -68,10 +45,6 @@ async function saveUserData(users) {
     
     // Rename to final file (atomic on most filesystems)
     await safeFileOperation(() => fs.rename(tempPath, usersPath));
-    
-    // Update cache
-    userDataCache = users;
-    cacheTimestamp = Date.now();
     
   } catch (error) {
     console.error('Failed to save user data:', error);
@@ -133,10 +106,10 @@ exports.handler = async (event, context) => {
     // Normalize email
     userEmail = userEmail.toLowerCase().trim();
 
-    // Optimized user data loading
+    // Load user data
     const users = await loadUserData();
     
-    // Optimized API keys loading with validation
+    // Load API keys with validation
     const apiKeys = {
       keys: [
         process.env.CLAUDE_API_KEY_1,
@@ -187,15 +160,14 @@ exports.handler = async (event, context) => {
               lastAccessed: new Date().toISOString()
             },
             performance: {
-              responseTime,
-              cacheHit: true
+              responseTime
             }
           })
         };
       }
     }
 
-    // Optimized key assignment algorithm
+    // Key assignment algorithm
     const userKeys = Object.values(users);
     const keyUsageCount = new Array(apiKeys.keys.length).fill(0);
     
@@ -229,7 +201,7 @@ exports.handler = async (event, context) => {
 
     users[userEmail] = newUser;
 
-    // Optimized atomic save operation
+    // Save user data
     await saveUserData(users);
 
     const responseTime = Date.now() - startTime;
@@ -243,7 +215,6 @@ exports.handler = async (event, context) => {
         userInfo: newUser,
         performance: {
           responseTime,
-          cacheHit: false,
           keyDistribution: keyUsageCount
         }
       })
