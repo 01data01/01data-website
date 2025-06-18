@@ -3627,14 +3627,24 @@
                 setTimeout(() => {
                     if (isGoogleApiLoaded && typeof google !== 'undefined') {
                         // Use real Google Sign-In
-                        google.accounts.id.prompt((notification) => {
-                            if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-                                // Fallback to demo if Google Sign-In fails
-                                simulateGoogleSignIn(pendingSignInType === 'newuser');
-                            }
-                        });
+                        try {
+                            google.accounts.id.prompt((notification) => {
+                                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                                    // Fallback to demo if Google Sign-In fails
+                                    console.log('Google Sign-In not available, using demo mode');
+                                    showNotification('Google Sign-In temporarily unavailable. Using demo mode.', 'info');
+                                    simulateGoogleSignIn(pendingSignInType === 'newuser');
+                                }
+                            });
+                        } catch (error) {
+                            console.error('Google Sign-In error:', error);
+                            showNotification('Authentication issue detected. Please check domain configuration.', 'info');
+                            simulateGoogleSignIn(pendingSignInType === 'newuser');
+                        }
                     } else {
                         // Use demo sign-in for testing
+                        console.log('Google API not loaded, using demo mode');
+                        showNotification('Demo authentication mode active.', 'info');
                         simulateGoogleSignIn(pendingSignInType === 'newuser');
                     }
 
