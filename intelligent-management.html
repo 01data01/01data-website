@@ -367,16 +367,8 @@
             
             localStorage.setItem('userData', JSON.stringify(userData));
             
-            // Update UI
-            document.getElementById('userName').textContent = userName;
-            document.getElementById('userAvatar').src = userImage;
-            
-            // Hide sign-in screen and show app
-            document.getElementById('signInScreen').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            
-            // Initialize Claude API for this user
-            initializeClaudeAPI(userEmail);
+            // Use the centralized authentication function
+            authenticateUser(userData);
         }
         
         function signOut() {
@@ -408,6 +400,65 @@
             }
         }
         
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Function to handle automatic authentication from main website
+        function checkForPassedUserData() {
+            const userParam = getUrlParameter('user');
+            if (userParam) {
+                try {
+                    const user = JSON.parse(decodeURIComponent(userParam));
+                    console.log('Found user data from main website:', user);
+                    
+                    // Convert to expected format
+                    const userData = {
+                        email: user.email,
+                        name: user.name,
+                        image: user.picture || user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4db6ac&color=fff`
+                    };
+                    
+                    // Store user data for future sessions
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    
+                    // Auto-authenticate the user
+                    authenticateUser(userData);
+                    
+                    // Clean up the URL to remove user data for security and cleaner appearance
+                    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                    
+                    return true;
+                } catch (e) {
+                    console.error('Error parsing user data from URL:', e);
+                }
+            }
+            return false;
+        }
+
+        // Function to authenticate user and show the app
+        function authenticateUser(userData) {
+            console.log('Authenticating user:', userData.email);
+            
+            // Update UI with user data
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userAvatar').src = userData.image;
+            
+            // Hide sign-in screen and show app
+            document.getElementById('signInScreen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            
+            // Initialize Claude API
+            initializeClaudeAPI(userData.email);
+            
+            // Initialize the assistant
+            console.log('Initializing assistant with user data:', userData);
+            IntelligentAssistant.init(userData);
+        }
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             console.log('DOM loaded, checking Claude API integration...');
@@ -417,23 +468,21 @@
             // Hide loading screen
             document.getElementById('loadingScreen').style.display = 'none';
             
+            // First, check if user data was passed from main website
+            if (checkForPassedUserData()) {
+                console.log('User authenticated from main website - skipping sign-in screen');
+                return;
+            }
+            
             // Check for existing Google Sign-In session
-            const userData = localStorage.getItem('userData');
-            if (userData) {
+            const storedUserData = localStorage.getItem('userData');
+            if (storedUserData) {
                 try {
-                    const user = JSON.parse(userData);
+                    const user = JSON.parse(storedUserData);
                     console.log('Found existing user session:', user.email);
                     
-                    // Update UI with user data
-                    document.getElementById('userName').textContent = user.name;
-                    document.getElementById('userAvatar').src = user.image;
-                    
-                    // Show app, hide sign-in
-                    document.getElementById('signInScreen').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                    
-                    // Initialize Claude API
-                    initializeClaudeAPI(user.email);
+                    // Authenticate with existing session
+                    authenticateUser(user);
                 } catch (e) {
                     console.error('Error parsing stored user data:', e);
                     // Show sign-in screen
@@ -444,19 +493,6 @@
                 console.log('No existing user session, showing sign-in screen');
                 document.getElementById('signInScreen').style.display = 'block';
             }
-            
-            // For development, create dummy user data if none exists
-            if (!userData) {
-                console.log('No user data found, creating dummy user for testing');
-                userData = {
-                    name: 'Test User',
-                    email: 'test@example.com',
-                    picture: null
-                };
-            }
-            
-            console.log('Initializing assistant with user data:', userData);
-            IntelligentAssistant.init(userData);
             
             // Check if Claude API is properly integrated
             setTimeout(() => {
