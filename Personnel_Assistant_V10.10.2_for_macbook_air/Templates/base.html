@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white shadow-lg">
+            <div class="p-4">
+                <h1 class="text-xl font-bold mb-6">Personal Assistant</h1>
+                <nav>
+                    <div class="space-y-2">
+                        <h2 class="text-lg font-semibold mb-2">Smart Features</h2>
+                        <a href="{{ url_for('suggested_tasks') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'suggested' %}bg-blue-100{% endif %}">
+                            Suggested Tasks
+                        </a>
+                    </div>
+                    
+                    <div class="mt-6 space-y-2">
+                        <h2 class="text-lg font-semibold mb-2">Calendar Views</h2>
+                        <a href="{{ url_for('monthly_view') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'monthly' %}bg-blue-100{% endif %}">
+                            Monthly View
+                        </a>
+                        <a href="{{ url_for('weekly_view') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'weekly' %}bg-blue-100{% endif %}">
+                            Weekly View
+                        </a>
+                        <a href="{{ url_for('daily_view') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'daily' %}bg-blue-100{% endif %}">
+                            Daily View
+                        </a>
+                    </div>
+                    
+                    <div class="mt-6 space-y-2">
+                        <h2 class="text-lg font-semibold mb-2">Tasks</h2>
+                        <a href="{{ url_for('tasks') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'tasks' %}bg-blue-100{% endif %}">
+                            Task List
+                        </a>
+                        <a href="{{ url_for('todo_done') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'todo-done' %}bg-blue-100{% endif %}">
+                            Todo & Done
+                        </a>
+                        <a href="{{ url_for('freetime_tasks') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'freetime' %}bg-blue-100{% endif %}">
+                            Free Time Tasks
+                        </a>
+                        <a href="{{ url_for('recurring_tasks') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'recurring' %}bg-blue-100{% endif %}">
+                            Recurring Tasks
+                        </a>
+                    </div>
+
+                    <div class="mt-6 space-y-2">
+                        <h2 class="text-lg font-semibold mb-2">Assistant</h2>
+                        <a href="{{ url_for('chat') }}" class="block px-4 py-2 rounded-lg hover:bg-gray-100 {% if active_view == 'chat' %}bg-blue-100{% endif %}">
+                            Chat with Claude
+                        </a>
+                    </div>
+
+                    <div class="mt-6 space-y-2">
+                        <h2 class="text-lg font-semibold mb-2">Calendar Data</h2>
+                        <!-- Export Calendar Button -->
+                        <button onclick="exportCalendar()" 
+                                class="w-full px-4 py-2 text-left rounded-lg hover:bg-gray-100 text-blue-600">
+                            Export Calendar
+                        </button>
+                        
+                        <!-- Import Calendar Button -->
+                        <label for="import-file" 
+                               class="block px-4 py-2 rounded-lg hover:bg-gray-100 text-blue-600 cursor-pointer">
+                            Import Calendar
+                        </label>
+                        <input type="file" id="import-file" accept=".json" class="hidden" onchange="importCalendar(this)">
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-8 overflow-y-auto">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <script>
+    function exportCalendar() {
+        fetch('/calendar/export', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Calendar exported successfully as ${data.filename}`);
+            } else {
+                alert('Error exporting calendar: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error exporting calendar: ' + error);
+        });
+    }
+
+    function importCalendar(input) {
+        if (!input.files || !input.files[0]) return;
+
+        const formData = new FormData();
+        formData.append('file', input.files[0]);
+        formData.append('merge', confirm('Do you want to merge with existing data? Click OK to merge, Cancel to replace.'));
+
+        fetch('/calendar/import', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('input[name="csrf_token"]').value
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Calendar imported successfully\n' + 
+                      `Added: ${data.stats.tasks_added} tasks\n` +
+                      `Updated: ${data.stats.tasks_updated} tasks\n` +
+                      `Added: ${data.stats.conversations_added} conversations`);
+                location.reload();
+            } else {
+                alert('Error importing calendar: ' + data.error);
+            }
+        })
+        .catch(error => {
+            alert('Error importing calendar: ' + error);
+        });
+
+        // Clear the input
+        input.value = '';
+    }
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
