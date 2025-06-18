@@ -4190,76 +4190,15 @@
             };
 
             // Store user session for Personal Assistant
-            localStorage.setItem('personal_assistant_user', JSON.stringify(userSession));
+            localStorage.setItem('intelligent_user', JSON.stringify(userSession));
 
-            // Open Personal Assistant in a new window/tab
-            const assistantUrl = './Personnel_Assistant_V10.10.2_for_macbook_air/app.py';
+            // Open the client-side Intelligent Management system
+            const assistantUrl = `intelligent-management.html?user=${encodeURIComponent(JSON.stringify(userSession))}`;
+            window.open(assistantUrl, '_blank');
             
-            // First try to check if the assistant server is running
-            fetch('http://localhost:8080')
-                .then(response => {
-                    if (response.ok) {
-                        // Server is running, open the assistant
-                        window.open('http://localhost:8080', '_blank');
-                        showNotification('Opening Intelligent Management System...', 'success');
-                    } else {
-                        throw new Error('Server not responding');
-                    }
-                })
-                .catch(error => {
-                    // Server is not running, show instructions
-                    showIntelligentManagementModal();
-                });
+            showNotification('Opening Intelligent Management System...', 'success');
         }
 
-        // Show modal with instructions to start the Personal Assistant
-        function showIntelligentManagementModal() {
-            const modal = document.createElement('div');
-            modal.className = 'auth-modal show';
-            modal.innerHTML = `
-                <div class="auth-modal-content">
-                    <button class="auth-modal-close" onclick="this.parentElement.parentElement.remove(); document.body.style.overflow = '';">×</button>
-                    <div class="auth-header">
-                        <div class="mgmt-icon" style="margin: 0 auto 20px auto;">
-                            <div class="mgmt-brain">
-                                <div class="mgmt-neural-paths">
-                                    <div class="mgmt-neural-line"></div>
-                                    <div class="mgmt-neural-line"></div>
-                                    <div class="mgmt-neural-line"></div>
-                                    <div class="mgmt-neural-line"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <h2>Start Intelligent Management</h2>
-                        <p>Your AI-powered task and project management system</p>
-                    </div>
-                    <div class="auth-instructions">
-                        <h3>To access your Intelligent Management System:</h3>
-                        <ol style="text-align: left; margin: 20px 0;">
-                            <li>Open Terminal on your Mac</li>
-                            <li>Navigate to the project folder:<br><code>cd "Desktop/01data website/Personnel_Assistant_V10.10.2_for_macbook_air"</code></li>
-                            <li>Activate the virtual environment:<br><code>source venv/bin/activate</code></li>
-                            <li>Start the assistant:<br><code>python app.py</code></li>
-                            <li>The system will open at: <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></li>
-                        </ol>
-                        <div style="background: rgba(77, 182, 172, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
-                            <strong>💡 Features you'll have access to:</strong>
-                            <ul style="text-align: left; margin: 10px 0 0 20px;">
-                                <li>AI-powered task creation via natural language</li>
-                                <li>Smart calendar with multiple views</li>
-                                <li>Recurring tasks and reminders</li>
-                                <li>Project management with milestones</li>
-                                <li>Conversation history with Claude AI</li>
-                                <li>Productivity insights and suggestions</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            document.body.style.overflow = 'hidden';
-        }
 
         // Initialize
         setTimeout(() => {
