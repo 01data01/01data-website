@@ -192,11 +192,18 @@
             <div id="calendar-view" class="view">
                 <div class="view-header">
                     <h2>Calendar</h2>
-                    <div class="calendar-controls">
-                        <button id="prevMonth">‹</button>
-                        <span id="currentMonth"></span>
-                        <button id="nextMonth">›</button>
-                        <button id="todayBtn">Today</button>
+                    <div class="calendar-header">
+                        <div class="calendar-view-switcher">
+                            <button class="view-btn active" data-view="month">Month</button>
+                            <button class="view-btn" data-view="week">Week</button>
+                            <button class="view-btn" data-view="day">Day</button>
+                        </div>
+                        <div class="calendar-controls">
+                            <button id="prevPeriod" class="nav-btn">‹</button>
+                            <span id="currentPeriod"></span>
+                            <button id="nextPeriod" class="nav-btn">›</button>
+                            <button id="todayBtn" class="today-btn">Today</button>
+                        </div>
                     </div>
                 </div>
                 <div class="calendar-container">
@@ -367,16 +374,8 @@
             
             localStorage.setItem('userData', JSON.stringify(userData));
             
-            // Update UI
-            document.getElementById('userName').textContent = userName;
-            document.getElementById('userAvatar').src = userImage;
-            
-            // Hide sign-in screen and show app
-            document.getElementById('signInScreen').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            
-            // Initialize Claude API for this user
-            initializeClaudeAPI(userEmail);
+            // Use the centralized authentication function
+            authenticateUser(userData);
         }
         
         function signOut() {
@@ -408,55 +407,169 @@
             }
         }
         
+        // Function to get URL parameters
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Function to handle automatic authentication from main website
+        function checkForPassedUserData() {
+            console.log('Checking for passed user data...');
+            console.log('Current URL:', window.location.href);
+            
+            const userParam = getUrlParameter('user');
+            console.log('User parameter:', userParam);
+            
+            if (userParam) {
+                try {
+                    const user = JSON.parse(decodeURIComponent(userParam));
+                    console.log('Parsed user data from main website:', user);
+                    
+                    // Convert to expected format
+                    const userData = {
+                        email: user.email,
+                        name: user.name,
+                        image: user.picture || user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4db6ac&color=fff`
+                    };
+                    
+                    console.log('Converted user data:', userData);
+                    
+                    // Store user data for future sessions
+                    localStorage.setItem('userData', JSON.stringify(userData));
+                    console.log('Stored user data in localStorage');
+                    
+                    // Auto-authenticate the user
+                    console.log('Calling authenticateUser...');
+                    authenticateUser(userData);
+                    
+                    // Clean up the URL to remove user data for security and cleaner appearance
+                    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                    console.log('URL cleaned, authentication complete');
+                    
+                    return true;
+                } catch (e) {
+                    console.error('Error parsing user data from URL:', e);
+                    console.error('Raw user parameter:', userParam);
+                }
+            } else {
+                console.log('No user parameter found in URL');
+            }
+            return false;
+        }
+
+        // Function to authenticate user and show the app
+        function authenticateUser(userData) {
+            console.log('🚀 Starting authenticateUser for:', userData.email);
+            
+            // Check if required DOM elements exist
+            const signInScreen = document.getElementById('signInScreen');
+            const app = document.getElementById('app');
+            const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            
+            console.log('DOM elements check:');
+            console.log('- signInScreen:', !!signInScreen);
+            console.log('- app:', !!app);
+            console.log('- userName:', !!userName);
+            console.log('- userAvatar:', !!userAvatar);
+            
+            if (!signInScreen || !app || !userName || !userAvatar) {
+                console.error('❌ Required DOM elements not found! Authentication cannot proceed.');
+                return;
+            }
+            
+            // Update UI with user data
+            console.log('📝 Updating UI with user data...');
+            userName.textContent = userData.name;
+            userAvatar.src = userData.image;
+            
+            // Hide sign-in screen and show app
+            console.log('🔄 Switching from sign-in screen to app...');
+            signInScreen.style.display = 'none';
+            app.style.display = 'block';
+            
+            console.log('✅ UI updated successfully');
+            
+            // Initialize Claude API
+            console.log('🔧 Initializing Claude API...');
+            initializeClaudeAPI(userData.email);
+            
+            // Initialize the assistant
+            console.log('🤖 Initializing assistant with user data:', userData);
+            if (typeof IntelligentAssistant !== 'undefined') {
+                IntelligentAssistant.init(userData);
+                console.log('✅ Assistant initialized');
+            } else {
+                console.warn('⚠️ IntelligentAssistant not available yet, will retry...');
+                // Retry after a short delay
+                setTimeout(() => {
+                    if (typeof IntelligentAssistant !== 'undefined') {
+                        IntelligentAssistant.init(userData);
+                        console.log('✅ Assistant initialized (retry)');
+                    } else {
+                        console.error('❌ IntelligentAssistant still not available');
+                    }
+                }, 1000);
+            }
+            
+            console.log('🎉 Authentication completed successfully!');
+        }
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, checking Claude API integration...');
-            console.log('IntelligentAssistant class:', window.IntelligentAssistant);
-            console.log('ClaudeAPI class:', window.ClaudeAPI);
+            console.log('🚀 DOM Content Loaded - Starting initialization...');
+            console.log('🔍 Checking integrations...');
+            console.log('- IntelligentAssistant class:', typeof window.IntelligentAssistant);
+            console.log('- ClaudeAPI class:', typeof window.ClaudeAPI);
             
             // Hide loading screen
-            document.getElementById('loadingScreen').style.display = 'none';
+            console.log('🔄 Hiding loading screen...');
+            const loadingScreen = document.getElementById('loadingScreen');
+            if (loadingScreen) {
+                loadingScreen.style.display = 'none';
+                console.log('✅ Loading screen hidden');
+            } else {
+                console.warn('⚠️ Loading screen element not found');
+            }
             
+            // First, check if user data was passed from main website
+            console.log('🔍 Step 1: Checking for passed user data from main website...');
+            if (checkForPassedUserData()) {
+                console.log('✅ User authenticated from main website - skipping remaining checks');
+                return;
+            }
+            
+            console.log('🔍 Step 2: Checking for existing localStorage session...');
             // Check for existing Google Sign-In session
-            const userData = localStorage.getItem('userData');
-            if (userData) {
+            const storedUserData = localStorage.getItem('userData');
+            if (storedUserData) {
                 try {
-                    const user = JSON.parse(userData);
-                    console.log('Found existing user session:', user.email);
+                    const user = JSON.parse(storedUserData);
+                    console.log('✅ Found existing user session:', user.email);
                     
-                    // Update UI with user data
-                    document.getElementById('userName').textContent = user.name;
-                    document.getElementById('userAvatar').src = user.image;
-                    
-                    // Show app, hide sign-in
-                    document.getElementById('signInScreen').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                    
-                    // Initialize Claude API
-                    initializeClaudeAPI(user.email);
+                    // Authenticate with existing session
+                    console.log('🔄 Authenticating with existing session...');
+                    authenticateUser(user);
                 } catch (e) {
-                    console.error('Error parsing stored user data:', e);
+                    console.error('❌ Error parsing stored user data:', e);
                     // Show sign-in screen
+                    console.log('🔄 Showing sign-in screen due to localStorage error...');
                     document.getElementById('signInScreen').style.display = 'block';
                 }
             } else {
                 // No existing session, show sign-in screen
-                console.log('No existing user session, showing sign-in screen');
-                document.getElementById('signInScreen').style.display = 'block';
+                console.log('ℹ️ No existing user session found');
+                console.log('🔄 Showing sign-in screen...');
+                const signInScreen = document.getElementById('signInScreen');
+                if (signInScreen) {
+                    signInScreen.style.display = 'block';
+                    console.log('✅ Sign-in screen displayed');
+                } else {
+                    console.error('❌ Sign-in screen element not found!');
+                }
             }
-            
-            // For development, create dummy user data if none exists
-            if (!userData) {
-                console.log('No user data found, creating dummy user for testing');
-                userData = {
-                    name: 'Test User',
-                    email: 'test@example.com',
-                    picture: null
-                };
-            }
-            
-            console.log('Initializing assistant with user data:', userData);
-            IntelligentAssistant.init(userData);
             
             // Check if Claude API is properly integrated
             setTimeout(() => {
