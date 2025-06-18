@@ -3,6 +3,8 @@ data/api-keys.json
 .env
 .env.local
 
+# Note: config.js is included in repo for deployment
+
 # Node modules
 node_modules/
 
