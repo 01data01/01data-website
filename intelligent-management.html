@@ -294,6 +294,9 @@
                         <input type="password" id="claudeApiKey" placeholder="Enter your Claude API key">
                         <small>Get your API key from <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></small>
                     </div>
+                    <div class="form-group">
+                        <button type="button" class="btn-secondary" onclick="testClaudeConnection()">Test Connection</button>
+                    </div>
                 </div>
                 <div class="settings-section">
                     <h4>Data Management</h4>
@@ -321,8 +324,21 @@
     <script src="js/projects.js"></script>
     
     <script>
+        // Debug function to show notification
+        function showNotification(message, type = 'info') {
+            console.log(`Notification (${type}): ${message}`);
+            // Create simple notification if assistant not available
+            if (typeof alert !== 'undefined') {
+                alert(message);
+            }
+        }
+        
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, checking Claude API integration...');
+            console.log('IntelligentAssistant class:', window.IntelligentAssistant);
+            console.log('ClaudeAPI class:', window.ClaudeAPI);
+            
             // Get user data from URL params or localStorage
             const urlParams = new URLSearchParams(window.location.search);
             const userDataParam = urlParams.get('user');
@@ -348,15 +364,29 @@
                 }
             }
             
-            if (userData) {
-                IntelligentAssistant.init(userData);
-            } else {
-                // Redirect back to main site for authentication
-                showNotification('Please sign in through the main 01data website', 'warning');
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 3000);
+            // For development, create dummy user data if none exists
+            if (!userData) {
+                console.log('No user data found, creating dummy user for testing');
+                userData = {
+                    name: 'Test User',
+                    email: 'test@example.com',
+                    picture: null
+                };
             }
+            
+            console.log('Initializing assistant with user data:', userData);
+            IntelligentAssistant.init(userData);
+            
+            // Check if Claude API is properly integrated
+            setTimeout(() => {
+                if (window.assistant) {
+                    console.log('Assistant initialized:', window.assistant);
+                    console.log('Claude API available:', !!window.assistant.claudeAPI);
+                    console.log('Assistant methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.assistant)));
+                } else {
+                    console.error('Assistant not initialized');
+                }
+            }, 1000);
         });
     </script>
 </body>
