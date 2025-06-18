@@ -895,6 +895,154 @@
             backdrop-filter: blur(15px);
         }
 
+        /* Intelligent Management Button */
+        .intelligent-management-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            margin-left: 15px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark), #40e0d0);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 6px 20px rgba(77, 182, 172, 0.3);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .intelligent-management-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(64, 224, 208, 0.15) 100%);
+            animation: intelligentPulse 3s ease-in-out infinite;
+        }
+
+        .intelligent-management-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(77, 182, 172, 0.4);
+        }
+
+        .intelligent-management-btn:hover .mgmt-brain {
+            animation-duration: 0.8s;
+        }
+
+        .intelligent-management-btn:hover .mgmt-neural-line {
+            animation-duration: 0.6s;
+        }
+
+        .mgmt-icon {
+            position: relative;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mgmt-brain {
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(64, 224, 208, 0.8));
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+            position: relative;
+            animation: mgmtBrainGlow 2s ease-in-out infinite alternate;
+        }
+
+        .mgmt-brain::before {
+            content: '';
+            position: absolute;
+            top: 15%;
+            left: 15%;
+            width: 70%;
+            height: 70%;
+            background: linear-gradient(145deg, rgba(255,255,255,0.4), transparent);
+            border-radius: 50% 50% 50% 50% / 45% 45% 55% 55%;
+        }
+
+        .mgmt-neural-paths {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18px;
+            height: 18px;
+        }
+
+        .mgmt-neural-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            border-radius: 1px;
+            animation: mgmtNeuralPulse 1.5s ease-in-out infinite;
+        }
+
+        .mgmt-neural-line:nth-child(1) {
+            width: 6px;
+            height: 1px;
+            top: 4px;
+            left: 2px;
+            transform: rotate(45deg);
+            animation-delay: 0s;
+        }
+
+        .mgmt-neural-line:nth-child(2) {
+            width: 5px;
+            height: 1px;
+            top: 7px;
+            left: 6px;
+            transform: rotate(-30deg);
+            animation-delay: 0.3s;
+        }
+
+        .mgmt-neural-line:nth-child(3) {
+            width: 4px;
+            height: 1px;
+            top: 10px;
+            left: 3px;
+            transform: rotate(60deg);
+            animation-delay: 0.6s;
+        }
+
+        .mgmt-neural-line:nth-child(4) {
+            width: 6px;
+            height: 1px;
+            top: 8px;
+            left: 9px;
+            transform: rotate(-45deg);
+            animation-delay: 0.9s;
+        }
+
+        @keyframes intelligentPulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes mgmtBrainGlow {
+            0% { 
+                box-shadow: 0 0 6px rgba(255, 255, 255, 0.4);
+                transform: scale(1);
+            }
+            100% { 
+                box-shadow: 0 0 10px rgba(64, 224, 208, 0.6);
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes mgmtNeuralPulse {
+            0%, 100% { opacity: 0; transform: scaleX(0); }
+            50% { opacity: 1; transform: scaleX(1); }
+        }
+
         .user-avatar {
             width: 32px;
             height: 32px;
@@ -3019,6 +3167,21 @@
                     </div>
                     <button class="logout-btn" id="logoutBtn">Sign Out</button>
                 </div>
+                
+                <!-- Intelligent Management Button (appears when user is signed in) -->
+                <a href="#" class="intelligent-management-btn" id="intelligentManagementBtn" style="display: none;" onclick="openIntelligentManagement()">
+                    <div class="mgmt-icon">
+                        <div class="mgmt-brain">
+                            <div class="mgmt-neural-paths">
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                                <div class="mgmt-neural-line"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <span>Intelligent Management</span>
+                </a>
             </div>
         </nav>
         
@@ -3760,12 +3923,14 @@
         function displayUserProfile(user) {
             const authButtons = document.querySelector('.auth-buttons');
             const userProfile = document.getElementById('userProfile');
+            const intelligentManagementBtn = document.getElementById('intelligentManagementBtn');
             const userName = document.getElementById('userName');
             const userEmail = document.getElementById('userEmail');
             const userAvatar = document.getElementById('userAvatar');
 
             authButtons.style.display = 'none';
             userProfile.style.display = 'flex';
+            intelligentManagementBtn.style.display = 'inline-flex';
             
             userName.textContent = user.name;
             userEmail.textContent = user.email;
@@ -3808,9 +3973,11 @@
             
             const authButtons = document.querySelector('.auth-buttons');
             const userProfile = document.getElementById('userProfile');
+            const intelligentManagementBtn = document.getElementById('intelligentManagementBtn');
             
             authButtons.style.display = 'flex';
             userProfile.style.display = 'none';
+            intelligentManagementBtn.style.display = 'none';
             
             // Sign out from Google
             if (typeof google !== 'undefined') {
@@ -4005,6 +4172,94 @@
                 }
             });
         });
+
+        // Open Intelligent Management System
+        function openIntelligentManagement() {
+            if (!currentUser) {
+                showNotification('Please sign in to access Intelligent Management', 'warning');
+                return;
+            }
+
+            // Create user session data for the Personal Assistant
+            const userSession = {
+                id: currentUser.sub,
+                name: currentUser.name,
+                email: currentUser.email,
+                picture: currentUser.picture,
+                timestamp: new Date().toISOString()
+            };
+
+            // Store user session for Personal Assistant
+            localStorage.setItem('personal_assistant_user', JSON.stringify(userSession));
+
+            // Open Personal Assistant in a new window/tab
+            const assistantUrl = './Personnel_Assistant_V10.10.2_for_macbook_air/app.py';
+            
+            // First try to check if the assistant server is running
+            fetch('http://localhost:8080')
+                .then(response => {
+                    if (response.ok) {
+                        // Server is running, open the assistant
+                        window.open('http://localhost:8080', '_blank');
+                        showNotification('Opening Intelligent Management System...', 'success');
+                    } else {
+                        throw new Error('Server not responding');
+                    }
+                })
+                .catch(error => {
+                    // Server is not running, show instructions
+                    showIntelligentManagementModal();
+                });
+        }
+
+        // Show modal with instructions to start the Personal Assistant
+        function showIntelligentManagementModal() {
+            const modal = document.createElement('div');
+            modal.className = 'auth-modal show';
+            modal.innerHTML = `
+                <div class="auth-modal-content">
+                    <button class="auth-modal-close" onclick="this.parentElement.parentElement.remove(); document.body.style.overflow = '';">×</button>
+                    <div class="auth-header">
+                        <div class="mgmt-icon" style="margin: 0 auto 20px auto;">
+                            <div class="mgmt-brain">
+                                <div class="mgmt-neural-paths">
+                                    <div class="mgmt-neural-line"></div>
+                                    <div class="mgmt-neural-line"></div>
+                                    <div class="mgmt-neural-line"></div>
+                                    <div class="mgmt-neural-line"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <h2>Start Intelligent Management</h2>
+                        <p>Your AI-powered task and project management system</p>
+                    </div>
+                    <div class="auth-instructions">
+                        <h3>To access your Intelligent Management System:</h3>
+                        <ol style="text-align: left; margin: 20px 0;">
+                            <li>Open Terminal on your Mac</li>
+                            <li>Navigate to the project folder:<br><code>cd "Desktop/01data website/Personnel_Assistant_V10.10.2_for_macbook_air"</code></li>
+                            <li>Activate the virtual environment:<br><code>source venv/bin/activate</code></li>
+                            <li>Start the assistant:<br><code>python app.py</code></li>
+                            <li>The system will open at: <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></li>
+                        </ol>
+                        <div style="background: rgba(77, 182, 172, 0.1); padding: 15px; border-radius: 8px; margin: 20px 0;">
+                            <strong>💡 Features you'll have access to:</strong>
+                            <ul style="text-align: left; margin: 10px 0 0 20px;">
+                                <li>AI-powered task creation via natural language</li>
+                                <li>Smart calendar with multiple views</li>
+                                <li>Recurring tasks and reminders</li>
+                                <li>Project management with milestones</li>
+                                <li>Conversation history with Claude AI</li>
+                                <li>Productivity insights and suggestions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.body.style.overflow = 'hidden';
+        }
 
         // Initialize
         setTimeout(() => {
