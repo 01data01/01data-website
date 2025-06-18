@@ -8,7 +8,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/intelligent-management.css">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMWY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMKY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com">
 </head>
 <body>
     <!-- Loading Screen -->
@@ -24,6 +26,28 @@
             </div>
             <h2>Initializing Intelligent Management</h2>
             <p>Setting up your AI-powered workspace...</p>
+        </div>
+    </div>
+
+    <!-- Google Sign-In Screen -->
+    <div id="signInScreen" class="sign-in-screen">
+        <div class="sign-in-content">
+            <div class="sign-in-header">
+                <div class="mgmt-icon">
+                    <div class="mgmt-brain">
+                        <div class="mgmt-neural-paths">
+                            <div class="mgmt-neural-line"></div>
+                            <div class="mgmt-neural-line"></div>
+                            <div class="mgmt-neural-line"></div>
+                            <div class="mgmt-neural-line"></div>
+                        </div>
+                    </div>
+                </div>
+                <h1>Intelligent Management</h1>
+                <p>Sign in to access your AI-powered workspace</p>
+            </div>
+            <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
+            <div id="signInError" class="sign-in-error" style="display: none;"></div>
         </div>
     </div>
 
@@ -74,6 +98,7 @@
                     <span class="user-name" id="userName"></span>
                 </div>
                 <button class="settings-btn" id="settingsBtn">⚙️</button>
+                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
                 <button class="back-btn" onclick="window.location.href='index.html'">← Back to 01data</button>
             </div>
         </header>
@@ -324,6 +349,56 @@
     <script src="js/projects.js"></script>
     
     <script>
+        // Google Sign-In Functions
+        function onSignIn(googleUser) {
+            const profile = googleUser.getBasicProfile();
+            const userEmail = profile.getEmail();
+            const userName = profile.getName();
+            const userImage = profile.getImageUrl();
+            
+            console.log('Google Sign-In successful:', userEmail);
+            
+            // Store user data
+            const userData = {
+                email: userEmail,
+                name: userName,
+                image: userImage
+            };
+            
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            // Update UI
+            document.getElementById('userName').textContent = userName;
+            document.getElementById('userAvatar').src = userImage;
+            
+            // Hide sign-in screen and show app
+            document.getElementById('signInScreen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            
+            // Initialize Claude API for this user
+            initializeClaudeAPI(userEmail);
+        }
+        
+        function signOut() {
+            const auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                console.log('User signed out.');
+                localStorage.removeItem('userData');
+                // Show sign-in screen again
+                document.getElementById('signInScreen').style.display = 'block';
+                document.getElementById('app').style.display = 'none';
+            });
+        }
+        
+        function initializeClaudeAPI(userEmail) {
+            // Initialize Claude API with user email for automatic API key assignment
+            if (window.ClaudeAPI) {
+                window.claudeAPI = new ClaudeAPI();
+                window.claudeAPI.userEmail = userEmail;
+                console.log('Claude API initialized for user:', userEmail);
+            }
+        }
+
         // Debug function to show notification
         function showNotification(message, type = 'info') {
             console.log(`Notification (${type}): ${message}`);
@@ -339,29 +414,35 @@
             console.log('IntelligentAssistant class:', window.IntelligentAssistant);
             console.log('ClaudeAPI class:', window.ClaudeAPI);
             
-            // Get user data from URL params or localStorage
-            const urlParams = new URLSearchParams(window.location.search);
-            const userDataParam = urlParams.get('user');
+            // Hide loading screen
+            document.getElementById('loadingScreen').style.display = 'none';
             
-            let userData = null;
-            
-            if (userDataParam) {
+            // Check for existing Google Sign-In session
+            const userData = localStorage.getItem('userData');
+            if (userData) {
                 try {
-                    userData = JSON.parse(decodeURIComponent(userDataParam));
-                    localStorage.setItem('intelligent_user', JSON.stringify(userData));
+                    const user = JSON.parse(userData);
+                    console.log('Found existing user session:', user.email);
+                    
+                    // Update UI with user data
+                    document.getElementById('userName').textContent = user.name;
+                    document.getElementById('userAvatar').src = user.image;
+                    
+                    // Show app, hide sign-in
+                    document.getElementById('signInScreen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    
+                    // Initialize Claude API
+                    initializeClaudeAPI(user.email);
                 } catch (e) {
-                    console.error('Error parsing user data from URL:', e);
+                    console.error('Error parsing stored user data:', e);
+                    // Show sign-in screen
+                    document.getElementById('signInScreen').style.display = 'block';
                 }
             } else {
-                // Try to get from localStorage
-                const stored = localStorage.getItem('intelligent_user');
-                if (stored) {
-                    try {
-                        userData = JSON.parse(stored);
-                    } catch (e) {
-                        console.error('Error parsing stored user data:', e);
-                    }
-                }
+                // No existing session, show sign-in screen
+                console.log('No existing user session, showing sign-in screen');
+                document.getElementById('signInScreen').style.display = 'block';
             }
             
             // For development, create dummy user data if none exists
