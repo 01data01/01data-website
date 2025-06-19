@@ -92,17 +92,11 @@ What would you like to do today?`,
     // Setup chat history controls
     setupHistoryControls() {
         const newChatBtn = document.getElementById('newChatBtn');
-        const historyChatBtn = document.getElementById('historyChatBtn');
         const exportChatBtn = document.getElementById('exportChatBtn');
         const clearChatBtn = document.getElementById('clearChatBtn');
-        const closeHistoryBtn = document.getElementById('closeHistoryBtn');
 
         if (newChatBtn) {
             newChatBtn.addEventListener('click', () => this.startNewChat());
-        }
-
-        if (historyChatBtn) {
-            historyChatBtn.addEventListener('click', () => this.toggleHistory());
         }
 
         if (exportChatBtn) {
@@ -111,10 +105,6 @@ What would you like to do today?`,
 
         if (clearChatBtn) {
             clearChatBtn.addEventListener('click', () => this.confirmClearChat());
-        }
-
-        if (closeHistoryBtn) {
-            closeHistoryBtn.addEventListener('click', () => this.hideHistory());
         }
     }
 
@@ -139,53 +129,17 @@ What would you like to do today?`,
         this.focus();
     }
 
-    // Toggle history sidebar
-    toggleHistory() {
-        if (this.historyContainer) {
-            this.isHistoryVisible = !this.isHistoryVisible;
-            
-            if (this.isHistoryVisible) {
-                this.showHistory();
-            } else {
-                this.hideHistory();
-            }
-        }
-    }
-
-    // Show history sidebar
-    showHistory() {
-        if (this.historyContainer) {
-            this.historyContainer.style.display = 'flex';
-            setTimeout(() => {
-                this.historyContainer.classList.add('show');
-            }, 10);
-            this.updateHistoryDisplay();
-            this.isHistoryVisible = true;
-        }
-    }
-
-    // Hide history sidebar
-    hideHistory() {
-        if (this.historyContainer) {
-            this.historyContainer.classList.remove('show');
-            setTimeout(() => {
-                this.historyContainer.style.display = 'none';
-            }, 400);
-            this.isHistoryVisible = false;
-        }
-    }
-
-    // Update history display
+    // Update history display in left sidebar
     updateHistoryDisplay() {
-        const historyContent = document.getElementById('historyContent');
-        if (!historyContent) return;
+        const historyList = document.getElementById('historyList');
+        if (!historyList) return;
 
         if (this.conversations.length === 0) {
-            historyContent.innerHTML = `
+            historyList.innerHTML = `
                 <div class="empty-history">
-                    <div class="empty-icon">📝</div>
-                    <p>No chat history yet</p>
-                    <span>Start a conversation to see it here</span>
+                    <div class="empty-icon">💭</div>
+                    <p>No conversations yet</p>
+                    <span>Start chatting to see history</span>
                 </div>
             `;
             return;
@@ -196,13 +150,16 @@ What would you like to do today?`,
             new Date(b.lastActivity || b.startTime) - new Date(a.lastActivity || a.startTime)
         );
 
-        historyContent.innerHTML = sortedConversations.map(conv => {
+        historyList.innerHTML = sortedConversations.map(conv => {
             const firstUserMessage = conv.messages.find(m => m.type === 'user');
             const title = firstUserMessage ? 
-                firstUserMessage.content.substring(0, 50) + (firstUserMessage.content.length > 50 ? '...' : '') :
+                firstUserMessage.content.substring(0, 40) + (firstUserMessage.content.length > 40 ? '...' : '') :
                 'New Conversation';
             
-            const date = new Date(conv.startTime).toLocaleDateString();
+            const date = new Date(conv.startTime).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
             const messageCount = conv.messages.length;
             const isActive = this.currentConversation && conv.id === this.currentConversation.id;
 
@@ -211,14 +168,14 @@ What would you like to do today?`,
                     <div class="conversation-title">${title}</div>
                     <div class="conversation-meta">
                         <span class="conversation-date">${date}</span>
-                        <span class="conversation-count">${messageCount} messages</span>
+                        <span class="conversation-count">${messageCount}</span>
                     </div>
                 </div>
             `;
         }).join('');
 
         // Add click handlers for conversation items
-        historyContent.querySelectorAll('.conversation-item').forEach(item => {
+        historyList.querySelectorAll('.conversation-item').forEach(item => {
             item.addEventListener('click', () => {
                 const conversationId = item.dataset.conversationId;
                 this.loadConversation(conversationId);
@@ -234,7 +191,6 @@ What would you like to do today?`,
         this.currentConversation = conversation;
         this.restoreMessages();
         this.updateHistoryDisplay();
-        this.hideHistory();
     }
 
     // Confirm clear chat
@@ -615,10 +571,8 @@ What would you like to do today?`,
         // Save to localStorage
         this.saveConversationHistory();
         
-        // Update history display if visible
-        if (this.isHistoryVisible) {
-            this.updateHistoryDisplay();
-        }
+        // Update history display in sidebar
+        this.updateHistoryDisplay();
     }
 
     // Load conversation history from localStorage
