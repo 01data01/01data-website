@@ -12,6 +12,9 @@ class TaskManager {
         // Event listener tracking for cleanup
         this.eventListeners = [];
         
+        // Date cache for performance
+        this.dateCache = new Map();
+        
         // Pre-compiled regex patterns
         this.patterns = {
             todayDate: new RegExp(new Date().toISOString().split('T')[0]),

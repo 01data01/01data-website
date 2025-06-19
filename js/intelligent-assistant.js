@@ -1,6 +1,6 @@
 /**
- * Intelligent Assistant - Core JavaScript Application
- * Client-side task management system with AI integration
+ * Intelligent Assistant - Main Application Controller
+ * Manages the core application state, navigation, and integrates AI modules
  */
 
 class IntelligentAssistant {
@@ -8,269 +8,200 @@ class IntelligentAssistant {
         this.user = null;
         this.tasks = [];
         this.projects = [];
-        this.conversations = [];
         this.currentView = 'dashboard';
-        this.currentDate = new Date();
         this.storageKey = 'intelligent_assistant_data';
         
-        // Track event listeners for cleanup
+        // AI Components
+        this.aiHandler = null;
+        this.taskParser = null;
+        this.chatManager = null;
+        
+        // Task Management
+        this.taskManager = null;
+        this.projectManager = null;
+        
+        // UI State
+        this.isInitialized = false;
+        this.domCache = {};
         this.eventListeners = [];
         
-        this.initializeEventListeners();
-        this.loadData();
+        console.log('Intelligent Assistant initialized');
     }
 
+    // Static initialization method called from HTML
     static init(userData) {
         window.assistant = new IntelligentAssistant();
         window.assistant.setUser(userData);
-        
-        // Initialize Claude API if available
-        if (window.ClaudeAPI) {
-            window.assistant.claudeAPI = new ClaudeAPI();
-            
-            // Set user email for automatic API key assignment
-            if (userData.email) {
-                window.assistant.claudeAPI.setUserEmail(userData.email);
-            }
-            
-            console.log('Claude API initialized on assistant instance');
-            
-            // Add AI methods to the assistant
-            window.assistant.parseTaskWithAI = async function(text) {
-                console.log('parseTaskWithAI called with:', text);
-                try {
-                    if (!this.claudeAPI.apiKey) {
-                        console.log('No API key found, falling back to local parsing');
-                        return this.parseTaskLocally(text);
-                    }
-                    
-                    const task = await this.claudeAPI.parseTask(text, new Date());
-                    console.log('AI parsing successful:', task);
-                    return task;
-                } catch (error) {
-                    console.error('AI parsing failed, falling back to local parsing:', error);
-                    return this.parseTaskLocally(text);
-                }
-            };
-            
-            window.assistant.processWithAI = async function(message) {
-                console.log('processWithAI called with:', message);
-                try {
-                    if (!this.claudeAPI.apiKey) {
-                        return "Please configure your Claude API key in settings to enable AI features.";
-                    }
-                    
-                    const context = {
-                        tasks: this.tasks,
-                        projects: this.projects,
-                        currentDate: new Date()
-                    };
-                    
-                    const response = await this.claudeAPI.processMessage(message, context);
-                    console.log('AI processing successful:', response);
-                    return response;
-                } catch (error) {
-                    console.error('AI processing failed:', error);
-                    return "I apologize, but I'm having trouble connecting to the AI service. Please check your API key in settings or try again later.";
-                }
-            };
-            
-            window.assistant.testAIConnection = async function() {
-                const result = await this.claudeAPI.testConnection();
-                
-                if (result.success) {
-                    this.showNotification('AI connection successful!', 'success');
-                    console.log('Claude API connection test passed');
-                } else {
-                    this.showNotification(`AI connection failed: ${result.error}`, 'error');
-                    console.error('Claude API connection test failed:', result.error);
-                }
-                
-                return result;
-            };
-            
-            window.assistant.setupClaudeAPI = function() {
-                const apiKey = document.getElementById('claudeApiKey')?.value;
-                if (apiKey) {
-                    this.claudeAPI.setApiKey(apiKey);
-                    console.log('Claude API key configured');
-                    this.testAIConnection();
-                }
-            };
-        } else {
-            console.warn('ClaudeAPI class not available');
-        }
-        
+        window.assistant.initializeComponents();
         window.assistant.initializeApp();
     }
 
-    // DOM Caching utility for performance
-    getElement(id) {
-        if (!this.domCache[id]) {
-            this.domCache[id] = document.getElementById(id);
+    // Initialize AI and task management components
+    initializeComponents() {
+        try {
+            // Initialize AI components
+            this.aiHandler = new AIAssistantHandler();
+            this.taskParser = new AITaskParser(this.aiHandler);
+            this.chatManager = new AIChatManager(this.aiHandler);
+            
+            // Initialize task management
+            if (window.TaskManager) {
+                this.taskManager = new TaskManager(this);
+            }
+            
+            if (window.ProjectManager) {
+                this.projectManager = new ProjectManager(this);
+            }
+            
+            // Initialize AI for user if available
+            if (this.user?.email) {
+                this.aiHandler.initialize(this.user.email);
+            }
+            
+            console.log('All components initialized successfully');
+        } catch (error) {
+            console.error('Error initializing components:', error);
         }
-        return this.domCache[id];
     }
 
-    // Add event listener with cleanup tracking
-    addEventListenerWithCleanup(element, event, handler, options) {
-        element.addEventListener(event, handler, options);
-        this.eventListeners.push({ element, event, handler, options });
-    }
-
-    // Cleanup all event listeners
-    cleanup() {
-        this.eventListeners.forEach(({ element, event, handler, options }) => {
-            element.removeEventListener(event, handler, options);
-        });
-        this.eventListeners = [];
-        this.domCache = {};
-    }
-
-    // Debounce utility for performance
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func.apply(this, args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
+    // Set user data and load user-specific information
     setUser(userData) {
         this.user = userData;
         this.updateUserDisplay();
         this.loadUserData();
+        
+        // Initialize AI for this user
+        if (this.aiHandler && userData.email) {
+            this.aiHandler.initialize(userData.email);
+        }
     }
 
+    // Initialize the main application
     initializeApp() {
-        // Hide loading screen
+        this.setupEventListeners();
+        this.loadData();
+        
+        // Show the app after a brief delay
         setTimeout(() => {
-            const loadingScreen = this.getElement('loadingScreen');
-            const app = this.getElement('app');
-            if (loadingScreen) loadingScreen.style.display = 'none';
-            if (app) app.style.display = 'flex';
+            this.hideLoadingScreen();
+            this.showApp();
             this.updateDashboard();
-            this.initializeCalendar();
-        }, 2000);
+            this.isInitialized = true;
+        }, 1000);
     }
 
-    initializeEventListeners() {
+    // Setup all event listeners
+    setupEventListeners() {
         // Navigation
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const view = e.target.closest('.nav-btn').dataset.view;
-                this.switchView(view);
-            });
+        this.addEventListeners('.nav-btn', 'click', (e) => {
+            const view = e.target.closest('.nav-btn').dataset.view;
+            this.switchView(view);
         });
 
-        // Quick add task with debouncing
+        // Quick add task
         const quickAddBtn = this.getElement('quickAddBtn');
         const quickTaskInput = this.getElement('quickTaskInput');
         
         if (quickAddBtn) {
-            this.addEventListenerWithCleanup(quickAddBtn, 'click', () => {
-                this.handleQuickAdd();
-            });
+            quickAddBtn.addEventListener('click', () => this.handleQuickAdd());
         }
 
         if (quickTaskInput) {
-            this.addEventListenerWithCleanup(quickTaskInput, 'keypress', this.debounce((e) => {
-                if (e.key === 'Enter') {
-                    this.handleQuickAdd();
-                }
-            }, 300));
+            quickTaskInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') this.handleQuickAdd();
+            });
         }
 
-        // Add task button
-        document.getElementById('addTaskBtn').addEventListener('click', () => {
-            this.showModal('addTaskModal');
+        // Modal management
+        this.addEventListeners('.modal-close', 'click', (e) => {
+            const modal = e.target.closest('.modal');
+            this.closeModal(modal.id);
         });
 
-        // Add task form
-        document.getElementById('addTaskForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.addTask();
-        });
+        // Task form
+        const addTaskForm = this.getElement('addTaskForm');
+        if (addTaskForm) {
+            addTaskForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleTaskFormSubmit();
+            });
+        }
 
         // Settings
-        document.getElementById('settingsBtn').addEventListener('click', () => {
-            // Load current API key into the form
-            const savedApiKey = localStorage.getItem('claude_api_key');
-            if (savedApiKey) {
-                document.getElementById('claudeApiKey').value = savedApiKey;
-            }
-            
-            this.showModal('settingsModal');
-        });
-
-        // Chat
-        document.getElementById('sendChatBtn').addEventListener('click', () => {
-            this.sendChatMessage();
-        });
-
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.sendChatMessage();
-            }
-        });
-
-        // Modal close buttons
-        document.querySelectorAll('.modal-close').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const modal = e.target.closest('.modal');
-                this.closeModal(modal.id);
-            });
-        });
+        const settingsBtn = this.getElement('settingsBtn');
+        if (settingsBtn) {
+            settingsBtn.addEventListener('click', () => this.openSettings());
+        }
 
         // Filter buttons
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const filter = e.target.dataset.filter;
-                this.filterTasks(filter);
-                
-                // Update active filter
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-            });
+        this.addEventListeners('.filter-btn', 'click', (e) => {
+            const filter = e.target.dataset.filter;
+            this.applyTaskFilter(filter);
+            this.updateActiveFilter(e.target);
         });
 
-        // Calendar controls
-        document.getElementById('prevMonth').addEventListener('click', () => {
-            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-            this.updateCalendar();
-        });
+        // Calendar navigation
+        this.setupCalendarEventListeners();
+    }
 
-        document.getElementById('nextMonth').addEventListener('click', () => {
-            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-            this.updateCalendar();
-        });
+    // Setup calendar-specific event listeners
+    setupCalendarEventListeners() {
+        const prevBtn = this.getElement('prevPeriod');
+        const nextBtn = this.getElement('nextPeriod');
+        const todayBtn = this.getElement('todayBtn');
 
-        document.getElementById('todayBtn').addEventListener('click', () => {
-            this.currentDate = new Date();
-            this.updateCalendar();
+        if (prevBtn) prevBtn.addEventListener('click', () => this.navigateCalendar(-1));
+        if (nextBtn) nextBtn.addEventListener('click', () => this.navigateCalendar(1));
+        if (todayBtn) todayBtn.addEventListener('click', () => this.goToToday());
+    }
+
+    // Helper method to add event listeners to multiple elements
+    addEventListeners(selector, event, handler) {
+        document.querySelectorAll(selector).forEach(element => {
+            element.addEventListener(event, handler);
+            this.eventListeners.push({ element, event, handler });
         });
     }
 
+    // Navigation and View Management
     switchView(viewName) {
-        // Update navigation
+        if (!viewName || this.currentView === viewName) return;
+
+        // Update navigation UI
+        this.updateNavigation(viewName);
+        
+        // Update content
+        this.updateViewContent(viewName);
+        
+        this.currentView = viewName;
+        
+        // Load view-specific data
+        this.loadViewData(viewName);
+    }
+
+    updateNavigation(viewName) {
+        // Remove active state from all nav buttons
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('active');
         });
-        document.querySelector(`[data-view="${viewName}"]`).classList.add('active');
+        
+        // Add active state to selected nav button
+        const activeBtn = document.querySelector(`[data-view="${viewName}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+    }
 
-        // Update content
+    updateViewContent(viewName) {
+        // Hide all views
         document.querySelectorAll('.view').forEach(view => {
             view.classList.remove('active');
         });
-        document.getElementById(`${viewName}-view`).classList.add('active');
+        
+        // Show selected view
+        const selectedView = document.getElementById(`${viewName}-view`);
+        if (selectedView) selectedView.classList.add('active');
+    }
 
-        this.currentView = viewName;
-
-        // Load view-specific data
+    loadViewData(viewName) {
         switch (viewName) {
             case 'dashboard':
                 this.updateDashboard();
@@ -285,179 +216,102 @@ class IntelligentAssistant {
                 this.updateProjectsList();
                 break;
             case 'ai-chat':
-                this.focusChat();
+                if (this.chatManager) this.chatManager.focus();
                 break;
         }
     }
 
+    // Task Management
     async handleQuickAdd() {
-        const input = document.getElementById('quickTaskInput');
+        const input = this.getElement('quickTaskInput');
         const text = input.value.trim();
         
         if (!text) return;
 
-        const btn = document.getElementById('quickAddBtn');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<span class="btn-icon">⏳</span>Processing...';
-        btn.disabled = true;
+        const btn = this.getElement('quickAddBtn');
+        this.setButtonLoading(btn, true);
 
         try {
-            // Use AI to parse the task
-            const task = await this.parseTaskWithAI(text);
+            let task;
             
-            if (task) {
-                this.tasks.push(task);
-                this.saveData();
-                this.updateDashboard();
-                this.updateTasksList();
-                this.updateCalendar();
-                
-                input.value = '';
-                this.showNotification('Task added successfully!', 'success');
+            // Try AI parsing first
+            if (this.taskParser) {
+                task = await this.taskParser.parseTask(text);
             } else {
-                // Fallback: create basic task
-                const basicTask = this.createBasicTask(text);
-                this.tasks.push(basicTask);
-                this.saveData();
-                this.updateDashboard();
-                
-                this.showNotification('Task added (basic mode)', 'info');
+                // Fallback to basic task creation
+                task = this.createBasicTask(text);
             }
+            
+            this.addTask(task);
+            input.value = '';
+            this.showNotification('Task added successfully!', 'success');
+            
         } catch (error) {
-            console.error('Error processing task:', error);
-            
-            // Fallback: create basic task
+            console.error('Error adding task:', error);
+            // Fallback to basic task
             const basicTask = this.createBasicTask(text);
-            this.tasks.push(basicTask);
-            this.saveData();
-            this.updateDashboard();
-            
-            this.showNotification('Task added (offline mode)', 'info');
+            this.addTask(basicTask);
+            this.showNotification('Task added (basic mode)', 'info');
         } finally {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
+            this.setButtonLoading(btn, false);
         }
     }
 
-    async parseTaskWithAI(text) {
-        // This would integrate with Claude API
-        // For now, we'll use a simple parser
-        return this.parseTaskLocally(text);
-    }
-
-    parseTaskLocally(text) {
-        const task = {
-            id: this.generateId(),
-            title: text,
-            description: '',
-            dueDate: null,
-            dueTime: null,
-            priority: 'medium',
-            status: 'pending',
-            project: null,
-            createdAt: new Date().toISOString(),
-            completedAt: null
-        };
-
-        // Simple date parsing
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        const lowerText = text.toLowerCase();
-
-        // Check for time indicators
-        const timeMatch = text.match(/(\d{1,2}):?(\d{2})?\s*(am|pm)?/i);
-        if (timeMatch) {
-            let hour = parseInt(timeMatch[1]);
-            const minute = timeMatch[2] ? parseInt(timeMatch[2]) : 0;
-            const ampm = timeMatch[3];
-
-            if (ampm && ampm.toLowerCase() === 'pm' && hour !== 12) {
-                hour += 12;
-            } else if (ampm && ampm.toLowerCase() === 'am' && hour === 12) {
-                hour = 0;
-            }
-
-            task.dueTime = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        }
-
-        // Check for date indicators
-        if (lowerText.includes('today')) {
-            task.dueDate = today.toISOString().split('T')[0];
-        } else if (lowerText.includes('tomorrow')) {
-            task.dueDate = tomorrow.toISOString().split('T')[0];
-        } else if (lowerText.includes('next week')) {
-            const nextWeek = new Date(today);
-            nextWeek.setDate(nextWeek.getDate() + 7);
-            task.dueDate = nextWeek.toISOString().split('T')[0];
-        }
-
-        // Check for priority indicators
-        if (lowerText.includes('urgent') || lowerText.includes('important') || lowerText.includes('asap')) {
-            task.priority = 'high';
-        } else if (lowerText.includes('low priority') || lowerText.includes('when possible')) {
-            task.priority = 'low';
-        }
-
-        // Extract clean title (remove time and date references)
-        let cleanTitle = text
-            .replace(/\b(today|tomorrow|next week)\b/gi, '')
-            .replace(/\b\d{1,2}:?\d{2}?\s*(am|pm)?\b/gi, '')
-            .replace(/\s+/g, ' ')
-            .trim();
-
-        if (cleanTitle) {
-            task.title = cleanTitle;
-        }
-
-        return task;
-    }
-
-    createBasicTask(text) {
-        return {
-            id: this.generateId(),
-            title: text,
-            description: '',
-            dueDate: null,
-            dueTime: null,
-            priority: 'medium',
-            status: 'pending',
-            project: null,
-            createdAt: new Date().toISOString(),
-            completedAt: null
-        };
-    }
-
-    addTask() {
-        const form = document.getElementById('addTaskForm');
-        const formData = new FormData(form);
+    handleTaskFormSubmit() {
+        const formData = this.getFormData('addTaskForm');
+        const editingId = document.getElementById('addTaskForm').dataset.editingTaskId;
         
-        const task = {
-            id: this.generateId(),
-            title: document.getElementById('taskTitle').value,
-            description: document.getElementById('taskDescription').value,
-            dueDate: document.getElementById('taskDate').value || null,
-            dueTime: document.getElementById('taskTime').value || null,
-            priority: document.getElementById('taskPriority').value,
-            status: 'pending',
-            project: document.getElementById('taskProject').value || null,
-            createdAt: new Date().toISOString(),
-            completedAt: null
-        };
-
-        this.tasks.push(task);
-        this.saveData();
-        this.updateDashboard();
-        this.updateTasksList();
-        this.updateCalendar();
+        if (editingId) {
+            this.updateTask(editingId, formData);
+        } else {
+            const task = this.createTaskFromForm(formData);
+            this.addTask(task);
+        }
         
         this.closeModal('addTaskModal');
-        form.reset();
-        
-        this.showNotification('Task added successfully!', 'success');
+        this.resetTaskForm();
     }
 
+    addTask(task) {
+        this.tasks.push(task);
+        this.saveData();
+        this.refreshAllViews();
+    }
+
+    updateTask(taskId, updates) {
+        const taskIndex = this.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+            this.tasks[taskIndex] = { ...this.tasks[taskIndex], ...updates };
+            this.saveData();
+            this.refreshAllViews();
+        }
+    }
+
+    toggleTask(taskId) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (task) {
+            if (task.status === 'completed') {
+                task.status = 'pending';
+                task.completedAt = null;
+            } else {
+                task.status = 'completed';
+                task.completedAt = new Date().toISOString();
+            }
+            this.saveData();
+            this.refreshAllViews();
+        }
+    }
+
+    deleteTask(taskId) {
+        const taskIndex = this.tasks.findIndex(t => t.id === taskId);
+        if (taskIndex !== -1) {
+            this.tasks.splice(taskIndex, 1);
+            this.saveData();
+            this.refreshAllViews();
+        }
+    }
+
+    // Dashboard Management
     updateDashboard() {
         this.updateStats();
         this.updateTodayTasks();
@@ -466,9 +320,17 @@ class IntelligentAssistant {
 
     updateStats() {
         const today = new Date().toISOString().split('T')[0];
+        const stats = this.calculateStats(today);
+        
+        this.updateElement('dueTodayCount', stats.dueToday);
+        this.updateElement('overdueCount', stats.overdue);
+        this.updateElement('completedCount', stats.completed);
+        this.updateElement('completionRate', `${stats.completionRate}%`);
+    }
+
+    calculateStats(today) {
         let dueToday = 0, overdue = 0, completed = 0;
         
-        // Single pass through tasks for efficiency
         this.tasks.forEach(task => {
             if (task.status === 'completed') {
                 completed++;
@@ -483,17 +345,8 @@ class IntelligentAssistant {
         
         const total = this.tasks.length;
         const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-        // Cache DOM elements and update
-        const dueTodayEl = this.getElement('dueTodayCount');
-        const overdueEl = this.getElement('overdueCount');
-        const completedEl = this.getElement('completedCount');
-        const completionRateEl = this.getElement('completionRate');
         
-        if (dueTodayEl) dueTodayEl.textContent = dueToday;
-        if (overdueEl) overdueEl.textContent = overdue;
-        if (completedEl) completedEl.textContent = completed;
-        if (completionRateEl) completionRateEl.textContent = completionRate + '%';
+        return { dueToday, overdue, completed, completionRate };
     }
 
     updateTodayTasks() {
@@ -501,95 +354,297 @@ class IntelligentAssistant {
         const todayTasks = this.tasks
             .filter(task => task.dueDate === today)
             .sort((a, b) => {
-                if (a.dueTime && b.dueTime) {
-                    return a.dueTime.localeCompare(b.dueTime);
-                }
+                if (a.dueTime && b.dueTime) return a.dueTime.localeCompare(b.dueTime);
                 return a.dueTime ? -1 : 1;
             });
 
-        const container = document.getElementById('todayTasksList');
-        container.innerHTML = '';
+        this.renderTaskList('todayTasksList', todayTasks, 'No tasks scheduled for today');
+    }
 
-        if (todayTasks.length === 0) {
-            container.innerHTML = '<div class="empty-state">No tasks scheduled for today</div>';
+    async updateAISuggestions() {
+        const container = this.getElement('aiSuggestions');
+        if (!container) return;
+
+        try {
+            let suggestions = [];
+            
+            // Try AI suggestions first
+            if (this.aiHandler) {
+                suggestions = await this.aiHandler.generateSuggestions(this.tasks);
+            }
+            
+            // Fallback to local suggestions
+            if (!suggestions.length && window.aiUtils) {
+                suggestions = window.aiUtils.generateTaskSuggestions(this.tasks);
+            }
+            
+            this.renderSuggestions(container, suggestions);
+        } catch (error) {
+            console.error('Error generating suggestions:', error);
+            container.innerHTML = '<div class="empty-state">Suggestions temporarily unavailable</div>';
+        }
+    }
+
+    // Task List Management
+    updateTasksList() {
+        if (this.taskManager) {
+            this.taskManager.renderTasksList();
+        } else {
+            // Fallback rendering
+            this.renderTaskList('allTasksList', this.tasks, 'No tasks yet. Add your first task!');
+        }
+    }
+
+    applyTaskFilter(filter) {
+        if (this.taskManager) {
+            this.taskManager.setFilter(filter);
+        }
+    }
+
+    updateActiveFilter(activeButton) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        activeButton.classList.add('active');
+    }
+
+    // Calendar Management
+    updateCalendar() {
+        // Calendar functionality is handled by calendar.js
+        if (window.calendarManager) {
+            window.calendarManager.render();
+        }
+    }
+
+    navigateCalendar(direction) {
+        if (window.calendarManager) {
+            window.calendarManager.navigate(direction);
+        }
+    }
+
+    goToToday() {
+        if (window.calendarManager) {
+            window.calendarManager.goToToday();
+        }
+    }
+
+    // Project Management
+    updateProjectsList() {
+        if (this.projectManager) {
+            this.projectManager.updateProjectsList();
+        }
+    }
+
+    // Settings Management
+    openSettings() {
+        // Load current settings
+        const apiKeyInput = this.getElement('claudeApiKey');
+        if (apiKeyInput) {
+            const savedApiKey = localStorage.getItem('claude_api_key');
+            if (savedApiKey) apiKeyInput.value = savedApiKey;
+        }
+        
+        this.showModal('settingsModal');
+    }
+
+    // UI Utility Methods
+    showModal(modalId) {
+        const modal = this.getElement(modalId);
+        if (modal) {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    closeModal(modalId) {
+        const modal = this.getElement(modalId);
+        if (modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+    }
+
+    hideLoadingScreen() {
+        const loadingScreen = this.getElement('loadingScreen');
+        if (loadingScreen) loadingScreen.style.display = 'none';
+    }
+
+    showApp() {
+        const app = this.getElement('app');
+        if (app) app.style.display = 'block';
+    }
+
+    updateUserDisplay() {
+        if (!this.user) return;
+        
+        this.updateElement('userName', this.user.name || 'User');
+        
+        const userAvatar = this.getElement('userAvatar');
+        if (userAvatar && this.user.image) {
+            userAvatar.src = this.user.image;
+            userAvatar.style.display = 'block';
+        }
+    }
+
+    setButtonLoading(button, isLoading) {
+        if (!button) return;
+        
+        if (isLoading) {
+            button.dataset.originalText = button.innerHTML;
+            button.innerHTML = '<span class="btn-icon">⏳</span>Processing...';
+            button.disabled = true;
+        } else {
+            button.innerHTML = button.dataset.originalText || button.innerHTML;
+            button.disabled = false;
+        }
+    }
+
+    showNotification(message, type = 'info') {
+        const container = this.getElement('notifications');
+        if (!container) return;
+        
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
+        
+        container.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'notificationSlideOut 0.3s ease forwards';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Data Management
+    saveData() {
+        const data = {
+            tasks: this.tasks,
+            projects: this.projects,
+            lastUpdated: new Date().toISOString()
+        };
+        
+        const userKey = this.user ? `${this.storageKey}_${this.user.email}` : this.storageKey;
+        localStorage.setItem(userKey, JSON.stringify(data));
+    }
+
+    loadData() {
+        if (!this.user) return;
+        
+        const userKey = `${this.storageKey}_${this.user.email}`;
+        const stored = localStorage.getItem(userKey);
+        
+        if (stored) {
+            try {
+                const data = JSON.parse(stored);
+                this.tasks = data.tasks || [];
+                this.projects = data.projects || [];
+            } catch (error) {
+                console.error('Error loading data:', error);
+                this.tasks = [];
+                this.projects = [];
+            }
+        }
+    }
+
+    loadUserData() {
+        this.loadData();
+    }
+
+    // Helper Methods
+    getElement(id) {
+        if (!this.domCache[id]) {
+            this.domCache[id] = document.getElementById(id);
+        }
+        return this.domCache[id];
+    }
+
+    updateElement(id, content) {
+        const element = this.getElement(id);
+        if (element) element.textContent = content;
+    }
+
+    getFormData(formId) {
+        const form = this.getElement(formId);
+        if (!form) return {};
+        
+        const formData = new FormData(form);
+        const data = {};
+        
+        for (let [key, value] of formData.entries()) {
+            data[key] = value;
+        }
+        
+        return data;
+    }
+
+    createTaskFromForm(formData) {
+        return {
+            id: this.generateId(),
+            title: formData.taskTitle || 'Untitled Task',
+            description: formData.taskDescription || '',
+            dueDate: formData.taskDate || null,
+            dueTime: formData.taskTime || null,
+            priority: formData.taskPriority || 'medium',
+            status: 'pending',
+            project: formData.taskProject || null,
+            category: null,
+            tags: [],
+            createdAt: new Date().toISOString(),
+            completedAt: null
+        };
+    }
+
+    createBasicTask(title) {
+        return {
+            id: this.generateId(),
+            title: title,
+            description: '',
+            dueDate: null,
+            dueTime: null,
+            priority: 'medium',
+            status: 'pending',
+            project: null,
+            category: null,
+            tags: [],
+            createdAt: new Date().toISOString(),
+            completedAt: null
+        };
+    }
+
+    resetTaskForm() {
+        const form = this.getElement('addTaskForm');
+        if (form) {
+            form.reset();
+            delete form.dataset.editingTaskId;
+            
+            // Reset modal title and button
+            const modal = this.getElement('addTaskModal');
+            if (modal) {
+                const title = modal.querySelector('.modal-header h3');
+                const button = modal.querySelector('button[type="submit"]');
+                if (title) title.textContent = 'Add New Task';
+                if (button) button.textContent = 'Add Task';
+            }
+        }
+    }
+
+    renderTaskList(containerId, tasks, emptyMessage) {
+        const container = this.getElement(containerId);
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (tasks.length === 0) {
+            container.innerHTML = `<div class="empty-state">${emptyMessage}</div>`;
             return;
         }
-
-        todayTasks.forEach(task => {
+        
+        tasks.forEach(task => {
             const taskElement = this.createTaskElement(task);
             container.appendChild(taskElement);
         });
-    }
-
-    updateAISuggestions() {
-        const suggestions = this.generateSuggestions();
-        const container = document.getElementById('aiSuggestions');
-        container.innerHTML = '';
-
-        suggestions.forEach(suggestion => {
-            const suggestionElement = document.createElement('div');
-            suggestionElement.className = 'suggestion-item';
-            suggestionElement.innerHTML = `
-                <div class="suggestion-icon">${suggestion.icon}</div>
-                <div class="suggestion-content">
-                    <div class="suggestion-title">${suggestion.title}</div>
-                    <div class="suggestion-description">${suggestion.description}</div>
-                </div>
-            `;
-            container.appendChild(suggestionElement);
-        });
-    }
-
-    generateSuggestions() {
-        const suggestions = [];
-        const today = new Date().toISOString().split('T')[0];
-        
-        // Check for overdue tasks
-        const overdueTasks = this.tasks.filter(task => 
-            task.dueDate && task.dueDate < today && task.status === 'pending'
-        );
-        
-        if (overdueTasks.length > 0) {
-            suggestions.push({
-                icon: '⚠️',
-                title: 'You have overdue tasks',
-                description: `${overdueTasks.length} task(s) need immediate attention`
-            });
-        }
-
-        // Check for tasks without due dates
-        const unscheduledTasks = this.tasks.filter(task => !task.dueDate && task.status === 'pending');
-        if (unscheduledTasks.length > 0) {
-            suggestions.push({
-                icon: '📅',
-                title: 'Schedule unscheduled tasks',
-                description: `${unscheduledTasks.length} task(s) could use due dates`
-            });
-        }
-
-        // Productivity tips
-        const completedToday = this.tasks.filter(task => 
-            task.completedAt && task.completedAt.startsWith(today)
-        ).length;
-
-        if (completedToday > 0) {
-            suggestions.push({
-                icon: '🎉',
-                title: 'Great progress today!',
-                description: `You've completed ${completedToday} task(s) today`
-            });
-        }
-
-        // Default suggestions if none
-        if (suggestions.length === 0) {
-            suggestions.push({
-                icon: '💡',
-                title: 'Try using natural language',
-                description: 'Type "Meeting with John tomorrow at 2pm" to quickly add tasks'
-            });
-        }
-
-        return suggestions.slice(0, 3); // Limit to 3 suggestions
     }
 
     createTaskElement(task) {
@@ -614,302 +669,33 @@ class IntelligentAssistant {
         return taskElement;
     }
 
-    toggleTask(taskId) {
-        const task = this.tasks.find(t => t.id === taskId);
-        if (task) {
-            if (task.status === 'completed') {
-                task.status = 'pending';
-                task.completedAt = null;
-            } else {
-                task.status = 'completed';
-                task.completedAt = new Date().toISOString();
-            }
-            
-            this.saveData();
-            this.updateDashboard();
-            this.updateTasksList();
-            this.updateCalendar();
-        }
-    }
-
-    updateTasksList() {
-        const container = document.getElementById('allTasksList');
+    renderSuggestions(container, suggestions) {
         container.innerHTML = '';
-
-        if (this.tasks.length === 0) {
-            container.innerHTML = '<div class="empty-state">No tasks yet. Add your first task!</div>';
+        
+        if (suggestions.length === 0) {
+            container.innerHTML = '<div class="empty-state">No suggestions at the moment</div>';
             return;
         }
-
-        // Sort tasks by priority and due date
-        const sortedTasks = [...this.tasks].sort((a, b) => {
-            const priorityOrder = { high: 0, medium: 1, low: 2 };
-            const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
-            
-            if (priorityDiff !== 0) return priorityDiff;
-            
-            if (a.dueDate && b.dueDate) {
-                return a.dueDate.localeCompare(b.dueDate);
-            }
-            
-            return a.dueDate ? -1 : 1;
-        });
-
-        sortedTasks.forEach(task => {
-            const taskElement = this.createDetailedTaskElement(task);
-            container.appendChild(taskElement);
-        });
-    }
-
-    createDetailedTaskElement(task) {
-        const taskElement = document.createElement('div');
-        taskElement.className = `task-item ${task.priority}-priority ${task.status === 'completed' ? 'completed' : ''}`;
         
-        const dueDateDisplay = task.dueDate ? 
-            `<span class="task-date">${this.formatDate(task.dueDate)}</span>` : '';
-        
-        const timeDisplay = task.dueTime ? 
-            `<span class="task-time">${this.formatTime(task.dueTime)}</span>` : '';
-        
-        taskElement.innerHTML = `
-            <div class="task-header">
-                <div class="task-checkbox ${task.status === 'completed' ? 'checked' : ''}" 
-                     onclick="assistant.toggleTask('${task.id}')">
-                    ${task.status === 'completed' ? '✓' : ''}
+        suggestions.forEach(suggestion => {
+            const suggestionElement = document.createElement('div');
+            suggestionElement.className = 'suggestion-item';
+            suggestionElement.innerHTML = `
+                <div class="suggestion-icon">${suggestion.icon || '💡'}</div>
+                <div class="suggestion-content">
+                    <div class="suggestion-title">${suggestion.title}</div>
+                    <div class="suggestion-description">${suggestion.description}</div>
                 </div>
-                <div class="task-title">${task.title}</div>
-                <div class="task-meta">
-                    ${dueDateDisplay}
-                    ${timeDisplay}
-                    <span class="task-priority-badge priority-${task.priority}">${task.priority}</span>
-                </div>
-            </div>
-            ${task.description ? `<div class="task-description">${task.description}</div>` : ''}
-        `;
-        
-        return taskElement;
-    }
-
-    filterTasks(filter) {
-        const allTasks = document.querySelectorAll('#allTasksList .task-item');
-        
-        allTasks.forEach(taskElement => {
-            const task = this.tasks.find(t => 
-                taskElement.querySelector('.task-title').textContent === t.title
-            );
-            
-            if (!task) return;
-            
-            let show = true;
-            
-            switch (filter) {
-                case 'pending':
-                    show = task.status === 'pending';
-                    break;
-                case 'completed':
-                    show = task.status === 'completed';
-                    break;
-                case 'all':
-                default:
-                    show = true;
-                    break;
-            }
-            
-            taskElement.style.display = show ? 'block' : 'none';
-        });
-    }
-
-    initializeCalendar() {
-        this.updateCalendar();
-    }
-
-    updateCalendar() {
-        const monthNames = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
-        
-        document.getElementById('currentMonth').textContent = 
-            `${monthNames[this.currentDate.getMonth()]} ${this.currentDate.getFullYear()}`;
-        
-        const calendar = document.getElementById('calendar');
-        calendar.innerHTML = '';
-        
-        // Add day headers
-        const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        dayHeaders.forEach(day => {
-            const dayHeader = document.createElement('div');
-            dayHeader.className = 'calendar-day-header';
-            dayHeader.textContent = day;
-            dayHeader.style.fontWeight = '600';
-            dayHeader.style.padding = '8px';
-            dayHeader.style.textAlign = 'center';
-            dayHeader.style.background = 'rgba(77, 182, 172, 0.1)';
-            calendar.appendChild(dayHeader);
-        });
-        
-        // Calculate calendar days
-        const year = this.currentDate.getFullYear();
-        const month = this.currentDate.getMonth();
-        const firstDay = new Date(year, month, 1);
-        const lastDay = new Date(year, month + 1, 0);
-        const startDate = new Date(firstDay);
-        startDate.setDate(startDate.getDate() - firstDay.getDay());
-        
-        const today = new Date().toISOString().split('T')[0];
-        
-        for (let i = 0; i < 42; i++) {
-            const currentDate = new Date(startDate);
-            currentDate.setDate(startDate.getDate() + i);
-            
-            const dayElement = document.createElement('div');
-            dayElement.className = 'calendar-day';
-            
-            const dateStr = currentDate.toISOString().split('T')[0];
-            const isCurrentMonth = currentDate.getMonth() === month;
-            const isToday = dateStr === today;
-            
-            if (!isCurrentMonth) {
-                dayElement.classList.add('other-month');
-            }
-            
-            if (isToday) {
-                dayElement.classList.add('today');
-            }
-            
-            const dayTasks = this.tasks.filter(task => task.dueDate === dateStr);
-            
-            dayElement.innerHTML = `
-                <div class="day-number">${currentDate.getDate()}</div>
-                <div class="day-tasks">${dayTasks.length > 0 ? `${dayTasks.length} task(s)` : ''}</div>
             `;
-            
-            calendar.appendChild(dayElement);
-        }
+            container.appendChild(suggestionElement);
+        });
     }
 
-    updateProjectsList() {
-        const container = document.getElementById('projectsList');
-        container.innerHTML = '';
-        
-        if (this.projects.length === 0) {
-            container.innerHTML = '<div class="empty-state">No projects yet. Create your first project!</div>';
-            return;
-        }
-        
-        // Implementation for projects would go here
-        container.innerHTML = '<div class="empty-state">Projects feature coming soon!</div>';
-    }
-
-    async sendChatMessage() {
-        const input = document.getElementById('chatInput');
-        const message = input.value.trim();
-        
-        if (!message) return;
-        
-        // Add user message to chat
-        this.addChatMessage(message, 'user');
-        input.value = '';
-        
-        // Show typing indicator
-        const typingIndicator = this.addTypingIndicator();
-        
-        try {
-            // Process message with AI (placeholder)
-            const response = await this.processWithAI(message);
-            
-            // Remove typing indicator
-            typingIndicator.remove();
-            
-            // Add AI response
-            this.addChatMessage(response, 'ai');
-        } catch (error) {
-            typingIndicator.remove();
-            this.addChatMessage('I apologize, but I encountered an error processing your request. Please try again or check your AI settings.', 'ai');
-        }
-    }
-
-    addChatMessage(content, type) {
-        const messagesContainer = document.getElementById('chatMessages');
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${type}-message`;
-        
-        const avatar = type === 'ai' ? '🤖' : (this.user?.name ? this.user.name[0].toUpperCase() : '👤');
-        
-        messageElement.innerHTML = `
-            <div class="message-avatar">${avatar}</div>
-            <div class="message-content">
-                <p>${content}</p>
-            </div>
-        `;
-        
-        messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        
-        return messageElement;
-    }
-
-    addTypingIndicator() {
-        const indicator = this.addChatMessage('Thinking...', 'ai');
-        indicator.classList.add('typing-indicator');
-        return indicator;
-    }
-
-    async processWithAI(message) {
-        // This would integrate with Claude API
-        // For now, return a simple response based on keywords
-        
-        const lowerMessage = message.toLowerCase();
-        
-        if (lowerMessage.includes('task') || lowerMessage.includes('todo')) {
-            return "I can help you manage tasks! Try saying something like 'Add a task to call John tomorrow at 2pm' or 'What tasks do I have this week?'";
-        }
-        
-        if (lowerMessage.includes('schedule') || lowerMessage.includes('calendar')) {
-            return "I can help you with scheduling! You can add events by saying 'Schedule a meeting with the team on Friday at 10am' or ask 'What's on my calendar today?'";
-        }
-        
-        if (lowerMessage.includes('project')) {
-            return "Project management features are coming soon! For now, you can organize related tasks and set priorities.";
-        }
-        
-        // Default response
-        return "I'm here to help you manage your tasks and schedule. You can ask me to add tasks, check your calendar, or organize your projects. What would you like to do?";
-    }
-
-    focusChat() {
-        document.getElementById('chatInput').focus();
-    }
-
-    showModal(modalId) {
-        document.getElementById(modalId).classList.add('show');
-        document.body.style.overflow = 'hidden';
-    }
-
-    closeModal(modalId) {
-        document.getElementById(modalId).classList.remove('show');
-        document.body.style.overflow = '';
-    }
-
-    updateUserDisplay() {
-        if (this.user) {
-            const userName = this.getElement('userName');
-            const userAvatar = this.getElement('userAvatar');
-            
-            if (userName) userName.textContent = this.user.name || 'User';
-            if (userAvatar) {
-                if (this.user.picture) {
-                    userAvatar.src = this.user.picture;
-                    userAvatar.style.display = 'block';
-                } else {
-                    userAvatar.style.display = 'none';
-                }
-            }
-        }
-    }
-
-    generateId() {
-        return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
+    refreshAllViews() {
+        this.updateDashboard();
+        this.updateTasksList();
+        this.updateCalendar();
+        this.updateProjectsList();
     }
 
     formatTime(timeString) {
@@ -923,88 +709,27 @@ class IntelligentAssistant {
         return `${displayHour}:${minute} ${ampm}`;
     }
 
-    formatDate(dateString) {
-        if (!dateString) return '';
-        
-        const date = new Date(dateString);
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        
-        const dateStr = date.toISOString().split('T')[0];
-        const todayStr = today.toISOString().split('T')[0];
-        const tomorrowStr = tomorrow.toISOString().split('T')[0];
-        
-        if (dateStr === todayStr) return 'Today';
-        if (dateStr === tomorrowStr) return 'Tomorrow';
-        
-        return date.toLocaleDateString();
+    generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).substr(2, 9);
     }
 
-    saveData() {
-        const data = {
-            tasks: this.tasks,
-            projects: this.projects,
-            conversations: this.conversations,
-            lastUpdated: new Date().toISOString()
-        };
-        
-        const userKey = this.user ? `${this.storageKey}_${this.user.email}` : this.storageKey;
-        localStorage.setItem(userKey, JSON.stringify(data));
-    }
-
-    loadData() {
-        if (!this.user) return;
-        
-        const userKey = `${this.storageKey}_${this.user.email}`;
-        const stored = localStorage.getItem(userKey);
-        
-        if (stored) {
-            try {
-                const data = JSON.parse(stored);
-                this.tasks = data.tasks || [];
-                this.projects = data.projects || [];
-                this.conversations = data.conversations || [];
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
-        }
-    }
-
-    loadUserData() {
-        this.loadData();
-    }
-
-    showNotification(message, type = 'info') {
-        const container = document.getElementById('notifications');
-        const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
-        notification.textContent = message;
-        
-        container.appendChild(notification);
-        
-        setTimeout(() => {
-            notification.style.animation = 'notificationSlideOut 0.3s ease forwards';
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 300);
-        }, 3000);
+    // Cleanup method
+    cleanup() {
+        this.eventListeners.forEach(({ element, event, handler }) => {
+            element.removeEventListener(event, handler);
+        });
+        this.eventListeners = [];
+        this.domCache = {};
     }
 }
 
 // Global functions for HTML onclick handlers
 function openModal(modalId) {
-    if (window.assistant) {
-        window.assistant.showModal(modalId);
-    }
+    if (window.assistant) window.assistant.showModal(modalId);
 }
 
 function closeModal(modalId) {
-    if (window.assistant) {
-        window.assistant.closeModal(modalId);
-    }
+    if (window.assistant) window.assistant.closeModal(modalId);
 }
 
 function saveSettings() {
@@ -1013,9 +738,8 @@ function saveSettings() {
     if (apiKey) {
         localStorage.setItem('claude_api_key', apiKey);
         
-        // Update Claude API settings
-        if (window.assistant && window.assistant.claudeAPI) {
-            window.assistant.claudeAPI.setApiKey(apiKey);
+        if (window.assistant?.aiHandler) {
+            window.assistant.aiHandler.apiKey = apiKey;
         }
         
         window.assistant.showNotification('Settings saved successfully!', 'success');
@@ -1025,13 +749,9 @@ function saveSettings() {
     }
 }
 
-function testClaudeConnection() {
-    console.log('Test connection called');
-    console.log('Assistant object:', window.assistant);
-    console.log('ClaudeAPI class:', window.ClaudeAPI);
-    
-    if (!window.assistant) {
-        alert('Assistant not initialized');
+async function testClaudeConnection() {
+    if (!window.assistant?.aiHandler) {
+        alert('AI handler not initialized');
         return;
     }
     
@@ -1041,48 +761,13 @@ function testClaudeConnection() {
         return;
     }
     
-    console.log('API key length:', apiKey.length);
-    console.log('Assistant has claudeAPI:', !!window.assistant.claudeAPI);
-    console.log('Assistant has testAIConnection:', !!window.assistant.testAIConnection);
+    window.assistant.aiHandler.apiKey = apiKey;
+    const result = await window.assistant.aiHandler.testConnection();
     
-    // Check if claudeAPI exists on assistant
-    if (window.assistant.claudeAPI) {
-        window.assistant.claudeAPI.setApiKey(apiKey);
-        if (window.assistant.testAIConnection) {
-            window.assistant.testAIConnection();
-        } else {
-            console.error('testAIConnection method not found');
-            window.assistant.showNotification('AI test method not available', 'error');
-        }
+    if (result.success) {
+        window.assistant.showNotification('AI connection successful!', 'success');
     } else {
-        // Try to initialize Claude API if it wasn't set up
-        if (window.ClaudeAPI) {
-            console.log('Initializing Claude API on assistant...');
-            window.assistant.claudeAPI = new window.ClaudeAPI();
-            window.assistant.claudeAPI.setApiKey(apiKey);
-            
-            // Add test method if missing
-            if (!window.assistant.testAIConnection) {
-                window.assistant.testAIConnection = async function() {
-                    const result = await this.claudeAPI.testConnection();
-                    
-                    if (result.success) {
-                        this.showNotification('AI connection successful!', 'success');
-                        console.log('Claude API connection test passed');
-                    } else {
-                        this.showNotification(`AI connection failed: ${result.error}`, 'error');
-                        console.error('Claude API connection test failed:', result.error);
-                    }
-                    
-                    return result;
-                };
-            }
-            
-            window.assistant.testAIConnection();
-        } else {
-            window.assistant.showNotification('ClaudeAPI class not loaded', 'error');
-            console.error('ClaudeAPI class not found globally');
-        }
+        window.assistant.showNotification(`AI connection failed: ${result.error}`, 'error');
     }
 }
 
