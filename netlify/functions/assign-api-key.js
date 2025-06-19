@@ -1,12 +1,54 @@
 const fs = require('fs').promises;
 const path = require('path');
 
+// Performance monitoring
+const metrics = {
+  requests: 0,
+  errors: 0
+};
+
+// Email validation pattern
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Optimized file operations with retry logic
+async function safeFileOperation(operation, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, 100 * (i + 1))); // Exponential backoff
+    }
+  }
+}
+
+// Load user data - using memory storage for Netlify Functions
+async function loadUserData() {
+  // In Netlify Functions, we'll use environment variables or external storage
+  // For now, return empty object (users will be assigned keys each time)
+  return {};
+}
+
+// Save user data - placeholder for Netlify Functions
+async function saveUserData(users) {
+  // In Netlify Functions, file system is read-only
+  // For now, we'll skip saving and assign keys dynamically
+  console.log('Note: User data not persisted in serverless environment');
+  return true;
+}
+
 exports.handler = async (event, context) => {
-  // Enable CORS
+  const startTime = Date.now();
+  metrics.requests++;
+  
+  // Enable CORS with security headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Content-Type': 'application/json',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY'
   };
 
   if (event.httpMethod === 'OPTIONS') {
@@ -14,6 +56,7 @@ exports.handler = async (event, context) => {
   }
 
   if (event.httpMethod !== 'POST') {
+    metrics.errors++;
     return {
       statusCode: 405,
       headers,
@@ -22,29 +65,36 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { userEmail } = JSON.parse(event.body);
-    
-    if (!userEmail) {
+    // Enhanced input validation
+    let userEmail;
+    try {
+      const body = JSON.parse(event.body || '{}');
+      userEmail = body.userEmail;
+    } catch (parseError) {
+      metrics.errors++;
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'User email is required' })
+        body: JSON.stringify({ error: 'Invalid JSON payload' })
+      };
+    }
+    
+    if (!userEmail || typeof userEmail !== 'string' || !EMAIL_PATTERN.test(userEmail)) {
+      metrics.errors++;
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Valid user email is required' })
       };
     }
 
-    // Read users data and get API keys from environment variables
-    const usersPath = path.join(process.cwd(), 'data', 'users.json');
+    // Normalize email
+    userEmail = userEmail.toLowerCase().trim();
+
+    // Load user data
+    const users = await loadUserData();
     
-    let users;
-    
-    try {
-      const usersData = await fs.readFile(usersPath, 'utf8');
-      users = JSON.parse(usersData);
-    } catch (error) {
-      users = {};
-    }
-    
-    // Get API keys from environment variables
+    // Load API keys with validation
     const apiKeys = {
       keys: [
         process.env.CLAUDE_API_KEY_1,
@@ -62,76 +112,100 @@ exports.handler = async (event, context) => {
         process.env.CLAUDE_API_KEY_13,
         process.env.CLAUDE_API_KEY_14,
         process.env.CLAUDE_API_KEY_15
-      ].filter(key => key) // Remove undefined keys
+      ].filter(key => key && typeof key === 'string' && key.startsWith('sk-ant-')) // Enhanced validation
     };
 
     if (apiKeys.keys.length === 0) {
+      metrics.errors++;
       return {
         statusCode: 500,
         headers,
-        body: JSON.stringify({ error: 'No API keys configured in environment variables' })
-      };
-    }
-
-    // Check if user already has an API key
-    if (users[userEmail]) {
-      const userApiKey = apiKeys.keys[users[userEmail].apiKeyIndex];
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          apiKey: userApiKey,
-          isNewUser: false,
-          userInfo: users[userEmail]
+        body: JSON.stringify({ 
+          error: 'No valid API keys configured',
+          metrics: { processedAt: new Date().toISOString(), requestId: Math.random().toString(36).substr(2, 9) }
         })
       };
     }
 
-    // Find next available API key (round-robin assignment)
-    const usedKeys = Object.values(users).map(user => user.apiKeyIndex);
-    let nextKeyIndex = 0;
-    
-    for (let i = 0; i < apiKeys.keys.length; i++) {
-      if (!usedKeys.includes(i)) {
-        nextKeyIndex = i;
-        break;
+    // Check if user already exists with optimized lookup
+    const existingUser = users[userEmail];
+    if (existingUser && typeof existingUser.apiKeyIndex === 'number') {
+      const userApiKey = apiKeys.keys[existingUser.apiKeyIndex];
+      
+      if (userApiKey) {
+        const responseTime = Date.now() - startTime;
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({
+            apiKey: userApiKey,
+            isNewUser: false,
+            userInfo: {
+              ...existingUser,
+              lastAccessed: new Date().toISOString()
+            },
+            performance: {
+              responseTime
+            }
+          })
+        };
       }
     }
 
-    // If all keys are used, use round-robin
-    if (usedKeys.length >= apiKeys.keys.length) {
-      nextKeyIndex = Object.keys(users).length % apiKeys.keys.length;
-    }
+    // Simple round-robin key assignment for serverless environment
+    // Use a hash of the email to consistently assign the same key to the same user
+    const emailHash = userEmail.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    const nextKeyIndex = Math.abs(emailHash) % apiKeys.keys.length;
 
-    // Assign API key to user
+    // Create new user record (not persisted in serverless environment)
     const newUser = {
       apiKeyIndex: nextKeyIndex,
       assignedDate: new Date().toISOString(),
       totalMessages: 0,
-      totalCost: 0
+      totalCost: 0,
+      userAgent: event.headers['user-agent'] || 'unknown'
     };
 
-    users[userEmail] = newUser;
+    // Note: In serverless environment, user data is not persisted
+    console.log(`Assigning API key ${nextKeyIndex} to user ${userEmail}`);
 
-    // Save updated users
-    await fs.writeFile(usersPath, JSON.stringify(users, null, 2));
-
+    const responseTime = Date.now() - startTime;
+    
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
         apiKey: apiKeys.keys[nextKeyIndex],
         isNewUser: true,
-        userInfo: newUser
+        userInfo: newUser,
+        performance: {
+          responseTime
+        }
       })
     };
 
   } catch (error) {
-    console.error('Error in assign-api-key:', error);
+    metrics.errors++;
+    const responseTime = Date.now() - startTime;
+    
+    console.error('Error in assign-api-key:', {
+      error: error.message,
+      stack: error.stack,
+      userEmail: userEmail || 'unknown',
+      responseTime
+    });
+    
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Internal server error' })
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        requestId: Math.random().toString(36).substr(2, 9),
+        timestamp: new Date().toISOString()
+      })
     };
   }
 };
