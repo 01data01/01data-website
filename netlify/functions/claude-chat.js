@@ -100,55 +100,16 @@ exports.handler = async (event, context) => {
 
 async function updateUsage(userEmail, message, response, cost) {
   try {
-    // Update users.json
-    const usersPath = path.join(process.cwd(), 'data', 'users.json');
-    let users = {};
+    // Log usage to console for monitoring (since file system is read-only in Netlify Functions)
+    console.log(`Usage - User: ${userEmail}, Cost: $${cost.toFixed(4)}, Message length: ${message.length}, Response length: ${response.length}`);
     
-    try {
-      const usersData = await fs.readFile(usersPath, 'utf8');
-      users = JSON.parse(usersData);
-    } catch (error) {
-      // File doesn't exist, start fresh
-    }
-
-    if (users[userEmail]) {
-      users[userEmail].totalMessages += 1;
-      users[userEmail].totalCost += cost;
-      users[userEmail].lastUsed = new Date().toISOString();
-    }
-
-    await fs.writeFile(usersPath, JSON.stringify(users, null, 2));
-
-    // Update usage.json
-    const usagePath = path.join(process.cwd(), 'data', 'usage.json');
-    let usage = {};
-    
-    try {
-      const usageData = await fs.readFile(usagePath, 'utf8');
-      usage = JSON.parse(usageData);
-    } catch (error) {
-      // File doesn't exist, start fresh
-    }
-
-    if (!usage[userEmail]) {
-      usage[userEmail] = [];
-    }
-
-    usage[userEmail].push({
-      timestamp: new Date().toISOString(),
-      message: message.substring(0, 100) + (message.length > 100 ? '...' : ''),
-      responseLength: response.length,
-      cost: cost
-    });
-
-    // Keep only last 100 messages per user to prevent huge files
-    if (usage[userEmail].length > 100) {
-      usage[userEmail] = usage[userEmail].slice(-100);
-    }
-
-    await fs.writeFile(usagePath, JSON.stringify(usage, null, 2));
+    // In a production environment, you would send this data to:
+    // - A database (PostgreSQL, MongoDB, etc.)
+    // - An external service (Airtable, Google Sheets, etc.)
+    // - A logging service (LogRocket, DataDog, etc.)
     
   } catch (error) {
-    console.error('Error updating usage:', error);
+    console.error('Error logging usage:', error);
+    // Don't throw error, just log it so chat continues to work
   }
 }

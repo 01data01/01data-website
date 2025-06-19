@@ -22,34 +22,19 @@ async function safeFileOperation(operation, retries = 3) {
   }
 }
 
-// Load user data from file
+// Load user data - using memory storage for Netlify Functions
 async function loadUserData() {
-  try {
-    const usersPath = path.join(process.cwd(), 'data', 'users.json');
-    const usersData = await safeFileOperation(() => fs.readFile(usersPath, 'utf8'));
-    return JSON.parse(usersData);
-  } catch (error) {
-    // If file doesn't exist or is corrupted, return empty object
-    return {};
-  }
+  // In Netlify Functions, we'll use environment variables or external storage
+  // For now, return empty object (users will be assigned keys each time)
+  return {};
 }
 
-// Save user data with atomic writes
+// Save user data - placeholder for Netlify Functions
 async function saveUserData(users) {
-  try {
-    const usersPath = path.join(process.cwd(), 'data', 'users.json');
-    const tempPath = usersPath + '.tmp';
-    
-    // Write to temporary file first (atomic operation)
-    await safeFileOperation(() => fs.writeFile(tempPath, JSON.stringify(users, null, 2)));
-    
-    // Rename to final file (atomic on most filesystems)
-    await safeFileOperation(() => fs.rename(tempPath, usersPath));
-    
-  } catch (error) {
-    console.error('Failed to save user data:', error);
-    throw new Error('Failed to save user data');
-  }
+  // In Netlify Functions, file system is read-only
+  // For now, we'll skip saving and assign keys dynamically
+  console.log('Note: User data not persisted in serverless environment');
+  return true;
 }
 
 exports.handler = async (event, context) => {
@@ -167,42 +152,25 @@ exports.handler = async (event, context) => {
       }
     }
 
-    // Key assignment algorithm
-    const userKeys = Object.values(users);
-    const keyUsageCount = new Array(apiKeys.keys.length).fill(0);
-    
-    // Count usage of each key for balanced distribution
-    userKeys.forEach(user => {
-      if (typeof user.apiKeyIndex === 'number' && user.apiKeyIndex < keyUsageCount.length) {
-        keyUsageCount[user.apiKeyIndex]++;
-      }
-    });
-    
-    // Find the least used key index
-    let nextKeyIndex = 0;
-    let minUsage = keyUsageCount[0];
-    
-    for (let i = 1; i < keyUsageCount.length; i++) {
-      if (keyUsageCount[i] < minUsage) {
-        minUsage = keyUsageCount[i];
-        nextKeyIndex = i;
-      }
-    }
+    // Simple round-robin key assignment for serverless environment
+    // Use a hash of the email to consistently assign the same key to the same user
+    const emailHash = userEmail.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    const nextKeyIndex = Math.abs(emailHash) % apiKeys.keys.length;
 
-    // Create new user record
+    // Create new user record (not persisted in serverless environment)
     const newUser = {
       apiKeyIndex: nextKeyIndex,
       assignedDate: new Date().toISOString(),
       totalMessages: 0,
       totalCost: 0,
-      keyUsageRank: minUsage + 1,
       userAgent: event.headers['user-agent'] || 'unknown'
     };
 
-    users[userEmail] = newUser;
-
-    // Save user data
-    await saveUserData(users);
+    // Note: In serverless environment, user data is not persisted
+    console.log(`Assigning API key ${nextKeyIndex} to user ${userEmail}`);
 
     const responseTime = Date.now() - startTime;
     
@@ -214,8 +182,7 @@ exports.handler = async (event, context) => {
         isNewUser: true,
         userInfo: newUser,
         performance: {
-          responseTime,
-          keyDistribution: keyUsageCount
+          responseTime
         }
       })
     };

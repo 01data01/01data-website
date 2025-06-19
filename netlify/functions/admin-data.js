@@ -16,15 +16,11 @@ const metrics = {
   responseTimes: []
 };
 
-// Optimized file loading with error handling
+// Optimized file loading with error handling for serverless environment
 async function safeLoadJsonFile(filePath, fallback = {}) {
-  try {
-    const data = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    // Return fallback if file doesn't exist or is corrupted
-    return fallback;
-  }
+  // In Netlify Functions, return fallback since files don't exist
+  console.log(`Note: File ${filePath} not available in serverless environment, using fallback`);
+  return fallback;
 }
 
 // Optimized statistics calculation
