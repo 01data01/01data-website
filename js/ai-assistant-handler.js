@@ -146,9 +146,7 @@ class AIAssistantHandler {
                 body: JSON.stringify({
                     userEmail: this.userEmail,
                     message: message,
-                    context: context,
-                    model: this.models.chat,
-                    maxTokens: this.maxTokens.chat
+                    apiKey: this.apiKey
                 })
             });
 
@@ -197,8 +195,7 @@ class AIAssistantHandler {
                 body: JSON.stringify({
                     userEmail: this.userEmail,
                     message: prompt,
-                    model: this.models.taskParsing,
-                    maxTokens: this.maxTokens.taskParsing
+                    apiKey: this.apiKey
                 })
             });
 
@@ -295,8 +292,7 @@ Rules:
                 body: JSON.stringify({
                     userEmail: this.userEmail,
                     message: prompt,
-                    model: this.models.suggestions,
-                    maxTokens: this.maxTokens.suggestions
+                    apiKey: this.apiKey
                 })
             });
 
