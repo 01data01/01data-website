@@ -348,6 +348,112 @@ body {
     display: none;
 }
 
+/* Contemporary Navigation Icons */
+.nav-icon {
+    width: 18px;
+    height: 18px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.nav-icon::before,
+.nav-icon::after {
+    content: '';
+    position: absolute;
+    background: currentColor;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Dashboard Icon - Grid */
+.icon-dashboard::before {
+    width: 18px;
+    height: 18px;
+    background: 
+        linear-gradient(currentColor, currentColor) 0 0/6px 6px,
+        linear-gradient(currentColor, currentColor) 8px 0/6px 6px,
+        linear-gradient(currentColor, currentColor) 0 8px/6px 6px,
+        linear-gradient(currentColor, currentColor) 8px 8px/6px 6px;
+    background-repeat: no-repeat;
+}
+
+/* Tasks Icon - Checkmark List */
+.icon-tasks::before {
+    width: 16px;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 
+        0 -6px 0 currentColor,
+        0 6px 0 currentColor;
+}
+
+.icon-tasks::after {
+    width: 6px;
+    height: 3px;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    background: transparent;
+    transform: rotate(-45deg) translateX(-8px);
+    box-shadow: 0 -6px 0 0 currentColor, 0 6px 0 0 currentColor;
+}
+
+/* Calendar Icon */
+.icon-calendar::before {
+    width: 14px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    background: transparent;
+}
+
+.icon-calendar::after {
+    width: 10px;
+    height: 2px;
+    background: currentColor;
+    top: 6px;
+    box-shadow: 0 4px 0 currentColor;
+}
+
+/* Projects Icon - Folder */
+.icon-projects::before {
+    width: 16px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    background: transparent;
+    border-top: 6px solid currentColor;
+}
+
+.icon-projects::after {
+    width: 6px;
+    height: 2px;
+    background: currentColor;
+    top: -2px;
+    left: 2px;
+    border-radius: 1px 1px 0 0;
+}
+
+/* AI Icon - Brain/Circuit */
+.icon-ai::before {
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.icon-ai::after {
+    width: 6px;
+    height: 6px;
+    background: 
+        linear-gradient(45deg, transparent 30%, currentColor 30%, currentColor 70%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, currentColor 30%, currentColor 70%, transparent 70%);
+    background-size: 2px 2px;
+    border-radius: 50%;
+}
+
 /* Mobile menu button - hidden on desktop */
 .mobile-menu-btn {
     display: none;
@@ -431,6 +537,21 @@ body {
     font-weight: 500;
     text-decoration: none;
     color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.settings-btn {
+    padding: 10px;
+    width: 44px;
+    height: 44px;
+    justify-content: center;
+}
+
+.settings-btn:hover {
+    transform: translateY(-1px) rotate(180deg);
 }
 
 .settings-btn:hover, .back-btn:hover, .sign-out-btn:hover {
@@ -576,19 +697,89 @@ body {
 }
 
 .stat-icon {
-    font-size: 2.5rem;
-    opacity: 0.9;
+    width: 40px;
+    height: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 2px 4px rgba(77, 182, 172, 0.2));
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(77, 182, 172, 0.2);
+}
+
+.stat-icon::before,
+.stat-icon::after {
+    content: '';
+    position: absolute;
+    background: white;
     transition: all 0.3s ease;
 }
 
 .stat-card:hover .stat-icon {
-    transform: scale(1.1);
-    filter: drop-shadow(0 4px 8px rgba(77, 182, 172, 0.3));
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 16px rgba(77, 182, 172, 0.3);
+}
+
+/* Today Icon - Clock */
+.icon-today::before {
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.icon-today::after {
+    width: 6px;
+    height: 8px;
+    background: white;
+    border-radius: 1px;
+    transform-origin: bottom center;
+    transform: rotate(45deg) translateY(-2px);
+    box-shadow: -2px 0 0 -1px white;
+}
+
+/* Warning Icon - Triangle */
+.icon-warning::before {
+    width: 0;
+    height: 0;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-bottom: 20px solid white;
+    background: transparent;
+}
+
+.icon-warning::after {
+    width: 3px;
+    height: 8px;
+    background: var(--accent-color);
+    border-radius: 1px;
+    bottom: 6px;
+    box-shadow: 0 -10px 0 0 var(--accent-color);
+}
+
+/* Completed Icon - Checkmark */
+.icon-completed::before {
+    width: 8px;
+    height: 16px;
+    border-right: 3px solid white;
+    border-bottom: 3px solid white;
+    background: transparent;
+    transform: rotate(45deg) translateY(-2px);
+}
+
+/* Analytics Icon - Bar Chart */
+.icon-analytics::before {
+    width: 20px;
+    height: 16px;
+    background: 
+        linear-gradient(white, white) 0 12px/4px 4px,
+        linear-gradient(white, white) 6px 8px/4px 8px,
+        linear-gradient(white, white) 12px 4px/4px 12px,
+        linear-gradient(white, white) 18px 0px/4px 16px;
+    background-repeat: no-repeat;
 }
 
 .stat-number {
@@ -674,9 +865,26 @@ body {
 }
 
 .quick-add-container h3::before {
-    content: '✨';
-    font-size: 1.2rem;
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+    border-radius: 6px;
+    position: relative;
+    margin-right: 8px;
     animation: sparkle 2s ease-in-out infinite;
+}
+
+.quick-add-container h3::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 2px;
+    left: 6px;
+    top: 6px;
+    box-shadow: 6px 0 0 -2px white, 0 6px 0 -2px white;
 }
 
 @keyframes sparkle {
@@ -777,12 +985,123 @@ body {
 }
 
 .btn-primary .btn-icon {
-    font-size: 1.1rem;
+    width: 16px;
+    height: 16px;
+    position: relative;
     transition: transform 0.3s ease;
+    flex-shrink: 0;
 }
 
 .btn-primary:hover .btn-icon {
     transform: scale(1.1) rotate(5deg);
+}
+
+/* AI Button Icon */
+.icon-ai-btn::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.icon-ai-btn::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: 
+        linear-gradient(45deg, transparent 30%, currentColor 30%, currentColor 70%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, currentColor 30%, currentColor 70%, transparent 70%);
+    background-size: 2px 2px;
+    left: 3px;
+    top: 3px;
+    border-radius: 50%;
+}
+
+/* Header Button Icons */
+.icon-settings,
+.icon-logout,
+.icon-back {
+    width: 16px;
+    height: 16px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-settings::before,
+.icon-settings::after,
+.icon-logout::before,
+.icon-logout::after,
+.icon-back::before,
+.icon-back::after {
+    content: '';
+    position: absolute;
+    background: currentColor;
+    transition: all 0.3s ease;
+}
+
+/* Settings Icon - Gear */
+.icon-settings::before {
+    width: 14px;
+    height: 14px;
+    background: 
+        radial-gradient(circle at center, transparent 30%, currentColor 30%, currentColor 50%, transparent 50%),
+        conic-gradient(from 0deg, currentColor 30deg, transparent 30deg, transparent 60deg, currentColor 60deg, currentColor 90deg, transparent 90deg, transparent 120deg, currentColor 120deg, currentColor 150deg, transparent 150deg, transparent 180deg, currentColor 180deg, currentColor 210deg, transparent 210deg, transparent 240deg, currentColor 240deg, currentColor 270deg, transparent 270deg, transparent 300deg, currentColor 300deg, currentColor 330deg, transparent 330deg);
+    border-radius: 2px;
+}
+
+.icon-settings::after {
+    width: 6px;
+    height: 6px;
+    background: transparent;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+}
+
+/* Logout Icon - Door with Arrow */
+.icon-logout::before {
+    width: 10px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-left: none;
+    background: transparent;
+    border-radius: 0 2px 2px 0;
+}
+
+.icon-logout::after {
+    width: 6px;
+    height: 2px;
+    background: currentColor;
+    left: -2px;
+    box-shadow: 
+        2px -2px 0 -1px currentColor,
+        2px 2px 0 -1px currentColor;
+    transform: rotate(0deg);
+}
+
+/* Back Icon - Arrow Left */
+.icon-back::before {
+    width: 8px;
+    height: 2px;
+    background: currentColor;
+    left: 2px;
+    border-radius: 1px;
+}
+
+.icon-back::after {
+    width: 5px;
+    height: 5px;
+    border-left: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+    background: transparent;
+    transform: rotate(-45deg);
+    left: 0;
+    top: 5.5px;
 }
 
 .btn-secondary {
@@ -865,15 +1184,49 @@ body {
 }
 
 .today-tasks-container h3::before {
-    content: '📅';
-    font-size: 1.2rem;
+    content: '';
+    width: 18px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+    border-radius: 4px;
+    position: relative;
     animation: bounce 2s ease-in-out infinite;
 }
 
+.today-tasks-container h3::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 2px;
+    background: white;
+    left: 3px;
+    top: 8px;
+    border-radius: 1px;
+    box-shadow: 0 4px 0 white;
+}
+
 .suggestions-container h3::before {
-    content: '🤖';
-    font-size: 1.2rem;
+    content: '';
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+    border-radius: 50%;
+    position: relative;
     animation: glow 2s ease-in-out infinite alternate;
+}
+
+.suggestions-container h3::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: 
+        linear-gradient(45deg, transparent 30%, white 30%, white 70%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, white 30%, white 70%, transparent 70%);
+    background-size: 3px 3px;
+    border-radius: 50%;
+    left: 4px;
+    top: 4px;
 }
 
 @keyframes bounce {
@@ -1887,6 +2240,20 @@ body {
     .settings-btn, .sign-out-btn, .back-btn {
         padding: 6px 8px;
         font-size: 0.85rem;
+        gap: 4px;
+    }
+    
+    .settings-btn {
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .icon-settings,
+    .icon-logout,
+    .icon-back {
+        width: 14px;
+        height: 14px;
     }
     
     .app-main {
