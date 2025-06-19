@@ -2509,6 +2509,93 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Modern Suggestion Buttons */
+.suggestions-message {
+    margin-bottom: 24px;
+}
+
+.suggestions-intro {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: var(--text-light);
+}
+
+.suggestion-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.suggestion-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid rgba(77, 182, 172, 0.2);
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.98) 100%);
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: left;
+    width: 100%;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+    overflow: hidden;
+}
+
+.suggestion-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(77, 182, 172, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.suggestion-btn:hover {
+    border-color: var(--accent-color);
+    background: linear-gradient(135deg, rgba(77, 182, 172, 0.08) 0%, rgba(255, 255, 255, 0.95) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(77, 182, 172, 0.15);
+    color: var(--accent-dark);
+}
+
+.suggestion-btn:hover::before {
+    left: 100%;
+}
+
+.suggestion-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(77, 182, 172, 0.2);
+}
+
+.suggestion-icon {
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, rgba(77, 182, 172, 0.1) 0%, rgba(77, 182, 172, 0.05) 100%);
+    border-radius: 8px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+.suggestion-text {
+    flex: 1;
+    line-height: 1.4;
+    font-weight: 500;
+}
+
 
 /* Modals */
 .modal {
