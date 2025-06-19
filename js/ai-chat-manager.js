@@ -11,12 +11,15 @@ class AIChatManager {
         this.isTyping = false;
         this.messageQueue = [];
         this.maxMessages = 100; // Limit conversation history
+        this.storageKey = 'assistant_chat_history';
         
         // Chat interface elements
         this.chatContainer = null;
         this.messagesContainer = null;
         this.inputElement = null;
         this.sendButton = null;
+        this.historyContainer = null;
+        this.isHistoryVisible = false;
         
         // Message templates
         this.templates = {
@@ -52,6 +55,7 @@ What would you like to do today?`,
         this.messagesContainer = document.getElementById('chatMessages');
         this.inputElement = document.getElementById('chatInput');
         this.sendButton = document.getElementById('sendChatBtn');
+        this.historyContainer = document.getElementById('chatHistorySidebar');
         
         if (!this.messagesContainer || !this.inputElement || !this.sendButton) {
             console.warn('Chat interface elements not found');
@@ -73,6 +77,9 @@ What would you like to do today?`,
             this.autoResizeInput();
         });
         
+        // Setup chat history controls
+        this.setupHistoryControls();
+        
         // Initialize with welcome message if chat is empty
         if (this.messagesContainer.children.length <= 1) {
             this.addWelcomeMessage();
@@ -80,6 +87,162 @@ What would you like to do today?`,
         
         // Load conversation history
         this.loadConversationHistory();
+    }
+
+    // Setup chat history controls
+    setupHistoryControls() {
+        const newChatBtn = document.getElementById('newChatBtn');
+        const historyChatBtn = document.getElementById('historyChatBtn');
+        const exportChatBtn = document.getElementById('exportChatBtn');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+
+        if (newChatBtn) {
+            newChatBtn.addEventListener('click', () => this.startNewChat());
+        }
+
+        if (historyChatBtn) {
+            historyChatBtn.addEventListener('click', () => this.toggleHistory());
+        }
+
+        if (exportChatBtn) {
+            exportChatBtn.addEventListener('click', () => this.exportChat());
+        }
+
+        if (clearChatBtn) {
+            clearChatBtn.addEventListener('click', () => this.confirmClearChat());
+        }
+
+        if (closeHistoryBtn) {
+            closeHistoryBtn.addEventListener('click', () => this.hideHistory());
+        }
+    }
+
+    // Start a new chat conversation
+    startNewChat() {
+        // Create new conversation
+        this.currentConversation = {
+            id: this.generateId(),
+            startTime: new Date().toISOString(),
+            messages: []
+        };
+        this.conversations.push(this.currentConversation);
+
+        // Clear messages and add welcome
+        this.messagesContainer.innerHTML = '';
+        this.addWelcomeMessage();
+        
+        // Update history display
+        this.updateHistoryDisplay();
+        
+        // Focus input
+        this.focus();
+    }
+
+    // Toggle history sidebar
+    toggleHistory() {
+        if (this.historyContainer) {
+            this.isHistoryVisible = !this.isHistoryVisible;
+            
+            if (this.isHistoryVisible) {
+                this.showHistory();
+            } else {
+                this.hideHistory();
+            }
+        }
+    }
+
+    // Show history sidebar
+    showHistory() {
+        if (this.historyContainer) {
+            this.historyContainer.style.display = 'flex';
+            setTimeout(() => {
+                this.historyContainer.classList.add('show');
+            }, 10);
+            this.updateHistoryDisplay();
+            this.isHistoryVisible = true;
+        }
+    }
+
+    // Hide history sidebar
+    hideHistory() {
+        if (this.historyContainer) {
+            this.historyContainer.classList.remove('show');
+            setTimeout(() => {
+                this.historyContainer.style.display = 'none';
+            }, 400);
+            this.isHistoryVisible = false;
+        }
+    }
+
+    // Update history display
+    updateHistoryDisplay() {
+        const historyContent = document.getElementById('historyContent');
+        if (!historyContent) return;
+
+        if (this.conversations.length === 0) {
+            historyContent.innerHTML = `
+                <div class="empty-history">
+                    <div class="empty-icon">📝</div>
+                    <p>No chat history yet</p>
+                    <span>Start a conversation to see it here</span>
+                </div>
+            `;
+            return;
+        }
+
+        // Sort conversations by most recent
+        const sortedConversations = [...this.conversations].sort((a, b) => 
+            new Date(b.lastActivity || b.startTime) - new Date(a.lastActivity || a.startTime)
+        );
+
+        historyContent.innerHTML = sortedConversations.map(conv => {
+            const firstUserMessage = conv.messages.find(m => m.type === 'user');
+            const title = firstUserMessage ? 
+                firstUserMessage.content.substring(0, 50) + (firstUserMessage.content.length > 50 ? '...' : '') :
+                'New Conversation';
+            
+            const date = new Date(conv.startTime).toLocaleDateString();
+            const messageCount = conv.messages.length;
+            const isActive = this.currentConversation && conv.id === this.currentConversation.id;
+
+            return `
+                <div class="conversation-item ${isActive ? 'active' : ''}" data-conversation-id="${conv.id}">
+                    <div class="conversation-title">${title}</div>
+                    <div class="conversation-meta">
+                        <span class="conversation-date">${date}</span>
+                        <span class="conversation-count">${messageCount} messages</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Add click handlers for conversation items
+        historyContent.querySelectorAll('.conversation-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const conversationId = item.dataset.conversationId;
+                this.loadConversation(conversationId);
+            });
+        });
+    }
+
+    // Load a specific conversation
+    loadConversation(conversationId) {
+        const conversation = this.conversations.find(c => c.id === conversationId);
+        if (!conversation) return;
+
+        this.currentConversation = conversation;
+        this.restoreMessages();
+        this.updateHistoryDisplay();
+        this.hideHistory();
+    }
+
+    // Confirm clear chat
+    confirmClearChat() {
+        if (confirm('Are you sure you want to clear all chat history? This action cannot be undone.')) {
+            this.clearChat();
+            this.updateHistoryDisplay();
+        }
     }
 
     // Add welcome message to chat
@@ -451,6 +614,11 @@ What would you like to do today?`,
         
         // Save to localStorage
         this.saveConversationHistory();
+        
+        // Update history display if visible
+        if (this.isHistoryVisible) {
+            this.updateHistoryDisplay();
+        }
     }
 
     // Load conversation history from localStorage
