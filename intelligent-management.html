@@ -78,23 +78,23 @@
                 </div>
                 <nav class="main-nav">
                     <button class="nav-btn active" data-view="dashboard">
-                        <span class="nav-icon">📊</span>
+                        <span class="nav-icon icon-dashboard"></span>
                         Dashboard
                     </button>
                     <button class="nav-btn" data-view="tasks">
-                        <span class="nav-icon">✅</span>
+                        <span class="nav-icon icon-tasks"></span>
                         Tasks
                     </button>
                     <button class="nav-btn" data-view="calendar">
-                        <span class="nav-icon">📅</span>
+                        <span class="nav-icon icon-calendar"></span>
                         Calendar
                     </button>
                     <button class="nav-btn" data-view="projects">
-                        <span class="nav-icon">📋</span>
+                        <span class="nav-icon icon-projects"></span>
                         Projects
                     </button>
                     <button class="nav-btn" data-view="ai-chat">
-                        <span class="nav-icon">🤖</span>
+                        <span class="nav-icon icon-ai"></span>
                         AI Assistant
                     </button>
                 </nav>
@@ -104,9 +104,17 @@
                     <img class="user-avatar" id="userAvatar" src="" alt="">
                     <span class="user-name" id="userName"></span>
                 </div>
-                <button class="settings-btn" id="settingsBtn">⚙️</button>
-                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-                <button class="back-btn" onclick="window.location.href='index.html'">← Back to 01data</button>
+                <button class="settings-btn" id="settingsBtn">
+                    <span class="icon-settings"></span>
+                </button>
+                <button class="sign-out-btn" onclick="signOut()">
+                    <span class="icon-logout"></span>
+                    Sign Out
+                </button>
+                <button class="back-btn" onclick="window.location.href='index.html'">
+                    <span class="icon-back"></span>
+                    Back to 01data
+                </button>
             </div>
         </header>
 
@@ -118,28 +126,28 @@
                     <!-- Quick Stats -->
                     <div class="stats-container">
                         <div class="stat-card">
-                            <div class="stat-icon">📅</div>
+                            <div class="stat-icon icon-today"></div>
                             <div class="stat-content">
                                 <div class="stat-number" id="dueTodayCount">0</div>
                                 <div class="stat-label">Due Today</div>
                             </div>
                         </div>
                         <div class="stat-card urgent">
-                            <div class="stat-icon">⚠️</div>
+                            <div class="stat-icon icon-warning"></div>
                             <div class="stat-content">
                                 <div class="stat-number" id="overdueCount">0</div>
                                 <div class="stat-label">Overdue</div>
                             </div>
                         </div>
                         <div class="stat-card success">
-                            <div class="stat-icon">✅</div>
+                            <div class="stat-icon icon-completed"></div>
                             <div class="stat-content">
                                 <div class="stat-number" id="completedCount">0</div>
                                 <div class="stat-label">Completed</div>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon">📊</div>
+                            <div class="stat-icon icon-analytics"></div>
                             <div class="stat-content">
                                 <div class="stat-number" id="completionRate">0%</div>
                                 <div class="stat-label">Completion Rate</div>
@@ -153,7 +161,7 @@
                         <div class="quick-add-form">
                             <input type="text" id="quickTaskInput" placeholder="What needs to be done? (Try: 'Meeting tomorrow at 2pm' or 'Call client next Friday')" />
                             <button id="quickAddBtn" class="btn-primary">
-                                <span class="btn-icon">🤖</span>
+                                <span class="btn-icon icon-ai-btn"></span>
                                 Add with AI
                             </button>
                         </div>
@@ -335,6 +343,7 @@
                     </div>
                     <div class="form-group">
                         <button type="button" class="btn-secondary" onclick="testClaudeConnection()">Test Connection</button>
+                        <button type="button" class="btn-secondary" onclick="testSimpleAI()" style="margin-left: 10px;">Quick AI Test</button>
                     </div>
                 </div>
                 <div class="settings-section">
@@ -356,11 +365,23 @@
     <div id="notifications" class="notifications-container"></div>
 
     <!-- Scripts -->
+    <!-- Simple AI Assistant (for quick testing) -->
+    <script src="js/simple-ai-assistant.js"></script>
+    
+    <!-- AI Modules (load first) -->
+    <script src="js/ai-utils.js"></script>
+    <script src="js/ai-assistant-handler.js"></script>
+    <script src="js/ai-task-parser.js"></script>
+    <script src="js/ai-chat-manager.js"></script>
+    
+    <!-- Core Application -->
     <script src="js/intelligent-assistant.js"></script>
-    <script src="js/claude-api.js"></script>
     <script src="js/calendar.js"></script>
     <script src="js/tasks.js"></script>
     <script src="js/projects.js"></script>
+    
+    <!-- Legacy Claude API (can be removed later) -->
+    <script src="js/claude-api.js"></script>
     
     <script>
         // Google Sign-In Functions
@@ -663,6 +684,79 @@
                 }
             }, 1000);
         });
+
+        // Global functions for HTML onclick handlers
+        function openModal(modalId) {
+            if (window.assistant) window.assistant.showModal(modalId);
+        }
+
+        function closeModal(modalId) {
+            if (window.assistant) window.assistant.closeModal(modalId);
+        }
+
+        function saveSettings() {
+            const apiKey = document.getElementById('claudeApiKey').value;
+            
+            if (apiKey) {
+                localStorage.setItem('claude_api_key', apiKey);
+                
+                if (window.assistant?.aiHandler) {
+                    window.assistant.aiHandler.apiKey = apiKey;
+                }
+                
+                window.assistant.showNotification('Settings saved successfully!', 'success');
+                window.assistant.closeModal('settingsModal');
+            } else {
+                window.assistant.showNotification('Please enter a valid API key', 'warning');
+            }
+        }
+
+        async function testClaudeConnection() {
+            if (!window.assistant?.aiHandler) {
+                alert('AI handler not initialized');
+                return;
+            }
+            
+            const apiKey = document.getElementById('claudeApiKey').value.trim();
+            if (!apiKey) {
+                window.assistant.showNotification('Please enter an API key first', 'warning');
+                return;
+            }
+            
+            window.assistant.aiHandler.apiKey = apiKey;
+            const result = await window.assistant.aiHandler.testConnection();
+            
+            if (result.success) {
+                window.assistant.showNotification('AI connection successful!', 'success');
+            } else {
+                window.assistant.showNotification(`AI connection failed: ${result.error}`, 'error');
+            }
+        }
+
+        async function testSimpleAI() {
+            if (!window.simpleAI) {
+                alert('Simple AI not loaded');
+                return;
+            }
+            
+            const userEmail = window.assistant?.user?.email || 'test@example.com';
+            
+            window.assistant.showNotification('Testing AI connection...', 'info');
+            
+            try {
+                // Initialize and test
+                await window.simpleAI.initialize(userEmail);
+                const result = await window.simpleAI.testConnection();
+                
+                if (result.success) {
+                    window.assistant.showNotification('✅ Simple AI working! Response: ' + result.response.substring(0, 50) + '...', 'success');
+                } else {
+                    window.assistant.showNotification('❌ Simple AI failed: ' + result.error, 'error');
+                }
+            } catch (error) {
+                window.assistant.showNotification('❌ Test error: ' + error.message, 'error');
+            }
+        }
     </script>
 </body>
 </html>
