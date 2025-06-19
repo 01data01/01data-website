@@ -245,10 +245,43 @@
             <div id="ai-chat-view" class="view">
                 <div class="chat-container">
                     <div class="chat-header">
-                        <h2>Assistant</h2>
-                        <div class="chat-status">
-                            <span class="status-indicator online"></span>
-                            Claude AI Ready
+                        <div class="chat-header-left">
+                            <h2>Assistant</h2>
+                            <div class="chat-status">
+                                <span class="status-indicator online"></span>
+                                Claude AI Ready
+                            </div>
+                        </div>
+                        <div class="chat-header-right">
+                            <div class="chat-controls">
+                                <button class="chat-control-btn" id="newChatBtn" title="New Chat">
+                                    <span class="icon">💬</span>
+                                </button>
+                                <button class="chat-control-btn" id="historyChatBtn" title="Chat History">
+                                    <span class="icon">📜</span>
+                                </button>
+                                <button class="chat-control-btn" id="exportChatBtn" title="Export Chat">
+                                    <span class="icon">📥</span>
+                                </button>
+                                <button class="chat-control-btn" id="clearChatBtn" title="Clear Chat">
+                                    <span class="icon">🗑️</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat History Sidebar -->
+                    <div class="chat-history-sidebar" id="chatHistorySidebar" style="display: none;">
+                        <div class="history-header">
+                            <h3>Chat History</h3>
+                            <button class="close-history" id="closeHistoryBtn">&times;</button>
+                        </div>
+                        <div class="history-content" id="historyContent">
+                            <div class="empty-history">
+                                <div class="empty-icon">📝</div>
+                                <p>No chat history yet</p>
+                                <span>Start a conversation to see it here</span>
+                            </div>
                         </div>
                     </div>
                     <div class="chat-messages" id="chatMessages">
