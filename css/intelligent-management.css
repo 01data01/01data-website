@@ -2573,8 +2573,26 @@ body {
 }
 
 .suggestion-btn:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.98);
     box-shadow: 0 2px 8px rgba(77, 182, 172, 0.2);
+}
+
+.suggestion-btn.clicked {
+    background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-dark) 100%);
+    color: white;
+    border-color: var(--accent-color);
+    transform: scale(0.95);
+    opacity: 0.8;
+}
+
+.suggestion-btn.clicked .suggestion-icon {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.suggestion-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 .suggestion-icon {
