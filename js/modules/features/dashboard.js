@@ -25,6 +25,7 @@ class DashboardModule {
         try {
             console.log('Initializing Dashboard Module...');
             
+            this.createStatsCards();
             this.setupEventListeners();
             this.loadDashboardData();
             this.updateStats();
@@ -37,6 +38,78 @@ class DashboardModule {
         } catch (error) {
             utils.logError('Dashboard Module Initialization', error);
         }
+    }
+
+    /**
+     * Create stats cards HTML structure
+     */
+    createStatsCards() {
+        const statsContainer = utils.getElementById('animated-stats-container');
+        if (!statsContainer) return;
+
+        const statsHTML = `
+            <div class="stats-container">
+                <div class="stat-card" data-stat="due-today">
+                    <div class="stat-icon icon-today">
+                        <div class="icon-clock">
+                            <div class="clock-face">
+                                <div class="clock-hand hour-hand"></div>
+                                <div class="clock-hand minute-hand"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Due Today</div>
+                    </div>
+                </div>
+
+                <div class="stat-card urgent" data-stat="overdue">
+                    <div class="stat-icon icon-warning">
+                        <div class="icon-triangle">
+                            <div class="triangle-inner">!</div>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Overdue</div>
+                    </div>
+                </div>
+
+                <div class="stat-card success" data-stat="completed">
+                    <div class="stat-icon icon-completed">
+                        <div class="icon-checkmark">
+                            <div class="checkmark-stem"></div>
+                            <div class="checkmark-kick"></div>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                </div>
+
+                <div class="stat-card info" data-stat="completion-rate">
+                    <div class="stat-icon icon-chart">
+                        <div class="icon-progress">
+                            <div class="progress-ring">
+                                <svg class="progress-ring-svg" viewBox="0 0 120 120">
+                                    <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
+                                    <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="8" 
+                                            stroke-linecap="round" stroke-dasharray="339.292" stroke-dashoffset="339.292"/>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">0%</div>
+                        <div class="stat-label">Completion Rate</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        statsContainer.innerHTML = statsHTML;
     }
 
     /**
@@ -54,7 +127,7 @@ class DashboardModule {
         }
 
         // Quick add input
-        const quickAddInput = utils.querySelector('.quick-add-input');
+        const quickAddInput = utils.getElementById('quickTaskInput');
         if (quickAddInput) {
             const keyListener = utils.addEventListener(quickAddInput, 'keydown', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -66,7 +139,7 @@ class DashboardModule {
         }
 
         // AI quick add button
-        const aiAddBtn = utils.querySelector('.ai-add-btn');
+        const aiAddBtn = utils.getElementById('quickAddBtn');
         if (aiAddBtn) {
             const clickListener = utils.addEventListener(aiAddBtn, 'click', () => {
                 this.handleAIQuickAdd();
@@ -120,7 +193,14 @@ class DashboardModule {
     loadDashboardData() {
         try {
             // Load tasks data
-            const tasks = utils.loadFromStorage('tasks', []);
+            let tasks = utils.loadFromStorage('tasks', []);
+            
+            // If no tasks exist, create some sample tasks for testing
+            if (tasks.length === 0) {
+                tasks = this.createSampleTasks();
+                utils.saveToStorage('tasks', tasks);
+            }
+            
             this.calculateStats(tasks);
             this.updateTodaysTasks(tasks);
             this.updateUpcoming(tasks);
@@ -128,6 +208,77 @@ class DashboardModule {
         } catch (error) {
             utils.logError('Dashboard Data Loading', error);
         }
+    }
+
+    /**
+     * Create sample tasks for testing
+     */
+    createSampleTasks() {
+        const today = new Date().toISOString().split('T')[0];
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        return [
+            {
+                id: utils.generateId('task'),
+                title: 'Review project proposal',
+                description: 'Review and approve the new project proposal',
+                priority: 'high',
+                category: 'Work',
+                dueDate: today,
+                time: '14:00',
+                completed: false,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: utils.generateId('task'),
+                title: 'Team meeting',
+                description: 'Weekly team sync meeting',
+                priority: 'medium',
+                category: 'Work',
+                dueDate: today,
+                time: '10:00',
+                completed: true,
+                createdAt: new Date().toISOString(),
+                completedAt: new Date().toISOString()
+            },
+            {
+                id: utils.generateId('task'),
+                title: 'Send quarterly report',
+                description: 'Finalize and send Q4 report to management',
+                priority: 'high',
+                category: 'Work',
+                dueDate: yesterday.toISOString().split('T')[0],
+                time: '17:00',
+                completed: false,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: utils.generateId('task'),
+                title: 'Doctor appointment',
+                description: 'Annual check-up',
+                priority: 'medium',
+                category: 'Personal',
+                dueDate: tomorrow.toISOString().split('T')[0],
+                time: '09:00',
+                completed: false,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: utils.generateId('task'),
+                title: 'Buy groceries',
+                description: 'Weekly grocery shopping',
+                priority: 'low',
+                category: 'Personal',
+                dueDate: null,
+                time: null,
+                completed: true,
+                createdAt: new Date().toISOString(),
+                completedAt: new Date().toISOString()
+            }
+        ];
     }
 
     /**
@@ -146,7 +297,8 @@ class DashboardModule {
             completed: 0,
             total: tasks.length,
             thisWeek: 0,
-            highPriority: 0
+            highPriority: 0,
+            completionRate: 0
         };
 
         tasks.forEach(task => {
@@ -177,6 +329,11 @@ class DashboardModule {
                 this.stats.highPriority++;
             }
         });
+
+        // Calculate completion rate
+        this.stats.completionRate = this.stats.total > 0 
+            ? Math.round((this.stats.completed / this.stats.total) * 100) 
+            : 0;
     }
 
     /**
@@ -187,15 +344,22 @@ class DashboardModule {
             'due-today': this.stats.dueToday,
             'overdue': this.stats.overdue,
             'completed': this.stats.completed,
-            'total-tasks': this.stats.total,
-            'this-week': this.stats.thisWeek,
-            'high-priority': this.stats.highPriority
+            'completion-rate': `${this.stats.completionRate}%`
         };
 
         Object.entries(statsMapping).forEach(([key, value]) => {
             const statElement = utils.querySelector(`[data-stat="${key}"] .stat-number`);
             if (statElement) {
-                this.animateNumber(statElement, parseInt(statElement.textContent) || 0, value);
+                const currentValue = key === 'completion-rate' 
+                    ? parseInt(statElement.textContent.replace('%', '')) || 0
+                    : parseInt(statElement.textContent) || 0;
+                
+                if (key === 'completion-rate') {
+                    this.animateNumber(statElement, currentValue, this.stats.completionRate, 800, '%');
+                    this.updateProgressRing(this.stats.completionRate);
+                } else {
+                    this.animateNumber(statElement, currentValue, value);
+                }
             }
         });
 
@@ -206,7 +370,7 @@ class DashboardModule {
     /**
      * Animate number changes
      */
-    animateNumber(element, fromValue, toValue, duration = 800) {
+    animateNumber(element, fromValue, toValue, duration = 800, suffix = '') {
         if (fromValue === toValue) return;
 
         const startTime = performance.now();
@@ -220,7 +384,7 @@ class DashboardModule {
             const easeOutQuart = 1 - Math.pow(1 - progress, 4);
             const currentValue = Math.round(fromValue + (difference * easeOutQuart));
             
-            element.textContent = currentValue;
+            element.textContent = currentValue + suffix;
             
             if (progress < 1) {
                 requestAnimationFrame(animate);
@@ -228,6 +392,19 @@ class DashboardModule {
         };
 
         requestAnimationFrame(animate);
+    }
+
+    /**
+     * Update progress ring for completion rate
+     */
+    updateProgressRing(percentage) {
+        const progressRing = utils.querySelector('.progress-ring-fill');
+        if (progressRing) {
+            const circumference = 2 * Math.PI * 54; // radius = 54
+            const offset = circumference - (percentage / 100) * circumference;
+            
+            progressRing.style.strokeDashoffset = offset;
+        }
     }
 
     /**
@@ -259,7 +436,7 @@ class DashboardModule {
      * Update today's tasks section
      */
     updateTodaysTasks(tasks = []) {
-        const todaysTasksContainer = utils.querySelector('.todays-tasks-list');
+        const todaysTasksContainer = utils.getElementById('todayTasksList');
         if (!todaysTasksContainer) return;
 
         const today = new Date();
@@ -307,10 +484,10 @@ class DashboardModule {
     }
 
     /**
-     * Update upcoming section
+     * Update upcoming section (AI Suggestions)
      */
     updateUpcoming(tasks = []) {
-        const upcomingContainer = utils.querySelector('.upcoming-list');
+        const upcomingContainer = utils.getElementById('aiSuggestions');
         if (!upcomingContainer) return;
 
         const today = new Date();
@@ -349,7 +526,7 @@ class DashboardModule {
      * Setup quick add functionality
      */
     setupQuickAdd() {
-        const quickAddInput = utils.querySelector('.quick-add-input');
+        const quickAddInput = utils.getElementById('quickTaskInput');
         if (quickAddInput) {
             // Auto-resize textarea
             const resizeListener = utils.addEventListener(quickAddInput, 'input', () => {
@@ -393,7 +570,7 @@ class DashboardModule {
      * Handle quick add form submission
      */
     handleQuickAdd() {
-        const quickAddInput = utils.querySelector('.quick-add-input');
+        const quickAddInput = utils.getElementById('quickTaskInput');
         if (!quickAddInput) return;
 
         const taskText = quickAddInput.value.trim();
@@ -441,7 +618,7 @@ class DashboardModule {
      * Handle AI quick add
      */
     async handleAIQuickAdd() {
-        const quickAddInput = utils.querySelector('.quick-add-input');
+        const quickAddInput = utils.getElementById('quickTaskInput');
         if (!quickAddInput) return;
 
         const taskText = quickAddInput.value.trim();
