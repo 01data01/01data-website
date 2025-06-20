@@ -5,7 +5,8 @@
 
 class MainApp {
     constructor() {
-        this.currentView = 'dashboard';
+        // Get initial view from URL hash or default to dashboard
+        this.currentView = this.getViewFromHash() || 'dashboard';
         this.initialized = false;
         this.user = null;
         this.eventListeners = [];
@@ -16,6 +17,15 @@ class MainApp {
         } else {
             this.init();
         }
+    }
+
+    /**
+     * Get view from URL hash
+     */
+    getViewFromHash() {
+        const hash = window.location.hash.replace('#', '');
+        const validViews = ['dashboard', 'tasks', 'calendar', 'projects', 'ai-chat'];
+        return validViews.includes(hash) ? hash : null;
     }
 
     /**
@@ -41,6 +51,15 @@ class MainApp {
             
             // Initialize current view
             this.showView(this.currentView);
+            
+            // Force initialize dashboard module for the first time
+            if (this.currentView === 'dashboard') {
+                setTimeout(() => {
+                    if (window.dashboardModule && !window.dashboardModule.initialized) {
+                        window.dashboardModule.initialize();
+                    }
+                }, 500);
+            }
             
             this.initialized = true;
             console.log('Application initialized successfully');
@@ -322,14 +341,14 @@ class MainApp {
 
         // Hide all views
         validViews.forEach(v => {
-            const viewElement = utils.getElementById(`${v}View`);
+            const viewElement = utils.getElementById(`${v}-view`);
             if (viewElement) {
                 utils.hide(viewElement);
             }
         });
 
         // Show selected view
-        const targetView = utils.getElementById(`${view}View`);
+        const targetView = utils.getElementById(`${view}-view`);
         if (targetView) {
             utils.show(targetView);
         }
