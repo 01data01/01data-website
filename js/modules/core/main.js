@@ -578,13 +578,13 @@ window.onSignIn = function(googleUser) {
     }
 };
 
-// Create and initialize main app
-const mainApp = new MainApp();
+// Make the class globally accessible
+window.MainApp = MainApp;
 
-// Make it globally accessible
-window.mainApp = mainApp;
+// Auto-initialize will be handled by HTML
+// No need to create instance here since HTML will do it
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = mainApp;
+    module.exports = MainApp;
 }
