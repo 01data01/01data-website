@@ -170,6 +170,11 @@ class IntelligentAssistant {
         // Update navigation UI
         this.updateNavigation(viewName);
         
+        // Update animated navigation if available
+        if (window.animatedNavigation && window.animatedNavigation.getActiveTab() !== viewName) {
+            window.animatedNavigation.switchToTab(viewName);
+        }
+        
         // Update content
         this.updateViewContent(viewName);
         
@@ -322,10 +327,21 @@ class IntelligentAssistant {
         const today = new Date().toISOString().split('T')[0];
         const stats = this.calculateStats(today);
         
+        // Update traditional elements (fallback)
         this.updateElement('dueTodayCount', stats.dueToday);
         this.updateElement('overdueCount', stats.overdue);
         this.updateElement('completedCount', stats.completed);
         this.updateElement('completionRate', `${stats.completionRate}%`);
+        
+        // Update animated dashboard if available
+        if (window.animatedDashboard && window.animatedDashboard.isInitialized) {
+            window.animatedDashboard.updateValues([
+                stats.dueToday,
+                stats.overdue,
+                stats.completed,
+                `${stats.completionRate}%`
+            ]);
+        }
     }
 
     calculateStats(today) {
