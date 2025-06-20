@@ -170,11 +170,6 @@ class IntelligentAssistant {
         // Update navigation UI
         this.updateNavigation(viewName);
         
-        // Update animated navigation if available
-        if (window.animatedNavigation && window.animatedNavigation.getActiveTab() !== viewName) {
-            window.animatedNavigation.switchToTab(viewName);
-        }
-        
         // Update content
         this.updateViewContent(viewName);
         

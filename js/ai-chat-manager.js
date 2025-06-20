@@ -46,6 +46,10 @@ What would you like to do today?`,
         };
         
         this.initializeChatInterface();
+        
+        // Make this instance globally accessible
+        window.chatManager = this;
+        
         console.log('AI Chat Manager initialized');
     }
 
@@ -215,23 +219,70 @@ What would you like to do today?`,
         suggestionsContainer.innerHTML = `
             <div class="message-avatar">🤖</div>
             <div class="message-content">
-                <p>Here are some things you can try:</p>
+                <p class="suggestions-intro">Here are some things you can try:</p>
                 <div class="suggestion-buttons">
-                    ${this.templates.suggestions.map(suggestion => 
-                        `<button class="suggestion-btn" onclick="chatManager.sendSuggestion('${suggestion}')">${suggestion}</button>`
+                    ${this.templates.suggestions.map((suggestion, index) => 
+                        `<button class="suggestion-btn" data-suggestion="${suggestion}">
+                            <span class="suggestion-icon">${this.getSuggestionIcon(index)}</span>
+                            <span class="suggestion-text">${suggestion}</span>
+                        </button>`
                     ).join('')}
                 </div>
             </div>
         `;
         
         this.messagesContainer.appendChild(suggestionsContainer);
+        
+        // Add click handlers for suggestion buttons
+        suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const suggestion = btn.dataset.suggestion;
+                console.log('Suggestion clicked:', suggestion);
+                
+                // Add visual feedback - mark as clicked
+                btn.classList.add('clicked');
+                
+                // Disable other suggestion buttons temporarily
+                suggestionsContainer.querySelectorAll('.suggestion-btn').forEach(otherBtn => {
+                    if (otherBtn !== btn) {
+                        otherBtn.style.opacity = '0.5';
+                        otherBtn.style.pointerEvents = 'none';
+                    }
+                });
+                
+                this.sendSuggestion(suggestion);
+            });
+        });
+        
         this.scrollToBottom();
+    }
+
+    // Get icon for suggestion based on index
+    getSuggestionIcon(index) {
+        const icons = ['📅', '📋', '⚡', '📊', '🎯'];
+        return icons[index] || '💡';
     }
 
     // Send a suggestion as a message
     sendSuggestion(suggestionText) {
+        if (!suggestionText || this.isTyping) return;
+        
+        console.log('Sending suggestion:', suggestionText);
+        
+        // Fill the input field and trigger visual feedback
         this.inputElement.value = suggestionText;
-        this.sendMessage();
+        
+        // Trigger input event to show the text
+        this.inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+        
+        // Auto-resize if needed
+        this.autoResizeInput();
+        
+        // Brief delay to show the text in input, then send
+        setTimeout(() => {
+            this.sendMessage();
+        }, 150);
     }
 
     // Send a new message
