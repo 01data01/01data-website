@@ -49,18 +49,8 @@ class AIChatModule {
      * Setup event listeners
      */
     setupEventListeners() {
-        // Chat input form
-        const chatForm = utils.querySelector('.chat-input-form');
-        if (chatForm) {
-            const submitListener = utils.addEventListener(chatForm, 'submit', (e) => {
-                e.preventDefault();
-                this.handleSendMessage();
-            });
-            this.eventListeners.push(submitListener);
-        }
-
-        // Chat input textarea
-        const chatInput = utils.querySelector('.chat-input');
+        // Chat input
+        const chatInput = utils.getElementById('chatInput');
         if (chatInput) {
             const keyListener = utils.addEventListener(chatInput, 'keydown', (e) => {
                 this.handleInputKeydown(e);
@@ -74,11 +64,38 @@ class AIChatModule {
             this.eventListeners.push(inputListener);
         }
 
+        // Send chat button
+        const sendChatBtn = utils.getElementById('sendChatBtn');
+        if (sendChatBtn) {
+            const clickListener = utils.addEventListener(sendChatBtn, 'click', () => {
+                this.handleSendMessage();
+            });
+            this.eventListeners.push(clickListener);
+        }
+
         // New chat button
-        const newChatBtn = utils.querySelector('.new-chat-btn');
+        const newChatBtn = utils.getElementById('newChatBtn');
         if (newChatBtn) {
             const clickListener = utils.addEventListener(newChatBtn, 'click', () => {
                 this.createNewConversation();
+            });
+            this.eventListeners.push(clickListener);
+        }
+
+        // Export chat button
+        const exportChatBtn = utils.getElementById('exportChatBtn');
+        if (exportChatBtn) {
+            const clickListener = utils.addEventListener(exportChatBtn, 'click', () => {
+                this.exportChat();
+            });
+            this.eventListeners.push(clickListener);
+        }
+
+        // Clear chat button
+        const clearChatBtn = utils.getElementById('clearChatBtn');
+        if (clearChatBtn) {
+            const clickListener = utils.addEventListener(clearChatBtn, 'click', () => {
+                this.clearAllChats();
             });
             this.eventListeners.push(clickListener);
         }
@@ -377,7 +394,7 @@ class AIChatModule {
      * Auto-resize chat input
      */
     autoResizeInput() {
-        const chatInput = utils.querySelector('.chat-input');
+        const chatInput = utils.getElementById('chatInput');
         if (chatInput) {
             chatInput.style.height = 'auto';
             chatInput.style.height = Math.min(chatInput.scrollHeight, 150) + 'px';
@@ -404,7 +421,7 @@ class AIChatModule {
      * Handle send message
      */
     async handleSendMessage() {
-        const chatInput = utils.querySelector('.chat-input');
+        const chatInput = utils.getElementById('chatInput');
         if (!chatInput) return;
 
         const messageText = chatInput.value.trim();
@@ -581,7 +598,7 @@ class AIChatModule {
      * Handle suggestion button click
      */
     handleSuggestionClick(suggestion) {
-        const chatInput = utils.querySelector('.chat-input');
+        const chatInput = utils.getElementById('chatInput');
         if (chatInput) {
             chatInput.value = suggestion;
             chatInput.focus();
@@ -762,6 +779,84 @@ class AIChatModule {
                 this.handleSendMessage(message);
             }
         }, 1000);
+    }
+
+    /**
+     * Export chat conversation
+     */
+    exportChat() {
+        if (!this.currentConversation || this.currentConversation.messages.length === 0) {
+            window.mainApp?.showNotification('No conversation to export', 'warning');
+            return;
+        }
+
+        try {
+            const chatData = {
+                title: this.currentConversation.title,
+                exportDate: new Date().toISOString(),
+                messages: this.currentConversation.messages.map(msg => ({
+                    role: msg.role,
+                    content: msg.content,
+                    timestamp: msg.timestamp
+                }))
+            };
+
+            const chatText = this.formatChatForExport(chatData);
+            const blob = new Blob([chatText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chat-${this.currentConversation.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            window.mainApp?.showNotification('Chat exported successfully', 'success');
+        } catch (error) {
+            utils.logError('Export Chat', error);
+            window.mainApp?.showNotification('Failed to export chat', 'error');
+        }
+    }
+
+    /**
+     * Format chat data for export
+     */
+    formatChatForExport(chatData) {
+        let output = `Chat Export: ${chatData.title}\n`;
+        output += `Exported on: ${new Date(chatData.exportDate).toLocaleString()}\n`;
+        output += '='.repeat(60) + '\n\n';
+
+        chatData.messages.forEach(msg => {
+            const timestamp = new Date(msg.timestamp).toLocaleString();
+            const role = msg.role === 'user' ? 'You' : 'AI Assistant';
+            output += `[${timestamp}] ${role}:\n${msg.content}\n\n`;
+        });
+
+        return output;
+    }
+
+    /**
+     * Clear all chat conversations
+     */
+    clearAllChats() {
+        if (this.conversations.length === 0) {
+            window.mainApp?.showNotification('No conversations to clear', 'info');
+            return;
+        }
+
+        if (confirm(`Are you sure you want to delete all ${this.conversations.length} conversation(s)? This action cannot be undone.`)) {
+            this.conversations = [];
+            this.currentConversation = null;
+            this.saveConversations();
+            this.createNewConversation();
+            this.updateConversationList();
+            this.clearChatMessages();
+            this.displayWelcomeMessage();
+            
+            window.mainApp?.showNotification('All conversations cleared', 'success');
+        }
     }
 
     /**
