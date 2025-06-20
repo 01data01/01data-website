@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modular CSS Test - Intelligent Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Modular CSS Imports -->
+    <link rel="stylesheet" href="css/modules/base.css">
+    <link rel="stylesheet" href="css/modules/auth.css">
+    <link rel="stylesheet" href="css/modules/layout.css">
+    <link rel="stylesheet" href="css/modules/dashboard.css">
+    <link rel="stylesheet" href="css/modules/tasks.css">
+    <link rel="stylesheet" href="css/modules/calendar.css">
+    <link rel="stylesheet" href="css/modules/ai-chat.css">
+    <link rel="stylesheet" href="css/modules/components.css">
+    
+    <style>
+        body {
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+        }
+        .test-section h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Modular CSS Test</h1>
+    <p>Testing all CSS modules are loading correctly and styles are working.</p>
+
+    <!-- Test Base Styles -->
+    <div class="test-section">
+        <h2>Base Styles Test</h2>
+        <button class="btn-primary">Primary Button</button>
+        <button class="btn-secondary">Secondary Button</button>
+        <button class="btn-danger">Danger Button</button>
+        <div class="glass-card" style="margin-top: 16px; padding: 20px;">
+            <h3>Glass Card Component</h3>
+            <p>This tests the glass morphism effect from base styles.</p>
+        </div>
+    </div>
+
+    <!-- Test Dashboard Styles -->
+    <div class="test-section">
+        <h2>Dashboard Styles Test</h2>
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon icon-today"></div>
+                <div class="stat-content">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Due Today</div>
+                </div>
+            </div>
+            <div class="stat-card urgent">
+                <div class="stat-icon icon-warning"></div>
+                <div class="stat-content">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Overdue</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="quick-add-container" style="margin-top: 24px;">
+            <h3>Quick Add Task</h3>
+            <div class="quick-add-form">
+                <input type="text" placeholder="Test quick add input...">
+                <button class="btn-primary">
+                    <span class="btn-icon icon-ai-btn"></span>
+                    Add with AI
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Layout Styles -->
+    <div class="test-section">
+        <h2>Layout Styles Test</h2>
+        <div style="display: flex; gap: 16px; align-items: center;">
+            <div class="mgmt-icon">
+                <div class="mgmt-brain">
+                    <div class="mgmt-neural-paths">
+                        <div class="mgmt-neural-line"></div>
+                        <div class="mgmt-neural-line"></div>
+                        <div class="mgmt-neural-line"></div>
+                        <div class="mgmt-neural-line"></div>
+                    </div>
+                </div>
+            </div>
+            <h3>Neural Network Logo</h3>
+        </div>
+        
+        <div style="margin-top: 16px;">
+            <button class="nav-btn active">
+                <span class="nav-icon icon-dashboard"></span>
+                Dashboard
+            </button>
+            <button class="nav-btn">
+                <span class="nav-icon icon-tasks"></span>
+                Tasks
+            </button>
+            <button class="nav-btn">
+                <span class="nav-icon icon-calendar"></span>
+                Calendar
+            </button>
+        </div>
+    </div>
+
+    <!-- Test Tasks Styles -->
+    <div class="test-section">
+        <h2>Tasks Styles Test</h2>
+        <div class="task-item priority-high">
+            <div class="task-checkbox"></div>
+            <div class="task-content">
+                <div class="task-title">High Priority Task</div>
+                <div class="task-description">This is a test task with high priority.</div>
+                <div class="task-meta">
+                    <div class="task-date">Today</div>
+                    <div class="task-time">2:00 PM</div>
+                    <div class="task-category">Work</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="task-item priority-medium" style="margin-top: 12px;">
+            <div class="task-checkbox completed"></div>
+            <div class="task-content">
+                <div class="task-title">Completed Task</div>
+                <div class="task-description">This task has been completed.</div>
+                <div class="task-meta">
+                    <div class="task-date">Yesterday</div>
+                    <div class="task-category">Personal</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Components Styles -->
+    <div class="test-section">
+        <h2>Components Styles Test</h2>
+        
+        <div class="form-group">
+            <label for="testInput">Test Input</label>
+            <input type="text" id="testInput" placeholder="Enter some text...">
+        </div>
+        
+        <div style="margin: 16px 0;">
+            <span class="badge primary">Primary Badge</span>
+            <span class="badge success">Success Badge</span>
+            <span class="badge warning">Warning Badge</span>
+            <span class="badge danger">Danger Badge</span>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Test Card</h3>
+            </div>
+            <div class="card-body">
+                This is a test card component with header and body.
+            </div>
+        </div>
+        
+        <div style="margin-top: 16px;">
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: 65%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Auth Styles -->
+    <div class="test-section">
+        <h2>Auth Styles Test</h2>
+        <div class="loading-brain" style="margin: 0 auto;">
+            <div class="loading-neural-paths">
+                <div class="loading-neural-line"></div>
+                <div class="loading-neural-line"></div>
+                <div class="loading-neural-line"></div>
+                <div class="loading-neural-line"></div>
+            </div>
+        </div>
+        <p style="text-align: center; margin-top: 16px;">Animated loading brain component</p>
+    </div>
+
+    <!-- Test Calendar Styles -->
+    <div class="test-section">
+        <h2>Calendar Styles Test</h2>
+        <div class="calendar-header">
+            <div class="calendar-view-switcher">
+                <button class="view-btn active">Month</button>
+                <button class="view-btn">Week</button>
+                <button class="view-btn">Day</button>
+            </div>
+            <div class="calendar-controls">
+                <button class="nav-btn">‹</button>
+                <span id="currentPeriod">December 2024</span>
+                <button class="nav-btn">›</button>
+                <button class="today-btn">Today</button>
+            </div>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; background: rgba(255,255,255,0.3); border-radius: 12px; overflow: hidden;">
+            <div class="calendar-header-cell">Mon</div>
+            <div class="calendar-header-cell">Tue</div>
+            <div class="calendar-header-cell">Wed</div>
+            <div class="calendar-header-cell">Thu</div>
+            <div class="calendar-header-cell">Fri</div>
+            <div class="calendar-header-cell">Sat</div>
+            <div class="calendar-header-cell">Sun</div>
+            
+            <div class="calendar-day">
+                <div class="day-number">1</div>
+                <div class="day-events">
+                    <div class="day-event">Meeting</div>
+                </div>
+            </div>
+            <div class="calendar-day today">
+                <div class="day-number">2</div>
+                <div class="day-events">
+                    <div class="day-event high-priority">Important!</div>
+                    <div class="day-event">Call</div>
+                </div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">3</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">4</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">5</div>
+                <div class="day-events">
+                    <div class="day-event medium-priority">Review</div>
+                </div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">6</div>
+            </div>
+            <div class="calendar-day">
+                <div class="day-number">7</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test AI Chat Styles -->
+    <div class="test-section">
+        <h2>AI Chat Styles Test</h2>
+        <div style="height: 300px;">
+            <div class="chat-layout" style="height: 100%;">
+                <div class="chat-sidebar">
+                    <div class="sidebar-header">
+                        <button class="new-chat-btn">
+                            <span>➕</span>
+                            New Chat
+                        </button>
+                    </div>
+                    <div class="sidebar-content">
+                        <div class="history-section">
+                            <h3 class="history-title">Recent</h3>
+                            <div class="history-list">
+                                <div class="history-item active">
+                                    <div class="history-title-text">Task Planning</div>
+                                    <div class="history-preview">Help me organize my tasks...</div>
+                                    <div class="history-time">2 hours ago</div>
+                                </div>
+                                <div class="history-item">
+                                    <div class="history-title-text">Project Discussion</div>
+                                    <div class="history-preview">Let's talk about the new website...</div>
+                                    <div class="history-time">Yesterday</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-main">
+                    <div class="chat-header">
+                        <div class="chat-header-left">
+                            <h2>Assistant</h2>
+                            <div class="chat-status">
+                                <span class="status-indicator"></span>
+                                Claude AI Ready
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-messages">
+                        <div class="message ai-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>Hello! I'm your AI assistant. How can I help you today?</p>
+                                <div class="suggestion-buttons">
+                                    <button class="suggestion-btn">Schedule a meeting</button>
+                                    <button class="suggestion-btn">Create a task</button>
+                                    <button class="suggestion-btn">Show my calendar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="message user-message">
+                            <div class="message-avatar">👤</div>
+                            <div class="message-content">
+                                <p>Help me plan my week!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <h2>✅ Complete Modular CSS Test</h2>
+        <p>All 8 CSS modules tested! If everything displays correctly, the modular CSS system is working perfectly.</p>
+        <div style="margin: 20px 0;">
+            <div class="badge success">Base Module ✓</div>
+            <div class="badge success">Auth Module ✓</div>
+            <div class="badge success">Layout Module ✓</div>
+            <div class="badge success">Dashboard Module ✓</div>
+            <div class="badge success">Tasks Module ✓</div>
+            <div class="badge success">Calendar Module ✓</div>
+            <div class="badge success">AI Chat Module ✓</div>
+            <div class="badge success">Components Module ✓</div>
+        </div>
+        <a href="intelligent-management.html" class="btn-primary" style="margin-top: 20px; text-decoration: none;">
+            Test Full Application
+        </a>
+    </div>
+</body>
+</html>

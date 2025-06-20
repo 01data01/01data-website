@@ -7,10 +7,26 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/intelligent-management.css">
+    <!-- Modular CSS Imports -->
+    <link rel="stylesheet" href="css/modules/base.css">
+    <link rel="stylesheet" href="css/modules/auth.css">
+    <link rel="stylesheet" href="css/modules/layout.css">
+    <link rel="stylesheet" href="css/modules/dashboard.css">
+    <link rel="stylesheet" href="css/modules/tasks.css">
+    <link rel="stylesheet" href="css/modules/calendar.css">
+    <link rel="stylesheet" href="css/modules/ai-chat.css">
+    <link rel="stylesheet" href="css/modules/components.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMKY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <meta name="google-signin-client_id" content="336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com">
+    
+    <!-- Modular JavaScript Imports -->
+    <script src="js/modules/core/utils.js"></script>
+    <script src="js/modules/core/auth.js"></script>
+    <script src="js/modules/ai/ai-service.js"></script>
+    <script src="js/modules/features/dashboard.js"></script>
+    <script src="js/modules/features/ai-chat.js"></script>
+    <script src="js/modules/core/main.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -1279,11 +1295,9 @@
             }
         }
 
-        // Call this when the app initializes
-        document.addEventListener('DOMContentLoaded', function() {
-            // Delay initialization to ensure DOM is ready
-            setTimeout(initializeAnimatedDashboard, 1000);
-        });
+        // Legacy initialization - now handled by modular system
+        // The modular JavaScript system will handle initialization
+        console.log('🎯 Modular JavaScript system loaded - legacy scripts disabled');
     </script>
 </body>
 </html>

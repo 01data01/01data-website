@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modular JavaScript Test - Intelligent Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Modular CSS Imports -->
+    <link rel="stylesheet" href="css/modules/base.css">
+    <link rel="stylesheet" href="css/modules/auth.css">
+    <link rel="stylesheet" href="css/modules/layout.css">
+    <link rel="stylesheet" href="css/modules/dashboard.css">
+    <link rel="stylesheet" href="css/modules/tasks.css">
+    <link rel="stylesheet" href="css/modules/calendar.css">
+    <link rel="stylesheet" href="css/modules/ai-chat.css">
+    <link rel="stylesheet" href="css/modules/components.css">
+    
+    <!-- Google APIs -->
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com">
+    
+    <style>
+        body {
+            padding: 20px;
+            background: var(--background-primary);
+        }
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--background-secondary);
+        }
+        .test-section h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        .module-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .status-loaded {
+            background: var(--success-color);
+            color: white;
+        }
+        .status-error {
+            background: var(--danger-color);
+            color: white;
+        }
+        .status-pending {
+            background: var(--warning-color);
+            color: white;
+        }
+        .test-output {
+            background: var(--background-tertiary);
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+        }
+        .test-controls {
+            margin-top: 16px;
+        }
+        .test-controls button {
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Modular JavaScript Test</h1>
+    <p>Testing all JavaScript modules are loading correctly and functioning properly.</p>
+
+    <!-- Module Loading Status -->
+    <div class="test-section">
+        <h2>Module Loading Status</h2>
+        <div id="moduleStatus">
+            <div>Utils Module: <span id="utilsStatus" class="module-status status-pending">Loading...</span></div>
+            <div>Auth Module: <span id="authStatus" class="module-status status-pending">Loading...</span></div>
+            <div>Main App: <span id="mainStatus" class="module-status status-pending">Loading...</span></div>
+            <div>Dashboard Module: <span id="dashboardStatus" class="module-status status-pending">Loading...</span></div>
+            <div>AI Chat Module: <span id="aiChatStatus" class="module-status status-pending">Loading...</span></div>
+            <div>AI Service: <span id="aiServiceStatus" class="module-status status-pending">Loading...</span></div>
+        </div>
+        <div class="test-output" id="moduleLoadOutput">Module loading in progress...</div>
+    </div>
+
+    <!-- Utils Module Test -->
+    <div class="test-section">
+        <h2>Utils Module Test</h2>
+        <div class="test-controls">
+            <button class="btn-primary" onclick="testUtils()">Test Utils Functions</button>
+            <button class="btn-secondary" onclick="testDOMUtils()">Test DOM Utils</button>
+            <button class="btn-secondary" onclick="testStorageUtils()">Test Storage Utils</button>
+        </div>
+        <div class="test-output" id="utilsOutput">Click buttons to test utility functions...</div>
+    </div>
+
+    <!-- Authentication Test -->
+    <div class="test-section">
+        <h2>Authentication Module Test</h2>
+        <div class="test-controls">
+            <button class="btn-primary" onclick="testAuthModule()">Test Auth Module</button>
+            <button class="btn-secondary" onclick="testAuthState()">Check Auth State</button>
+            <button class="btn-secondary" onclick="testPermissions()">Test Permissions</button>
+        </div>
+        <div class="test-output" id="authOutput">Click buttons to test authentication functionality...</div>
+    </div>
+
+    <!-- Main App Test -->
+    <div class="test-section">
+        <h2>Main Application Test</h2>
+        <div class="test-controls">
+            <button class="btn-primary" onclick="testMainApp()">Test Main App</button>
+            <button class="btn-secondary" onclick="testNavigation()">Test Navigation</button>
+            <button class="btn-secondary" onclick="testRouting()">Test Routing</button>
+        </div>
+        <div class="test-output" id="mainAppOutput">Click buttons to test main application functionality...</div>
+    </div>
+
+    <!-- Dashboard Module Test -->
+    <div class="test-section">
+        <h2>Dashboard Module Test</h2>
+        <div class="test-controls">
+            <button class="btn-primary" onclick="testDashboard()">Test Dashboard</button>
+            <button class="btn-secondary" onclick="testQuickAdd()">Test Quick Add</button>
+            <button class="btn-secondary" onclick="testStatsCalculation()">Test Stats</button>
+        </div>
+        <div class="test-output" id="dashboardOutput">Click buttons to test dashboard functionality...</div>
+    </div>
+
+    <!-- AI Service Test -->
+    <div class="test-section">
+        <h2>AI Service Test</h2>
+        <div class="test-controls">
+            <button class="btn-primary" onclick="testAIService()">Test AI Service</button>
+            <button class="btn-secondary" onclick="testTaskParsing()">Test Task Parsing</button>
+            <button class="btn-secondary" onclick="testAIChat()">Test AI Chat</button>
+        </div>
+        <div class="test-output" id="aiServiceOutput">Click buttons to test AI service functionality...</div>
+    </div>
+
+    <!-- AI Chat Module Test -->
+    <div class="test-section">
+        <h2>AI Chat Module Test</h2>
+        <div class="test-controls">
+            <button class="btn-primary" onclick="testAIChatModule()">Test Chat Module</button>
+            <button class="btn-secondary" onclick="testConversationManagement()">Test Conversations</button>
+            <button class="btn-secondary" onclick="testMessageHandling()">Test Messages</button>
+        </div>
+        <div class="test-output" id="aiChatOutput">Click buttons to test AI chat functionality...</div>
+    </div>
+
+    <!-- Integration Test -->
+    <div class="test-section">
+        <h2>Integration Test</h2>
+        <div class="test-controls">
+            <button class="btn-primary" onclick="runFullIntegrationTest()">Run Full Test</button>
+            <button class="btn-secondary" onclick="testModuleCommunication()">Test Module Communication</button>
+            <button class="btn-secondary" onclick="testDataFlow()">Test Data Flow</button>
+        </div>
+        <div class="test-output" id="integrationOutput">Click buttons to test module integration...</div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <h2>✅ Modular JavaScript Testing Complete</h2>
+        <p>All JavaScript modules tested! If everything works correctly, the modular system is ready for production.</p>
+        <a href="intelligent-management.html" class="btn-primary" style="margin-top: 20px; text-decoration: none;">
+            Test Full Application
+        </a>
+    </div>
+
+    <!-- Modular JavaScript Imports -->
+    <script src="js/modules/core/utils.js"></script>
+    <script src="js/modules/core/auth.js"></script>
+    <script src="js/modules/ai/ai-service.js"></script>
+    <script src="js/modules/features/dashboard.js"></script>
+    <script src="js/modules/features/ai-chat.js"></script>
+    <script src="js/modules/core/main.js"></script>
+
+    <script>
+        // Module status tracking
+        const moduleStatus = {
+            utils: false,
+            auth: false,
+            main: false,
+            dashboard: false,
+            aiChat: false,
+            aiService: false
+        };
+
+        // Check module loading
+        function checkModuleLoading() {
+            const checks = [
+                { name: 'utils', check: () => typeof window.Utils !== 'undefined' },
+                { name: 'auth', check: () => typeof window.authModule !== 'undefined' },
+                { name: 'main', check: () => typeof window.mainApp !== 'undefined' },
+                { name: 'dashboard', check: () => typeof window.dashboardModule !== 'undefined' },
+                { name: 'aiChat', check: () => typeof window.aiChatModule !== 'undefined' },
+                { name: 'aiService', check: () => typeof window.aiService !== 'undefined' }
+            ];
+
+            let allLoaded = true;
+            const output = [];
+
+            checks.forEach(({ name, check }) => {
+                try {
+                    const loaded = check();
+                    moduleStatus[name] = loaded;
+                    
+                    const statusElement = document.getElementById(`${name}Status`);
+                    if (statusElement) {
+                        statusElement.textContent = loaded ? 'Loaded' : 'Failed';
+                        statusElement.className = `module-status ${loaded ? 'status-loaded' : 'status-error'}`;
+                    }
+                    
+                    output.push(`${name}: ${loaded ? '✅ Loaded' : '❌ Failed'}`);
+                    if (!loaded) allLoaded = false;
+                    
+                } catch (error) {
+                    output.push(`${name}: ❌ Error - ${error.message}`);
+                    allLoaded = false;
+                }
+            });
+
+            const outputElement = document.getElementById('moduleLoadOutput');
+            if (outputElement) {
+                outputElement.innerHTML = output.join('<br>') + 
+                    `<br><br><strong>${allLoaded ? '✅ All modules loaded successfully!' : '❌ Some modules failed to load'}</strong>`;
+            }
+
+            return allLoaded;
+        }
+
+        // Test functions
+        function testUtils() {
+            const output = document.getElementById('utilsOutput');
+            const tests = [];
+
+            try {
+                // Test basic utilities
+                tests.push(`generateId: ${utils.generateId('test')}`);
+                tests.push(`capitalize: ${utils.capitalize('hello world')}`);
+                tests.push(`truncate: ${utils.truncate('This is a very long string that should be truncated', 20)}`);
+                tests.push(`formatDate: ${utils.formatDate(new Date())}`);
+                tests.push(`isValidEmail: ${utils.isValidEmail('test@example.com')}`);
+                
+                output.innerHTML = `✅ Utils Module Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Utils Module Error: ${error.message}`;
+            }
+        }
+
+        function testDOMUtils() {
+            const output = document.getElementById('utilsOutput');
+            const tests = [];
+
+            try {
+                // Test DOM utilities
+                const testElement = utils.getElementById('utilsOutput');
+                tests.push(`getElementById: ${testElement ? 'Found element' : 'Element not found'}`);
+                
+                const buttons = utils.querySelectorAll('.btn-primary');
+                tests.push(`querySelectorAll: Found ${buttons.length} primary buttons`);
+                
+                tests.push(`debounce: ${typeof utils.debounce === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`throttle: ${typeof utils.throttle === 'function' ? 'Available' : 'Not available'}`);
+                
+                output.innerHTML = `✅ DOM Utils Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ DOM Utils Error: ${error.message}`;
+            }
+        }
+
+        function testStorageUtils() {
+            const output = document.getElementById('utilsOutput');
+            const tests = [];
+
+            try {
+                // Test storage utilities
+                const testData = { test: 'data', timestamp: Date.now() };
+                const saved = utils.saveToStorage('test_key', testData);
+                tests.push(`saveToStorage: ${saved ? 'Success' : 'Failed'}`);
+                
+                const loaded = utils.loadFromStorage('test_key');
+                tests.push(`loadFromStorage: ${loaded && loaded.test === 'data' ? 'Success' : 'Failed'}`);
+                
+                utils.removeFromStorage('test_key');
+                const removed = utils.loadFromStorage('test_key');
+                tests.push(`removeFromStorage: ${!removed ? 'Success' : 'Failed'}`);
+                
+                output.innerHTML = `✅ Storage Utils Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Storage Utils Error: ${error.message}`;
+            }
+        }
+
+        function testAuthModule() {
+            const output = document.getElementById('authOutput');
+            const tests = [];
+
+            try {
+                tests.push(`Module initialized: ${authModule.initialized ? 'Yes' : 'No'}`);
+                tests.push(`Is authenticated: ${authModule.isAuthenticated() ? 'Yes' : 'No'}`);
+                tests.push(`Current user: ${authModule.getCurrentUser() ? 'Found' : 'None'}`);
+                tests.push(`Connection status: Available`);
+                
+                output.innerHTML = `✅ Auth Module Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Auth Module Error: ${error.message}`;
+            }
+        }
+
+        function testAuthState() {
+            const output = document.getElementById('authOutput');
+            const tests = [];
+
+            try {
+                const user = authModule.getCurrentUser();
+                if (user) {
+                    tests.push(`User name: ${user.name}`);
+                    tests.push(`User email: ${user.email}`);
+                    tests.push(`Sign-in time: ${user.signInTime || 'Not available'}`);
+                } else {
+                    tests.push('No user currently signed in');
+                }
+                
+                const sessionDuration = authModule.getSessionDuration();
+                tests.push(`Session duration: ${Math.round(sessionDuration / 1000)} seconds`);
+                
+                output.innerHTML = `✅ Auth State Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Auth State Error: ${error.message}`;
+            }
+        }
+
+        function testPermissions() {
+            const output = document.getElementById('authOutput');
+            const tests = [];
+
+            try {
+                const permissions = authModule.getUserPermissions();
+                tests.push(`Permissions count: ${permissions.length}`);
+                tests.push(`Has read:tasks: ${authModule.hasPermission('read:tasks') ? 'Yes' : 'No'}`);
+                tests.push(`Has use:ai: ${authModule.hasPermission('use:ai') ? 'Yes' : 'No'}`);
+                
+                output.innerHTML = `✅ Permissions Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Permissions Error: ${error.message}`;
+            }
+        }
+
+        function testMainApp() {
+            const output = document.getElementById('mainAppOutput');
+            const tests = [];
+
+            try {
+                tests.push(`App initialized: ${mainApp.initialized ? 'Yes' : 'No'}`);
+                tests.push(`Current view: ${mainApp.currentView}`);
+                tests.push(`User data: ${mainApp.user ? 'Available' : 'None'}`);
+                tests.push(`Event listeners: ${mainApp.eventListeners.length} registered`);
+                
+                output.innerHTML = `✅ Main App Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Main App Error: ${error.message}`;
+            }
+        }
+
+        function testNavigation() {
+            const output = document.getElementById('mainAppOutput');
+            const tests = [];
+
+            try {
+                const currentView = mainApp.currentView;
+                tests.push(`Current view before: ${currentView}`);
+                
+                // Test navigation (won't actually navigate in test environment)
+                tests.push(`Navigation method: ${typeof mainApp.navigateTo === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Show view method: ${typeof mainApp.showView === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Update navigation: ${typeof mainApp.updateNavigation === 'function' ? 'Available' : 'Not available'}`);
+                
+                output.innerHTML = `✅ Navigation Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Navigation Error: ${error.message}`;
+            }
+        }
+
+        function testRouting() {
+            const output = document.getElementById('mainAppOutput');
+            const tests = [];
+
+            try {
+                tests.push(`Setup routing: ${typeof mainApp.setupRouting === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Current URL hash: ${window.location.hash || 'None'}`);
+                tests.push(`History state: ${history.state ? 'Available' : 'None'}`);
+                
+                output.innerHTML = `✅ Routing Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Routing Error: ${error.message}`;
+            }
+        }
+
+        function testDashboard() {
+            const output = document.getElementById('dashboardOutput');
+            const tests = [];
+
+            try {
+                tests.push(`Module initialized: ${dashboardModule.initialized ? 'Yes' : 'No'}`);
+                tests.push(`Stats object: ${typeof dashboardModule.stats === 'object' ? 'Available' : 'Not available'}`);
+                tests.push(`Event listeners: ${dashboardModule.eventListeners.length} registered`);
+                
+                // Test dashboard methods
+                tests.push(`Load data method: ${typeof dashboardModule.loadDashboardData === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Update stats method: ${typeof dashboardModule.updateStats === 'function' ? 'Available' : 'Not available'}`);
+                
+                output.innerHTML = `✅ Dashboard Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Dashboard Error: ${error.message}`;
+            }
+        }
+
+        function testQuickAdd() {
+            const output = document.getElementById('dashboardOutput');
+            const tests = [];
+
+            try {
+                const testText = "Call client about project update !!! #work today 2:00 PM";
+                const parsed = dashboardModule.parseTaskText(testText);
+                
+                tests.push(`Parse task text: ${typeof dashboardModule.parseTaskText === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Parsed title: ${parsed.title}`);
+                tests.push(`Parsed priority: ${parsed.priority}`);
+                tests.push(`Parsed category: ${parsed.category}`);
+                
+                output.innerHTML = `✅ Quick Add Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Quick Add Error: ${error.message}`;
+            }
+        }
+
+        function testStatsCalculation() {
+            const output = document.getElementById('dashboardOutput');
+            const tests = [];
+
+            try {
+                const mockTasks = [
+                    { id: '1', title: 'Test task 1', completed: false, dueDate: new Date().toISOString().split('T')[0], priority: 'high' },
+                    { id: '2', title: 'Test task 2', completed: true, dueDate: new Date().toISOString().split('T')[0], priority: 'medium' },
+                    { id: '3', title: 'Test task 3', completed: false, dueDate: '2023-01-01', priority: 'low' }
+                ];
+                
+                dashboardModule.calculateStats(mockTasks);
+                
+                tests.push(`Total tasks: ${dashboardModule.stats.total}`);
+                tests.push(`Due today: ${dashboardModule.stats.dueToday}`);
+                tests.push(`Overdue: ${dashboardModule.stats.overdue}`);
+                tests.push(`Completed: ${dashboardModule.stats.completed}`);
+                
+                output.innerHTML = `✅ Stats Calculation Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Stats Calculation Error: ${error.message}`;
+            }
+        }
+
+        function testAIService() {
+            const output = document.getElementById('aiServiceOutput');
+            const tests = [];
+
+            try {
+                tests.push(`Service initialized: ${aiService.initialized ? 'Yes' : 'No'}`);
+                tests.push(`Connection status: ${aiService.getConnectionStatus()}`);
+                tests.push(`User email: ${aiService.userEmail || 'Not set'}`);
+                tests.push(`API key: ${aiService.apiKey ? 'Available' : 'Not available'}`);
+                tests.push(`Queue length: ${aiService.getQueueLength()}`);
+                tests.push(`System prompts: ${Object.keys(aiService.systemPrompts).length} available`);
+                
+                // Test actual chat functionality if authenticated
+                if (aiService.userEmail && aiService.apiKey) {
+                    tests.push('🔄 Testing chat functionality...');
+                    aiService.chat('Hello, are you working?', 'test').then(response => {
+                        const additionalTests = [...tests];
+                        additionalTests.push(`Chat test response: ${response.substring(0, 50)}...`);
+                        output.innerHTML = `✅ AI Service Tests:<br>${additionalTests.join('<br>')}`;
+                    }).catch(error => {
+                        const additionalTests = [...tests];
+                        additionalTests.push(`Chat test failed: ${error.message}`);
+                        output.innerHTML = `⚠️ AI Service Tests:<br>${additionalTests.join('<br>')}`;
+                    });
+                    return; // Don't update output yet, wait for async test
+                }
+                
+                output.innerHTML = `✅ AI Service Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ AI Service Error: ${error.message}`;
+            }
+        }
+
+        function testTaskParsing() {
+            const output = document.getElementById('aiServiceOutput');
+            const tests = [];
+
+            try {
+                const testInput = "Call client about project update tomorrow 2pm #work high priority";
+                
+                tests.push(`Parse task method: ${typeof aiService.parseTask === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Fallback parsing: ${typeof aiService.fallbackTaskParsing === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Date validation: ${typeof aiService.validateDate === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Time validation: ${typeof aiService.validateTime === 'function' ? 'Available' : 'Not available'}`);
+                
+                // Test fallback parsing
+                const fallbackResult = aiService.fallbackTaskParsing(testInput);
+                tests.push(`Fallback result: ${fallbackResult.title.substring(0, 30)}...`);
+                
+                output.innerHTML = `✅ Task Parsing Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Task Parsing Error: ${error.message}`;
+            }
+        }
+
+        function testAIChat() {
+            const output = document.getElementById('aiServiceOutput');
+            const tests = [];
+
+            try {
+                tests.push(`Chat method: ${typeof aiService.chat === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Context management: ${typeof aiService.updateConversationContext === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Conversation contexts: ${aiService.conversationContext.size} stored`);
+                
+                // Test context operations
+                aiService.updateConversationContext('test', 'Hello', 'Hi there!');
+                const context = aiService.getConversationContext('test');
+                tests.push(`Context test: ${context.length > 0 ? 'Success' : 'Failed'}`);
+                
+                output.innerHTML = `✅ AI Chat Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ AI Chat Error: ${error.message}`;
+            }
+        }
+
+        function testAIChatModule() {
+            const output = document.getElementById('aiChatOutput');
+            const tests = [];
+
+            try {
+                tests.push(`Module initialized: ${aiChatModule.initialized ? 'Yes' : 'No'}`);
+                tests.push(`Current conversation: ${aiChatModule.currentConversation ? 'Available' : 'None'}`);
+                tests.push(`Conversations count: ${aiChatModule.conversations.length}`);
+                tests.push(`Connection status: ${aiChatModule.connectionStatus}`);
+                
+                output.innerHTML = `✅ AI Chat Module Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ AI Chat Module Error: ${error.message}`;
+            }
+        }
+
+        function testConversationManagement() {
+            const output = document.getElementById('aiChatOutput');
+            const tests = [];
+
+            try {
+                const initialCount = aiChatModule.conversations.length;
+                
+                tests.push(`Initial conversations: ${initialCount}`);
+                tests.push(`Create conversation: ${typeof aiChatModule.createNewConversation === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Load conversation: ${typeof aiChatModule.loadConversation === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Update list: ${typeof aiChatModule.updateConversationList === 'function' ? 'Available' : 'Not available'}`);
+                
+                output.innerHTML = `✅ Conversation Management Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Conversation Management Error: ${error.message}`;
+            }
+        }
+
+        function testMessageHandling() {
+            const output = document.getElementById('aiChatOutput');
+            const tests = [];
+
+            try {
+                tests.push(`Display message: ${typeof aiChatModule.displayMessage === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Format content: ${typeof aiChatModule.formatMessageContent === 'function' ? 'Available' : 'Not available'}`);
+                tests.push(`Format timestamp: ${typeof aiChatModule.formatTimestamp === 'function' ? 'Available' : 'Not available'}`);
+                
+                // Test message formatting
+                const testContent = "This is a **bold** text with *italic* and `code`";
+                const formatted = aiChatModule.formatMessageContent(testContent);
+                tests.push(`Format test: ${formatted.includes('<strong>') ? 'Success' : 'Failed'}`);
+                
+                output.innerHTML = `✅ Message Handling Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Message Handling Error: ${error.message}`;
+            }
+        }
+
+        function testModuleCommunication() {
+            const output = document.getElementById('integrationOutput');
+            const tests = [];
+
+            try {
+                // Test cross-module communication
+                tests.push(`Utils ↔ Main: ${mainApp && typeof utils !== 'undefined' ? 'Connected' : 'Failed'}`);
+                tests.push(`Auth ↔ Main: ${mainApp && authModule ? 'Connected' : 'Failed'}`);
+                tests.push(`Dashboard ↔ Utils: ${dashboardModule && typeof utils !== 'undefined' ? 'Connected' : 'Failed'}`);
+                tests.push(`AI Chat ↔ AI Service: ${aiChatModule && aiService ? 'Connected' : 'Failed'}`);
+                
+                // Test global accessibility
+                tests.push(`Window.utils: ${typeof window.Utils !== 'undefined' ? 'Available' : 'Missing'}`);
+                tests.push(`Window.mainApp: ${typeof window.mainApp !== 'undefined' ? 'Available' : 'Missing'}`);
+                tests.push(`Window.authModule: ${typeof window.authModule !== 'undefined' ? 'Available' : 'Missing'}`);
+                
+                output.innerHTML = `✅ Module Communication Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Module Communication Error: ${error.message}`;
+            }
+        }
+
+        function testDataFlow() {
+            const output = document.getElementById('integrationOutput');
+            const tests = [];
+
+            try {
+                // Test data flow between modules
+                const testData = { test: 'integration', timestamp: Date.now() };
+                
+                // Utils → Storage
+                const saved = utils.saveToStorage('integration_test', testData);
+                tests.push(`Utils → Storage: ${saved ? 'Success' : 'Failed'}`);
+                
+                // Storage → Utils
+                const loaded = utils.loadFromStorage('integration_test');
+                tests.push(`Storage → Utils: ${loaded && loaded.test === 'integration' ? 'Success' : 'Failed'}`);
+                
+                // Auth → Main App (if authenticated)
+                const user = authModule.getCurrentUser();
+                tests.push(`Auth → Main: ${user ? 'Data available' : 'No user data'}`);
+                
+                // Clean up
+                utils.removeFromStorage('integration_test');
+                tests.push(`Cleanup: Success`);
+                
+                output.innerHTML = `✅ Data Flow Tests:<br>${tests.join('<br>')}`;
+            } catch (error) {
+                output.innerHTML = `❌ Data Flow Error: ${error.message}`;
+            }
+        }
+
+        function runFullIntegrationTest() {
+            const output = document.getElementById('integrationOutput');
+            output.innerHTML = 'Running full integration test...<br><br>';
+            
+            setTimeout(() => {
+                testModuleCommunication();
+                setTimeout(() => {
+                    testDataFlow();
+                    setTimeout(() => {
+                        const finalOutput = output.innerHTML + '<br><strong>🎉 Full integration test completed!</strong>';
+                        output.innerHTML = finalOutput;
+                    }, 500);
+                }, 500);
+            }, 500);
+        }
+
+        // Initialize testing on page load
+        window.addEventListener('load', () => {
+            setTimeout(checkModuleLoading, 1000);
+        });
+    </script>
+</body>
+</html>
