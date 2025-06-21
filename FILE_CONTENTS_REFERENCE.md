@@ -7,15 +7,16 @@
 **Key Sections**:
 - **Lines 1-33**: HTML head, CSS/JS imports, Google Sign-in setup
 - **Lines 35-71**: Loading screen with animated brain icon
-- **Lines 73-130**: Google Sign-in screen interface
-- **Lines 132-279**: Main application structure:
+- **Lines 73-82**: Google Sign-in screen interface with demo mode option
+- **Lines 72-80**: Demo mode bypass button for development/testing
+- **Lines 134-279**: Main application structure:
   - **Lines 76-130**: Header with navigation and user info
-  - **Lines 135-145**: Dashboard view container
+  - **Lines 135-145**: Dashboard view container (includes animated stats icons)
   - **Lines 147-162**: Tasks view with filters and task list
   - **Lines 164-183**: Calendar view with controls
   - **Lines 185-194**: Projects view container
   - **Lines 196-278**: AI Chat interface (sidebar + main chat area)
-- **Lines 282-329**: Script initialization and Google Sign-in handlers
+- **Lines 322-346**: Script initialization, Google Sign-in handlers, and demo mode function
 
 ### `index.html` (Landing Page)
 **Purpose**: Main website landing page with navigation to intelligent management
@@ -49,15 +50,25 @@
 - Google Sign-in button styling
 - Error message styling
 - Authentication form elements
+- **Lines 387-407**: Demo mode button styling with glass-morphism effects
 
 ### `css/modules/dashboard.css`
-**Purpose**: Dashboard-specific styling
+**Purpose**: Dashboard-specific styling with animated dashboard icons
 **Contains**:
 - Dashboard grid layout
 - Stats containers and cards
 - Quick add task form
 - Chart and graph styling
 - Dashboard-specific animations
+- **Lines 792-1107**: Animated dashboard icons system:
+  - Glass-morphism card designs with gradient borders
+  - Animated clock icon (rotating hands for Due Today)
+  - Animated warning icon (pulsing diamond for Overdue)
+  - Animated checkmark icon (drawing effect for Completed)
+  - Animated bar chart icon (pulsing bars for Completion Rate)
+  - Orbiting particle effects around each icon
+  - Gradient icon circles with glowing rings
+  - Value update animations with scaling and color effects
 
 ### `css/modules/tasks.css`
 **Purpose**: Tasks module styling
@@ -104,15 +115,21 @@
 ## JavaScript Files
 
 ### `js/modules/core/main.js`
-**Purpose**: Main application controller and initialization
+**Purpose**: Main application controller and initialization with enhanced authentication
 **Key Functions**:
 - **Lines 34-71**: Application initialization
-- **Lines 109-171**: Authentication system
-- **Lines 285-301**: Show/hide application screens
-- **Lines 399-434**: View routing and navigation
+- **Lines 111-214**: Enhanced authentication system with:
+  - Google API timeout handling (3-second max wait)
+  - Demo mode bypass option for development
+  - Better error handling for authentication failures
+  - URL parameter user data processing
+  - localStorage user session management
+- **Lines 314-316**: hideLoadingScreen() method to prevent infinite loading
+- **Lines 320-339**: showApp() method with user info updates
+- **Lines 377-414**: Event listeners setup
+- **Lines 418-435**: View routing and navigation
 - **Lines 454-522**: Module initialization for each view
 - **Lines 589-609**: Notification system
-- **Lines 658-661**: Auth module compatibility layer
 
 ### `js/modules/core/utils.js`
 **Purpose**: Shared utility functions across all modules
@@ -130,13 +147,19 @@
 **Contains**: User authentication, session management, Google Sign-in integration
 
 ### `js/modules/features/dashboard.js`
-**Purpose**: Dashboard functionality and data visualization
+**Purpose**: Dashboard functionality with animated dashboard icons
 **Key Features**:
-- Dashboard initialization and setup
-- Stats calculation and display
-- Quick task creation
-- Data visualization
-- Dashboard widgets management
+- **Lines 28-34**: Dashboard initialization with animated icons integration
+- **Lines 46-127**: Enhanced stats cards HTML generation with animated icon structure
+- **Lines 190-221**: Animated icons initialization and particle creation system
+- **Lines 448-508**: Enhanced stats updating with animated value transitions
+- **Lines 477-508**: animateNumber() method with visual update effects
+- **Lines 526-572**: updateUrgencyIndicators() with dynamic animation speeds
+- **Lines 1003-1014**: animateStatsCards() with staggered entrance animations
+- Stats calculation and display with real-time data
+- Quick task creation with AI enhancement
+- Sample task generation for testing
+- Particle animation management for orbiting effects around icons
 
 ### `js/modules/features/tasks.js`
 **Purpose**: Task management functionality
@@ -283,6 +306,38 @@
 **Purpose**: AI debugging interface
 **Contains**: Debug console for AI chat functionality
 
+## Standalone Components
+
+### `css/animated-dashboard-icons.css`
+**Purpose**: Standalone animated dashboard icons stylesheet
+**Contains**: 
+- Complete CSS for animated dashboard icons system
+- Glass-morphism card designs and animations
+- All 4 animated icon types (clock, warning, checkmark, chart)
+- Particle orbit animations and glowing ring effects
+- Responsive design and keyframe animations
+- Can be used independently in other projects
+
+### `js/animated-dashboard-icons.js`
+**Purpose**: Standalone animated dashboard icons JavaScript class
+**Contains**:
+- AnimatedDashboardIcons class for easy integration
+- Particle creation and management
+- Value update animations
+- Click handler support
+- Customizable card configurations
+- Auto-initialization capabilities
+- Module export support
+
+### `animated-dashboard-example.html`
+**Purpose**: Standalone example page for animated dashboard icons
+**Contains**:
+- Complete working example of animated dashboard icons
+- Custom dashboard configuration examples
+- Interactive demo controls
+- Responsive showcase
+- Integration guide and usage examples
+
 ## Static Pages
 
 ### `cookie-policy.html`
@@ -304,10 +359,22 @@
 - AI chat depends on `ai-service.js`
 - All modules are initialized by `main.js`
 - All views share `base.css` and `components.css`
+- Dashboard module integrates animated icons CSS and JavaScript
+- Authentication system supports both Google Sign-In and demo mode
+- Animated dashboard icons can work independently or integrated
 
 ### Data Flow:
-1. `main.js` → initializes all modules
+1. `main.js` → initializes all modules with enhanced authentication
 2. Feature modules → use `utils.js` for common operations
 3. AI modules → communicate through `ai-service.js`
 4. Backend functions → handle API communication
 5. Data files → store persistent information
+6. Dashboard → creates animated icons → displays real-time stats with animations
+7. Authentication → supports URL parameters, localStorage, Google API, and demo mode
+
+### Recent Enhancements (Latest Update):
+- **Animated Dashboard Icons**: Professional glass-morphism cards with 4 animated icon types
+- **Enhanced Authentication**: Added demo mode, timeout handling, and better error management
+- **Standalone Components**: Created reusable animated dashboard icons for other projects
+- **Loading Screen Fix**: Prevented infinite loading with proper timeout handling
+- **Development Mode**: Added demo mode bypass for easier testing and development

@@ -67,6 +67,16 @@
             </div>
             <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
             <div id="signInError" class="sign-in-error" style="display: none;"></div>
+            
+            <!-- Demo Mode Button for Development -->
+            <div style="margin-top: 20px; text-align: center;">
+                <button onclick="enableDemoMode()" class="btn-secondary" style="font-size: 0.9rem; padding: 8px 16px;">
+                    🚀 Demo Mode (Skip Sign-In)
+                </button>
+                <p style="font-size: 0.8rem; color: #666; margin-top: 8px;">
+                    For testing purposes - bypasses Google Sign-In
+                </p>
+            </div>
         </div>
     </div>
 
@@ -309,6 +319,13 @@
             }
         }
         
+        // Demo mode function
+        function enableDemoMode() {
+            localStorage.setItem('useDemoMode', 'true');
+            console.log('Demo mode enabled, reloading...');
+            window.location.reload();
+        }
+
         // Initialize the modular system when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Initializing modular JavaScript system...');
