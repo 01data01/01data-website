@@ -46,9 +46,6 @@ class MainApp {
             // Initialize authentication
             await this.initializeAuth();
             
-            // Initialize animated icons
-            this.initializeAnimatedIcons();
-            
             // Set up routing
             this.setupRouting();
             
@@ -629,53 +626,6 @@ class MainApp {
      */
     isAuthenticated() {
         return this.user && this.user.signedIn;
-    }
-
-    /**
-     * Initialize animated icons
-     */
-    initializeAnimatedIcons() {
-        // Create supernova dots for AI assistant icon
-        this.createSupernovaDots();
-        
-        // Recreate dots every 8 seconds to match the animation cycle
-        setInterval(() => {
-            this.createSupernovaDots();
-        }, 8000);
-    }
-
-    /**
-     * Create supernova dots for AI assistant icon
-     */
-    createSupernovaDots() {
-        const supernovaCore = document.querySelector('.supernova-core');
-        if (supernovaCore) {
-            // Clear any existing dots
-            const existingDots = supernovaCore.querySelectorAll('.supernova-dot');
-            existingDots.forEach(dot => dot.remove());
-            
-            // Create 20 dots (smaller number for performance)
-            for (let i = 0; i < 20; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'supernova-dot';
-                
-                // Calculate random explosion direction
-                const angle = (Math.PI * 2 * i) / 20 + (Math.random() - 0.5) * 0.5;
-                const distance = 8 + Math.random() * 12; // Random distance between 8-20px
-                
-                const explodeX = Math.cos(angle) * distance;
-                const explodeY = Math.sin(angle) * distance;
-                
-                // Set CSS custom properties for explosion direction
-                dot.style.setProperty('--explode-x', `${explodeX}px`);
-                dot.style.setProperty('--explode-y', `${explodeY}px`);
-                
-                // Add slight delay variation for more organic explosion
-                dot.style.animationDelay = `${Math.random() * 0.3}s`;
-                
-                supernovaCore.appendChild(dot);
-            }
-        }
     }
 }
 
