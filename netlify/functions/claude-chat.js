@@ -74,17 +74,11 @@ exports.handler = async (event, context) => {
 
     // Handle streaming response
     if (stream) {
-      const streamHeaders = {
-        ...headers,
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive'
-      };
-
-      // Create a readable stream to pass through the Claude response
+      // For Netlify Functions, we'll collect the full response and send it back
+      // The client will simulate streaming
       const reader = claudeResponse.body.getReader();
       const decoder = new TextDecoder();
-      let streamedData = '';
+      let fullContent = '';
 
       try {
         while (true) {
@@ -92,7 +86,26 @@ exports.handler = async (event, context) => {
           if (done) break;
           
           const chunk = decoder.decode(value, { stream: true });
-          streamedData += chunk;
+          const lines = chunk.split('\n');
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                
+                if (data.type === 'content_block_delta' && data.delta && data.delta.type === 'text_delta') {
+                  fullContent += data.delta.text;
+                } else if (data.type === 'message_stop') {
+                  break;
+                } else if (data.type === 'error') {
+                  throw new Error(data.error.message || 'Streaming error');
+                }
+              } catch (parseError) {
+                // Skip invalid JSON lines
+                continue;
+              }
+            }
+          }
         }
       } catch (streamError) {
         console.error('Streaming error:', streamError);
@@ -103,11 +116,26 @@ exports.handler = async (event, context) => {
         };
       }
 
+      // Calculate approximate cost (rough estimate)
+      const inputTokens = message.length / 4;
+      const outputTokens = fullContent.length / 4;
+      const estimatedCost = (inputTokens * 0.003 + outputTokens * 0.015) / 1000;
+
+      // Update user usage
+      await updateUsage(userEmail, message, fullContent, estimatedCost);
+
       return {
         statusCode: 200,
-        headers: streamHeaders,
-        body: streamedData,
-        isBase64Encoded: false
+        headers,
+        body: JSON.stringify({
+          response: fullContent,
+          isStreaming: true,
+          usage: {
+            inputTokens: Math.round(inputTokens),
+            outputTokens: Math.round(outputTokens),
+            estimatedCost: Math.round(estimatedCost * 1000) / 1000
+          }
+        })
       };
     }
 
