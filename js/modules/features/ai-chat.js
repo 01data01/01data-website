@@ -243,11 +243,13 @@ class AIChatModule {
         if (window.aiService && window.aiService.initialized) {
             try {
                 console.log('Using AI service with streaming');
+                console.log('AI service connection status:', window.aiService.connectionStatus);
                 
                 // Create a streaming message element
                 const streamingMessage = this.createStreamingMessage();
                 
                 await window.aiService.chatStream(message, 'default', (chunk, fullContent) => {
+                    console.log('Received chunk:', chunk);
                     this.updateStreamingMessage(streamingMessage, chunk, fullContent);
                 });
                 
@@ -271,12 +273,15 @@ class AIChatModule {
             
             const fullResponse = `I received your message: "${message}". I'm here to help with your productivity and task management! I can assist you with organizing tasks, scheduling meetings, creating projects, and providing intelligent insights about your workflow.`;
             
-            // Simulate streaming by adding text character by character
+            // Simulate streaming by adding text word by word for better effect
             let currentText = '';
-            for (let i = 0; i < fullResponse.length; i++) {
-                currentText += fullResponse[i];
-                this.updateStreamingMessage(streamingMessage, fullResponse[i], currentText);
-                await new Promise(resolve => setTimeout(resolve, 20)); // Simulate typing delay
+            const words = fullResponse.split(' ');
+            
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i] + (i < words.length - 1 ? ' ' : '');
+                currentText += word;
+                this.updateStreamingMessage(streamingMessage, word, currentText);
+                await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50)); // Realistic typing delay
             }
             
             // Finish streaming animation
@@ -333,6 +338,7 @@ class AIChatModule {
      * Create streaming message element
      */
     createStreamingMessage() {
+        console.log('Creating streaming message element');
         const messagesContainer = document.getElementById('chatMessages');
         if (!messagesContainer) {
             console.error('Chat messages container not found');
@@ -361,6 +367,7 @@ class AIChatModule {
         messagesContainer.appendChild(messageElement);
         this.scrollToBottom();
         
+        console.log('Streaming message element created successfully');
         return messageElement;
     }
 
