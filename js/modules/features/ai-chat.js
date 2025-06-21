@@ -7,6 +7,9 @@ class AIChatModule {
     constructor() {
         this.initialized = false;
         this.connectionStatus = 'disconnected';
+        this.currentChatId = null;
+        this.chatHistory = [];
+        this.currentMessages = [];
     }
 
     /**
@@ -20,6 +23,8 @@ class AIChatModule {
             
             this.setupEventListeners();
             this.updateConnectionStatus();
+            this.loadChatHistory();
+            this.createNewChat(); // Start with a new chat
             
             this.initialized = true;
             console.log('AI Chat Module initialized successfully');
@@ -68,7 +73,16 @@ class AIChatModule {
         const newChatBtn = document.getElementById('newChatBtn');
         if (newChatBtn) {
             newChatBtn.addEventListener('click', () => {
+                this.saveCurrentChat();
                 this.createNewChat();
+            });
+        }
+
+        // Clear chat button
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        if (clearChatBtn) {
+            clearChatBtn.addEventListener('click', () => {
+                this.clearAllChats();
             });
         }
     }
@@ -142,6 +156,13 @@ class AIChatModule {
 
         messagesContainer.appendChild(messageElement);
         this.scrollToBottom();
+
+        // Add message to current conversation
+        this.currentMessages.push({
+            role: role,
+            content: content,
+            timestamp: new Date().toISOString()
+        });
     }
 
     /**
@@ -248,7 +269,7 @@ class AIChatModule {
                 // Create a streaming message element
                 const streamingMessage = this.createStreamingMessage();
                 
-                await window.aiService.chatStream(message, 'default', (chunk, fullContent) => {
+                await window.aiService.chatStream(message, this.currentChatId, (chunk, fullContent) => {
                     console.log('Received chunk:', chunk);
                     this.updateStreamingMessage(streamingMessage, chunk, fullContent);
                 });
@@ -258,6 +279,14 @@ class AIChatModule {
                 
                 // Hide typing indicator after streaming is complete
                 this.hideTypingIndicator();
+                
+                // Get the final content and add to current messages
+                const finalContent = streamingMessage.querySelector('.message-text').textContent;
+                this.currentMessages.push({
+                    role: 'assistant',
+                    content: finalContent,
+                    timestamp: new Date().toISOString()
+                });
                 
             } catch (error) {
                 console.error('AI service streaming error:', error);
@@ -286,6 +315,13 @@ class AIChatModule {
             
             // Finish streaming animation
             this.finishStreamingMessage(streamingMessage);
+            
+            // Add to current messages
+            this.currentMessages.push({
+                role: 'assistant',
+                content: fullResponse,
+                timestamp: new Date().toISOString()
+            });
         }
     }
 
@@ -293,6 +329,10 @@ class AIChatModule {
      * Create new chat
      */
     createNewChat() {
+        // Generate new chat ID
+        this.currentChatId = this.generateChatId();
+        this.currentMessages = [];
+
         const messagesContainer = document.getElementById('chatMessages');
         if (messagesContainer) {
             messagesContainer.innerHTML = `
@@ -309,6 +349,15 @@ class AIChatModule {
                 </div>
             `;
         }
+
+        // Add welcome message to current messages
+        this.currentMessages.push({
+            role: 'assistant',
+            content: "Hello! I'm your AI assistant. I can help you manage tasks, schedule appointments, and organize your projects.",
+            timestamp: new Date().toISOString()
+        });
+
+        this.updateHistoryDisplay();
     }
 
     /**
@@ -392,6 +441,251 @@ class AIChatModule {
         
         // Remove streaming class to stop the pulse animation
         messageElement.classList.remove('streaming');
+    }
+
+    /**
+     * Save current chat to history
+     */
+    saveCurrentChat() {
+        if (!this.currentChatId || this.currentMessages.length <= 1) return;
+
+        const userEmail = this.getCurrentUserEmail();
+        if (!userEmail) return;
+
+        // Get first user message for title
+        const firstUserMessage = this.currentMessages.find(msg => msg.role === 'user');
+        const title = firstUserMessage ? 
+            firstUserMessage.content.substring(0, 50) + (firstUserMessage.content.length > 50 ? '...' : '') :
+            'New Conversation';
+
+        const chatData = {
+            id: this.currentChatId,
+            title: title,
+            messages: this.currentMessages,
+            timestamp: new Date().toISOString(),
+            userEmail: userEmail
+        };
+
+        // Add to history
+        this.chatHistory.unshift(chatData);
+
+        // Keep only last 50 conversations
+        if (this.chatHistory.length > 50) {
+            this.chatHistory = this.chatHistory.slice(0, 50);
+        }
+
+        // Save to localStorage
+        this.saveChatHistory();
+        this.updateHistoryDisplay();
+    }
+
+    /**
+     * Load chat history from localStorage
+     */
+    loadChatHistory() {
+        const userEmail = this.getCurrentUserEmail();
+        if (!userEmail) return;
+
+        const storageKey = `chatHistory_${userEmail}`;
+        this.chatHistory = window.Utils.loadFromStorage(storageKey, []);
+    }
+
+    /**
+     * Save chat history to localStorage
+     */
+    saveChatHistory() {
+        const userEmail = this.getCurrentUserEmail();
+        if (!userEmail) return;
+
+        const storageKey = `chatHistory_${userEmail}`;
+        window.Utils.saveToStorage(storageKey, this.chatHistory);
+    }
+
+    /**
+     * Update history display in sidebar
+     */
+    updateHistoryDisplay() {
+        const historyList = document.getElementById('historyList');
+        if (!historyList) return;
+
+        if (this.chatHistory.length === 0) {
+            historyList.innerHTML = `
+                <div class="empty-history">
+                    <div class="empty-icon">💭</div>
+                    <p>No conversations yet</p>
+                    <span>Start chatting to see history</span>
+                </div>
+            `;
+            return;
+        }
+
+        historyList.innerHTML = this.chatHistory.map(chat => `
+            <div class="history-item ${chat.id === this.currentChatId ? 'active' : ''}" 
+                 data-chat-id="${chat.id}">
+                <div class="history-item-title">${chat.title}</div>
+                <div class="history-item-date">${this.formatDate(chat.timestamp)}</div>
+                <div class="history-item-actions">
+                    <button class="history-action-btn load-chat" data-chat-id="${chat.id}" title="Load chat">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                    </button>
+                    <button class="history-action-btn delete-chat" data-chat-id="${chat.id}" title="Delete chat">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"></polyline>
+                            <path d="m19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+
+        // Add event listeners for history items
+        this.setupHistoryEventListeners();
+    }
+
+    /**
+     * Setup event listeners for history items
+     */
+    setupHistoryEventListeners() {
+        const historyList = document.getElementById('historyList');
+        if (!historyList) return;
+
+        // Load chat buttons
+        const loadButtons = historyList.querySelectorAll('.load-chat');
+        loadButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const chatId = button.getAttribute('data-chat-id');
+                this.loadChat(chatId);
+            });
+        });
+
+        // Delete chat buttons
+        const deleteButtons = historyList.querySelectorAll('.delete-chat');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const chatId = button.getAttribute('data-chat-id');
+                this.deleteChat(chatId);
+            });
+        });
+
+        // History item clicks
+        const historyItems = historyList.querySelectorAll('.history-item');
+        historyItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const chatId = item.getAttribute('data-chat-id');
+                this.loadChat(chatId);
+            });
+        });
+    }
+
+    /**
+     * Load a specific chat from history
+     */
+    loadChat(chatId) {
+        const chat = this.chatHistory.find(c => c.id === chatId);
+        if (!chat) return;
+
+        // Save current chat if it has messages
+        if (this.currentMessages.length > 1) {
+            this.saveCurrentChat();
+        }
+
+        // Load the selected chat
+        this.currentChatId = chatId;
+        this.currentMessages = [...chat.messages];
+
+        // Display messages
+        const messagesContainer = document.getElementById('chatMessages');
+        if (messagesContainer) {
+            messagesContainer.innerHTML = '';
+            
+            chat.messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${message.role}-message`;
+                
+                const avatar = message.role === 'user' ? '👤' : '🤖';
+                const timestamp = new Date(message.timestamp).toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit' 
+                });
+
+                messageElement.innerHTML = `
+                    <div class="message-avatar">${avatar}</div>
+                    <div class="message-content">
+                        <div class="message-text">${this.formatMessage(message.content)}</div>
+                        <div class="message-timestamp">${timestamp}</div>
+                    </div>
+                `;
+
+                messagesContainer.appendChild(messageElement);
+            });
+
+            this.scrollToBottom();
+        }
+
+        this.updateHistoryDisplay();
+    }
+
+    /**
+     * Delete a chat from history
+     */
+    deleteChat(chatId) {
+        if (confirm('Are you sure you want to delete this conversation?')) {
+            this.chatHistory = this.chatHistory.filter(chat => chat.id !== chatId);
+            this.saveChatHistory();
+            this.updateHistoryDisplay();
+
+            // If we deleted the current chat, create a new one
+            if (this.currentChatId === chatId) {
+                this.createNewChat();
+            }
+        }
+    }
+
+    /**
+     * Clear all chats
+     */
+    clearAllChats() {
+        if (confirm('Are you sure you want to delete all conversations? This cannot be undone.')) {
+            this.chatHistory = [];
+            this.saveChatHistory();
+            this.createNewChat();
+        }
+    }
+
+    /**
+     * Generate unique chat ID
+     */
+    generateChatId() {
+        return `chat_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    /**
+     * Get current user email
+     */
+    getCurrentUserEmail() {
+        if (window.authModule && window.authModule.getCurrentUser()) {
+            return window.authModule.getCurrentUser().email;
+        }
+        return null;
+    }
+
+    /**
+     * Format date for display
+     */
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return date.toLocaleDateString('en-US', { weekday: 'long' });
+        if (diffDays < 30) return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     /**
