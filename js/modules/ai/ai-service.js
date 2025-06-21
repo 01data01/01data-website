@@ -391,6 +391,35 @@ class AIService {
     }
 
     /**
+     * Chat with AI assistant using streaming
+     */
+    async chatStream(message, conversationId = 'default', onChunk = null, context = {}) {
+        try {
+            // Build conversation context prompt
+            const conversationHistory = this.getConversationContext(conversationId);
+            let fullMessage = message;
+            
+            // Add context if this is a continuation
+            if (conversationHistory.length > 0) {
+                const recentHistory = conversationHistory.slice(-6); // Last 3 exchanges
+                const historyText = recentHistory.map(entry => `${entry.role}: ${entry.content}`).join('\n');
+                fullMessage = `Previous conversation:\n${historyText}\n\nUser: ${message}`;
+            }
+            
+            const response = await this.makeStreamingAPIRequest(fullMessage, 'chatAssistant', onChunk);
+            
+            // Store context for conversation continuity
+            this.updateConversationContext(conversationId, message, response.content);
+            
+            return response.content;
+            
+        } catch (error) {
+            utils.logError('AI Chat Stream', error);
+            throw error;
+        }
+    }
+
+    /**
      * Build chat prompt
      */
     buildChatPrompt(message, conversationId, context) {
@@ -589,6 +618,90 @@ class AIService {
             if (attempt < this.config.retryAttempts) {
                 await new Promise(resolve => setTimeout(resolve, this.config.retryDelay * (attempt + 1)));
                 return this.makeAPIRequest(message, type, attempt + 1);
+            }
+            
+            throw error;
+        }
+    }
+
+    /**
+     * Make streaming API request to Claude
+     */
+    async makeStreamingAPIRequest(message, type = 'chatAssistant', onChunk = null, attempt = 0) {
+        if (!this.userEmail || !this.apiKey) {
+            throw new Error('User not authenticated or API key not available');
+        }
+
+        try {
+            const response = await fetch(this.apiEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userEmail: this.userEmail,
+                    message: message,
+                    apiKey: this.apiKey,
+                    stream: true
+                }),
+                signal: AbortSignal.timeout(this.config.timeout)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullContent = '';
+
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const data = JSON.parse(line.slice(6));
+                                
+                                if (data.type === 'content_block_delta' && data.delta && data.delta.type === 'text_delta') {
+                                    const textChunk = data.delta.text;
+                                    fullContent += textChunk;
+                                    
+                                    if (onChunk) {
+                                        onChunk(textChunk, fullContent);
+                                    }
+                                } else if (data.type === 'message_stop') {
+                                    break;
+                                } else if (data.type === 'error') {
+                                    throw new Error(data.error.message || 'Streaming error');
+                                }
+                            } catch (parseError) {
+                                // Skip invalid JSON lines
+                                continue;
+                            }
+                        }
+                    }
+                }
+            } finally {
+                reader.releaseLock();
+            }
+
+            return {
+                content: fullContent,
+                usage: {}
+            };
+
+        } catch (error) {
+            if (attempt < this.config.retryAttempts) {
+                await new Promise(resolve => setTimeout(resolve, this.config.retryDelay * (attempt + 1)));
+                return this.makeStreamingAPIRequest(message, type, onChunk, attempt + 1);
             }
             
             throw error;
