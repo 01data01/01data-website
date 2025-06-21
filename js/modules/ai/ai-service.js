@@ -51,16 +51,20 @@ class AIService {
             // Get user email from auth module
             if (window.authModule && window.authModule.getCurrentUser()) {
                 this.userEmail = window.authModule.getCurrentUser().email;
+                console.log('User email set:', this.userEmail);
                 await this.initializeUserAPI();
+            } else {
+                console.log('No user found, AI service will run in disconnected mode');
+                this.connectionStatus = 'disconnected';
             }
             
             this.setupRequestQueue();
             
             this.initialized = true;
-            console.log('AI Service initialized successfully');
+            console.log('AI Service initialized successfully. Status:', this.connectionStatus);
             
         } catch (error) {
-            utils.logError('AI Service Initialization', error);
+            console.error('AI Service Initialization error:', error);
             this.connectionStatus = 'error';
         }
     }
@@ -625,7 +629,7 @@ class AIService {
     }
 
     /**
-     * Make streaming API request to Claude
+     * Make streaming API request to Claude (simulated streaming)
      */
     async makeStreamingAPIRequest(message, type = 'chatAssistant', onChunk = null, attempt = 0) {
         if (!this.userEmail || !this.apiKey) {
@@ -652,50 +656,35 @@ class AIService {
                 throw new Error(`API request failed: ${response.status} ${response.statusText} - ${errorData.error || 'Unknown error'}`);
             }
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let fullContent = '';
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
 
-            try {
-                while (true) {
-                    const { done, value } = await reader.read();
+            const fullContent = data.response || '';
+            
+            // Simulate streaming by sending chunks character by character
+            if (onChunk && fullContent) {
+                let currentText = '';
+                const words = fullContent.split(' ');
+                
+                for (let i = 0; i < words.length; i++) {
+                    const word = words[i] + (i < words.length - 1 ? ' ' : '');
+                    currentText += word;
                     
-                    if (done) break;
-                    
-                    const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('\n');
-                    
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            try {
-                                const data = JSON.parse(line.slice(6));
-                                
-                                if (data.type === 'content_block_delta' && data.delta && data.delta.type === 'text_delta') {
-                                    const textChunk = data.delta.text;
-                                    fullContent += textChunk;
-                                    
-                                    if (onChunk) {
-                                        onChunk(textChunk, fullContent);
-                                    }
-                                } else if (data.type === 'message_stop') {
-                                    break;
-                                } else if (data.type === 'error') {
-                                    throw new Error(data.error.message || 'Streaming error');
-                                }
-                            } catch (parseError) {
-                                // Skip invalid JSON lines
-                                continue;
-                            }
-                        }
+                    if (onChunk) {
+                        onChunk(word, currentText);
                     }
+                    
+                    // Simulate realistic typing speed
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
                 }
-            } finally {
-                reader.releaseLock();
             }
 
             return {
                 content: fullContent,
-                usage: {}
+                usage: data.usage || {}
             };
 
         } catch (error) {
