@@ -100,6 +100,9 @@
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .history-item:hover {
@@ -108,10 +111,71 @@
     transform: translateX(4px);
 }
 
+.history-item:hover .history-item-actions {
+    opacity: 1;
+}
+
 .history-item.active {
     background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
     color: white;
     border-color: var(--accent-color);
+}
+
+.history-item-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+.history-item-date {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-bottom: 8px;
+}
+
+.history-item-actions {
+    display: flex;
+    gap: 4px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.history-action-btn {
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 6px;
+    padding: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+.history-action-btn:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
+}
+
+.history-action-btn svg {
+    color: var(--text-dark);
+}
+
+.history-item.active .history-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.history-item.active .history-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.history-item.active .history-action-btn svg {
+    color: white;
 }
 
 .history-title-text {
