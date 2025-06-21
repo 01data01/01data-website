@@ -110,10 +110,36 @@ class MainApp {
      */
     async initializeAuth() {
         return new Promise((resolve) => {
-            // Check if user is already signed in
+            // First check for user data passed from main website URL
+            const urlUser = this.checkForURLUserData();
+            if (urlUser) {
+                this.user = urlUser;
+                utils.saveToStorage('user', this.user);
+                
+                // Initialize AI service with user email
+                if (window.aiService) {
+                    window.aiService.setUserEmail(this.user.email).catch(error => {
+                        console.warn('AI service initialization failed:', error);
+                    });
+                }
+                
+                this.showApp();
+                resolve();
+                return;
+            }
+
+            // Check if user is already signed in locally
             const savedUser = utils.loadFromStorage('user');
             if (savedUser) {
                 this.user = savedUser;
+                
+                // Initialize AI service with user email
+                if (window.aiService) {
+                    window.aiService.setUserEmail(this.user.email).catch(error => {
+                        console.warn('AI service initialization failed:', error);
+                    });
+                }
+                
                 this.showApp();
                 resolve();
                 return;
@@ -142,6 +168,44 @@ class MainApp {
                 }, 1000);
             }
         });
+    }
+
+    /**
+     * Check for user data passed via URL parameters
+     */
+    checkForURLUserData() {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userParam = urlParams.get('user');
+            
+            if (userParam) {
+                console.log('Found user data in URL, processing...');
+                const decodedParam = decodeURIComponent(userParam);
+                const userData = JSON.parse(decodedParam);
+                
+                // Validate user data
+                if (userData.email && userData.name) {
+                    const formattedUser = {
+                        id: userData.id,
+                        name: userData.name,
+                        email: userData.email,
+                        image: userData.picture || userData.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=4db6ac&color=fff`,
+                        signedIn: true
+                    };
+                    
+                    // Clean up URL for security
+                    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                    
+                    console.log('Successfully processed URL user data');
+                    return formattedUser;
+                }
+            }
+        } catch (error) {
+            console.error('Error processing URL user data:', error);
+        }
+        
+        return null;
     }
 
     /**
@@ -201,27 +265,27 @@ class MainApp {
      * Show loading screen
      */
     showLoading() {
-        utils.show('loadingScreen');
-        utils.hide('signInScreen');
-        utils.hide('app');
+        utils.show('#loadingScreen');
+        utils.hide('#signInScreen');
+        utils.hide('#app');
     }
 
     /**
      * Show sign-in screen
      */
     showSignIn() {
-        utils.hide('loadingScreen');
-        utils.show('signInScreen');
-        utils.hide('app');
+        utils.hide('#loadingScreen');
+        utils.show('#signInScreen');
+        utils.hide('#app');
     }
 
     /**
      * Show main application
      */
     showApp() {
-        utils.hide('loadingScreen');
-        utils.hide('signInScreen');
-        utils.show('app');
+        utils.hide('#loadingScreen');
+        utils.hide('#signInScreen');
+        utils.show('#app');
         
         // Update user info in header
         this.updateUserInfo();
