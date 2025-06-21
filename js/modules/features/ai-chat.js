@@ -100,6 +100,54 @@ class AIChatModule {
             this.eventListeners.push(clickListener);
         }
 
+        // Quick action buttons
+        const quickActionBtns = utils.querySelectorAll('.quick-action-btn');
+        quickActionBtns.forEach(btn => {
+            const clickListener = utils.addEventListener(btn, 'click', (e) => {
+                const action = e.currentTarget.dataset.action;
+                this.handleQuickAction(action);
+            });
+            this.eventListeners.push(clickListener);
+        });
+
+        // Suggestion cards
+        const suggestionCards = utils.querySelectorAll('.suggestion-card');
+        suggestionCards.forEach(card => {
+            const clickListener = utils.addEventListener(card, 'click', (e) => {
+                const suggestion = e.currentTarget.dataset.suggestion;
+                this.useSuggestion(suggestion);
+            });
+            this.eventListeners.push(clickListener);
+        });
+
+        // Voice input button
+        const voiceBtn = utils.querySelector('.voice-input-btn');
+        if (voiceBtn) {
+            const clickListener = utils.addEventListener(voiceBtn, 'click', () => {
+                this.startVoiceInput();
+            });
+            this.eventListeners.push(clickListener);
+        }
+
+        // Attachment button
+        const attachBtn = utils.querySelector('.attachment-btn');
+        if (attachBtn) {
+            const clickListener = utils.addEventListener(attachBtn, 'click', () => {
+                this.showAttachmentOptions();
+            });
+            this.eventListeners.push(clickListener);
+        }
+
+        // Model selection
+        const modelSelect = utils.getElementById('aiModelSelect');
+        if (modelSelect) {
+            const changeListener = utils.addEventListener(modelSelect, 'change', (e) => {
+                this.changeAIModel(e.target.value);
+            });
+            this.eventListeners.push(changeListener);
+        }
+        }
+
         // Conversation history items
         this.setupConversationListeners();
 
@@ -155,9 +203,79 @@ class AIChatModule {
      * Setup chat interface
      */
     setupChatInterface() {
+        this.createEnhancedChatInterface();
         this.updateConnectionStatus();
         this.displayWelcomeMessage();
         this.updateConversationList();
+        this.showSmartSuggestions();
+    }
+
+    /**
+     * Create enhanced chat interface with modern features
+     */
+    createEnhancedChatInterface() {
+        // Enhanced chat input container
+        const inputContainer = utils.querySelector('.chat-input-container');
+        if (inputContainer) {
+            // Add voice input and attachment buttons
+            const chatInput = utils.getElementById('chatInput');
+            if (chatInput && !utils.querySelector('.input-enhancement-controls')) {
+                const enhancementControls = document.createElement('div');
+                enhancementControls.className = 'input-enhancement-controls';
+                enhancementControls.innerHTML = `
+                    <button class="input-control-btn voice-input-btn" title="Voice input">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                    </button>
+                    <button class="input-control-btn attachment-btn" title="Attach file">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                        </svg>
+                    </button>
+                    <select id="aiModelSelect" class="ai-model-select" title="Select AI model">
+                        <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+                        <option value="claude-3-haiku">Claude 3 Haiku</option>
+                        <option value="claude-3-opus">Claude 3 Opus</option>
+                    </select>
+                `;
+                
+                // Insert before send button
+                const sendBtn = utils.getElementById('sendChatBtn');
+                if (sendBtn) {
+                    inputContainer.insertBefore(enhancementControls, sendBtn);
+                }
+            }
+        }
+
+        // Add smart suggestions section to chat main area
+        const chatMain = utils.querySelector('.chat-main');
+        if (chatMain && !utils.querySelector('.smart-suggestions-section')) {
+            const suggestionsSection = document.createElement('div');
+            suggestionsSection.className = 'smart-suggestions-section';
+            suggestionsSection.innerHTML = `
+                <div class="suggestions-header">
+                    <h4>Smart Suggestions</h4>
+                    <button class="suggestions-toggle-btn" title="Toggle suggestions">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="suggestions-grid" id="smartSuggestions">
+                    <!-- Smart suggestions will be populated here -->
+                </div>
+            `;
+            
+            // Insert after chat header
+            const chatHeader = utils.querySelector('.chat-header');
+            if (chatHeader) {
+                chatHeader.parentNode.insertBefore(suggestionsSection, chatHeader.nextSibling);
+            }
+        }
     }
 
     /**
@@ -856,6 +974,305 @@ class AIChatModule {
             this.displayWelcomeMessage();
             
             window.mainApp?.showNotification('All conversations cleared', 'success');
+        }
+    }
+
+    /**
+     * Show smart suggestions based on context
+     */
+    showSmartSuggestions() {
+        const suggestionsContainer = utils.getElementById('smartSuggestions');
+        if (!suggestionsContainer) return;
+
+        // Context-aware suggestions
+        const suggestions = [
+            {
+                icon: '📝',
+                title: 'Create Task',
+                description: 'Add a new task to your list',
+                action: 'create-task'
+            },
+            {
+                icon: '📅',
+                title: 'Schedule Meeting',
+                description: 'Plan your next meeting',
+                action: 'schedule-meeting'
+            },
+            {
+                icon: '📊',
+                title: 'Productivity Report',
+                description: 'Get insights on your progress',
+                action: 'productivity-report'
+            },
+            {
+                icon: '🎯',
+                title: 'Set Goals',
+                description: 'Define your objectives',
+                action: 'set-goals'
+            },
+            {
+                icon: '💡',
+                title: 'Get Ideas',
+                description: 'Brainstorm solutions',
+                action: 'brainstorm'
+            },
+            {
+                icon: '📈',
+                title: 'Analyze Data',
+                description: 'Review your metrics',
+                action: 'analyze-data'
+            }
+        ];
+
+        suggestionsContainer.innerHTML = suggestions.map(suggestion => `
+            <div class="suggestion-card" data-action="${suggestion.action}">
+                <div class="suggestion-icon">${suggestion.icon}</div>
+                <div class="suggestion-content">
+                    <h5 class="suggestion-title">${suggestion.title}</h5>
+                    <p class="suggestion-description">${suggestion.description}</p>
+                </div>
+                <div class="suggestion-arrow">→</div>
+            </div>
+        `).join('');
+
+        // Add click handlers for suggestion cards
+        const cards = suggestionsContainer.querySelectorAll('.suggestion-card');
+        cards.forEach(card => {
+            const clickListener = utils.addEventListener(card, 'click', (e) => {
+                const action = e.currentTarget.dataset.action;
+                this.handleQuickAction(action);
+            });
+            this.eventListeners.push(clickListener);
+        });
+    }
+
+    /**
+     * Handle quick actions from suggestions
+     */
+    handleQuickAction(action) {
+        const actions = {
+            'create-task': 'Help me create a new task for today',
+            'schedule-meeting': 'I need to schedule a meeting. Can you help me plan it?',
+            'productivity-report': 'Can you give me a productivity report for this week?',
+            'set-goals': 'Help me set some goals for this month',
+            'brainstorm': 'I need some creative ideas. Can you help me brainstorm?',
+            'analyze-data': 'Can you help me analyze my productivity data?'
+        };
+
+        const message = actions[action];
+        if (message) {
+            const chatInput = utils.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.value = message;
+                chatInput.focus();
+                this.autoResizeInput();
+            }
+        }
+    }
+
+    /**
+     * Start voice input (Web Speech API)
+     */
+    startVoiceInput() {
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            window.mainApp?.showNotification('Voice input not supported in this browser', 'warning');
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        const voiceBtn = utils.querySelector('.voice-input-btn');
+        if (voiceBtn) {
+            voiceBtn.classList.add('recording');
+            voiceBtn.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M12 1v6m0 6v6"/>
+                    <path d="m21 12-6-6-6 6-6-6"/>
+                </svg>
+            `;
+        }
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            const chatInput = utils.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.value = transcript;
+                this.autoResizeInput();
+                chatInput.focus();
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Voice recognition error:', event.error);
+            window.mainApp?.showNotification('Voice input failed', 'error');
+        };
+
+        recognition.onend = () => {
+            if (voiceBtn) {
+                voiceBtn.classList.remove('recording');
+                voiceBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                        <line x1="12" y1="19" x2="12" y2="23"/>
+                        <line x1="8" y1="23" x2="16" y2="23"/>
+                    </svg>
+                `;
+            }
+        };
+
+        recognition.start();
+    }
+
+    /**
+     * Show attachment options
+     */
+    showAttachmentOptions() {
+        // Create attachment modal
+        const modal = document.createElement('div');
+        modal.className = 'modal attachment-modal active';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Attach File</h3>
+                    <button class="modal-close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="attachment-options">
+                        <div class="attachment-option" data-type="file">
+                            <div class="attachment-icon">📎</div>
+                            <div class="attachment-text">
+                                <h5>Upload File</h5>
+                                <p>Attach documents, images, or other files</p>
+                            </div>
+                        </div>
+                        <div class="attachment-option" data-type="image">
+                            <div class="attachment-icon">🖼️</div>
+                            <div class="attachment-text">
+                                <h5>Upload Image</h5>
+                                <p>Share screenshots or pictures</p>
+                            </div>
+                        </div>
+                        <div class="attachment-option" data-type="url">
+                            <div class="attachment-icon">🔗</div>
+                            <div class="attachment-text">
+                                <h5>Share URL</h5>
+                                <p>Reference a web page or resource</p>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" style="display: none;" multiple>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Add event listeners
+        const closeBtn = modal.querySelector('.modal-close');
+        closeBtn.addEventListener('click', () => {
+            modal.remove();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Handle attachment options
+        const options = modal.querySelectorAll('.attachment-option');
+        options.forEach(option => {
+            option.addEventListener('click', (e) => {
+                const type = e.currentTarget.dataset.type;
+                this.handleAttachment(type);
+                modal.remove();
+            });
+        });
+    }
+
+    /**
+     * Handle attachment selection
+     */
+    handleAttachment(type) {
+        switch (type) {
+            case 'file':
+            case 'image':
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.multiple = true;
+                if (type === 'image') {
+                    fileInput.accept = 'image/*';
+                }
+                fileInput.addEventListener('change', (e) => {
+                    this.processFileAttachment(e.target.files);
+                });
+                fileInput.click();
+                break;
+            case 'url':
+                const url = prompt('Enter URL:');
+                if (url) {
+                    this.addUrlAttachment(url);
+                }
+                break;
+        }
+    }
+
+    /**
+     * Process file attachments
+     */
+    processFileAttachment(files) {
+        Array.from(files).forEach(file => {
+            // For now, just add filename to chat input
+            const chatInput = utils.getElementById('chatInput');
+            if (chatInput) {
+                const currentValue = chatInput.value;
+                const attachment = `[Attached: ${file.name}] `;
+                chatInput.value = currentValue + attachment;
+                this.autoResizeInput();
+            }
+        });
+        window.mainApp?.showNotification(`${files.length} file(s) attached`, 'success');
+    }
+
+    /**
+     * Add URL attachment
+     */
+    addUrlAttachment(url) {
+        const chatInput = utils.getElementById('chatInput');
+        if (chatInput) {
+            const currentValue = chatInput.value;
+            const attachment = `[URL: ${url}] `;
+            chatInput.value = currentValue + attachment;
+            this.autoResizeInput();
+        }
+        window.mainApp?.showNotification('URL attached', 'success');
+    }
+
+    /**
+     * Change AI model
+     */
+    changeAIModel(model) {
+        this.aiConfig.model = model;
+        utils.saveToStorage('aiModel', model);
+        window.mainApp?.showNotification(`Switched to ${model}`, 'info');
+    }
+
+    /**
+     * Use suggestion from suggestion cards
+     */
+    useSuggestion(suggestion) {
+        const chatInput = utils.getElementById('chatInput');
+        if (chatInput) {
+            chatInput.value = suggestion;
+            chatInput.focus();
+            this.autoResizeInput();
         }
     }
 

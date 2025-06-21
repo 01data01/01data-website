@@ -41,69 +41,130 @@ class DashboardModule {
     }
 
     /**
-     * Create stats cards HTML structure
+     * Create enhanced stats cards HTML structure
      */
     createStatsCards() {
-        const statsContainer = utils.getElementById('animated-stats-container');
+        const statsContainer = utils.getElementById('dashboardContent');
         if (!statsContainer) return;
 
         const statsHTML = `
             <div class="stats-container">
-                <div class="stat-card" data-stat="due-today">
+                <div class="stat-card clickable" data-stat="due-today" data-filter="due-today">
                     <div class="stat-icon icon-today">
-                        <div class="icon-clock">
-                            <div class="clock-face">
-                                <div class="clock-hand hour-hand"></div>
-                                <div class="clock-hand minute-hand"></div>
-                            </div>
-                        </div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">0</div>
+                        <div class="stat-number" data-count="0">0</div>
                         <div class="stat-label">Due Today</div>
+                        <div class="stat-trend">📈 <span class="trend-text">Track progress</span></div>
                     </div>
+                    <div class="stat-action">→</div>
                 </div>
 
-                <div class="stat-card urgent" data-stat="overdue">
+                <div class="stat-card urgent clickable" data-stat="overdue" data-filter="overdue">
                     <div class="stat-icon icon-warning">
-                        <div class="icon-triangle">
-                            <div class="triangle-inner">!</div>
-                        </div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">0</div>
+                        <div class="stat-number" data-count="0">0</div>
                         <div class="stat-label">Overdue</div>
+                        <div class="stat-trend urgent-text">⚡ <span class="trend-text">Needs attention</span></div>
                     </div>
+                    <div class="stat-action">→</div>
                 </div>
 
-                <div class="stat-card success" data-stat="completed">
+                <div class="stat-card success clickable" data-stat="completed" data-filter="completed">
                     <div class="stat-icon icon-completed">
-                        <div class="icon-checkmark">
-                            <div class="checkmark-stem"></div>
-                            <div class="checkmark-kick"></div>
-                        </div>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22,4 12,14.01 9,11.01"/>
+                        </svg>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number">0</div>
+                        <div class="stat-number" data-count="0">0</div>
                         <div class="stat-label">Completed</div>
+                        <div class="stat-trend success-text">🎉 <span class="trend-text">Well done!</span></div>
                     </div>
+                    <div class="stat-action">→</div>
                 </div>
 
                 <div class="stat-card info" data-stat="completion-rate">
                     <div class="stat-icon icon-chart">
-                        <div class="icon-progress">
-                            <div class="progress-ring">
-                                <svg class="progress-ring-svg" viewBox="0 0 120 120">
-                                    <circle class="progress-ring-bg" cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
-                                    <circle class="progress-ring-fill" cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="8" 
-                                            stroke-linecap="round" stroke-dasharray="339.292" stroke-dashoffset="339.292"/>
-                                </svg>
+                        <div class="progress-ring-container">
+                            <svg class="progress-ring" viewBox="0 0 60 60">
+                                <circle class="progress-ring-bg" cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
+                                <circle class="progress-ring-fill" cx="30" cy="30" r="25" fill="none" stroke="currentColor" stroke-width="4" 
+                                        stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="157" transform="rotate(-90 30 30)"/>
+                            </svg>
+                            <div class="progress-center">
+                                <span class="progress-percentage">0%</span>
                             </div>
                         </div>
                     </div>
                     <div class="stat-content">
                         <div class="stat-number">0%</div>
                         <div class="stat-label">Completion Rate</div>
+                        <div class="stat-trend">📊 <span class="trend-text">This week</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-main-content">
+                <div class="dashboard-section quick-add-container">
+                    <div class="section-header">
+                        <h3>🚀 Quick Task</h3>
+                        <div class="section-subtitle">Add a task instantly with AI assistance</div>
+                    </div>
+                    <div class="quick-add-form">
+                        <div class="quick-add-input-container">
+                            <textarea id="quickTaskInput" placeholder="What needs to be done? Try: 'Meeting with John tomorrow at 2pm #work !!!'" rows="2"></textarea>
+                            <div class="input-suggestions" id="inputSuggestions"></div>
+                        </div>
+                        <div class="quick-add-actions">
+                            <button class="btn-primary" id="quickAddBtn">
+                                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                                AI Enhance
+                            </button>
+                            <button class="btn-secondary" id="simpleAddBtn">
+                                <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"/>
+                                    <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                                Add Task
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-section today-tasks-container">
+                    <div class="section-header">
+                        <h3>📅 Today's Focus</h3>
+                        <div class="section-actions">
+                            <button class="btn-icon refresh-tasks" title="Refresh">🔄</button>
+                            <button class="btn-icon view-all-tasks" title="View All">📋</button>
+                        </div>
+                    </div>
+                    <div class="today-tasks-list" id="todayTasksList">
+                        <!-- Today's tasks will be populated here -->
+                    </div>
+                </div>
+
+                <div class="dashboard-section suggestions-container">
+                    <div class="section-header">
+                        <h3>🧠 AI Insights</h3>
+                        <div class="section-subtitle">Smart suggestions for better productivity</div>
+                    </div>
+                    <div class="ai-suggestions-list" id="aiSuggestions">
+                        <!-- AI suggestions will be populated here -->
                     </div>
                 </div>
             </div>
@@ -433,7 +494,7 @@ class DashboardModule {
     }
 
     /**
-     * Update today's tasks section
+     * Update enhanced today's tasks section
      */
     updateTodaysTasks(tasks = []) {
         const todaysTasksContainer = utils.getElementById('todayTasksList');
@@ -449,35 +510,87 @@ class DashboardModule {
             const dueDate = new Date(task.dueDate);
             dueDate.setHours(0, 0, 0, 0);
             return dueDate.getTime() === today.getTime();
-        }).slice(0, 5); // Show max 5 tasks
+        }).slice(0, 6); // Show max 6 tasks
 
         if (todaysTasks.length === 0) {
             todaysTasksContainer.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">✅</div>
-                    <p>No tasks due today!</p>
-                    <p class="empty-subtitle">Great job staying on top of your schedule.</p>
+                <div class="empty-state animated">
+                    <div class="empty-animation">
+                        <div class="checkmark-animation">
+                            <svg viewBox="0 0 52 52">
+                                <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+                                <path class="checkmark-check" fill="none" d="m14.1 27.2l7.1 7.2 16.7-16.8"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <h4>All clear for today! 🎉</h4>
+                    <p>No pending tasks. Perfect time to plan ahead or relax.</p>
+                    <button class="btn-primary" onclick="document.getElementById('quickTaskInput').focus()">
+                        Add Tomorrow's Task
+                    </button>
                 </div>
             `;
             return;
         }
 
-        todaysTasksContainer.innerHTML = todaysTasks.map(task => `
-            <div class="dashboard-task-item priority-${task.priority || 'medium'}" data-task-id="${task.id}">
-                <div class="task-checkbox" ${task.completed ? 'checked' : ''}></div>
-                <div class="task-content">
-                    <div class="task-title">${utils.truncate(task.title, 40)}</div>
-                    <div class="task-meta">
-                        ${task.time ? `<span class="task-time">${utils.formatTime(task.time)}</span>` : ''}
-                        ${task.category ? `<span class="task-category">${task.category}</span>` : ''}
-                    </div>
+        // Sort tasks by priority and time
+        const priorityOrder = { 'high': 3, 'medium': 2, 'low': 1 };
+        todaysTasks.sort((a, b) => {
+            const priorityDiff = (priorityOrder[b.priority] || 2) - (priorityOrder[a.priority] || 2);
+            if (priorityDiff !== 0) return priorityDiff;
+            
+            // If same priority, sort by time
+            if (a.time && b.time) {
+                return a.time.localeCompare(b.time);
+            }
+            return a.time ? -1 : 1;
+        });
+
+        todaysTasksContainer.innerHTML = `
+            <div class="task-progress-bar">
+                <div class="progress-info">
+                    <span>${todaysTasks.length} tasks remaining</span>
+                    <span class="progress-percentage">Ready to start!</span>
                 </div>
-                <div class="task-actions">
-                    <button class="task-action-btn" data-action="edit" title="Edit">✏️</button>
-                    <button class="task-action-btn" data-action="complete" title="Complete">✓</button>
+                <div class="progress-track">
+                    <div class="progress-fill" style="width: ${Math.max(0, (5 - todaysTasks.length) / 5 * 100)}%"></div>
                 </div>
             </div>
-        `).join('');
+            <div class="tasks-timeline">
+                ${todaysTasks.map((task, index) => `
+                    <div class="timeline-task priority-${task.priority || 'medium'} ${task.time ? 'has-time' : 'no-time'}" 
+                         data-task-id="${task.id}" style="animation-delay: ${index * 0.1}s">
+                        <div class="task-time-marker">
+                            ${task.time ? `<span class="time-display">${utils.formatTime(task.time)}</span>` : 
+                                         `<span class="no-time-display">Anytime</span>`}
+                            <div class="priority-indicator priority-${task.priority || 'medium'}" title="${task.priority || 'medium'} priority"></div>
+                        </div>
+                        <div class="task-main-content">
+                            <div class="task-header">
+                                <h5 class="task-title">${task.title}</h5>
+                                <div class="task-actions">
+                                    <button class="task-action-btn complete-btn" data-action="complete" title="Mark as complete">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="20,6 9,17 4,12"/>
+                                        </svg>
+                                    </button>
+                                    <button class="task-action-btn edit-btn" data-action="edit" title="Edit task">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            ${task.description ? `<p class="task-description">${utils.truncate(task.description, 80)}</p>` : ''}
+                            <div class="task-meta">
+                                ${task.category ? `<span class="task-category">${task.category}</span>` : ''}
+                                <span class="task-created">Created ${utils.getRelativeTime(task.createdAt)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
 
         // Re-setup quick actions for new tasks
         this.setupTaskQuickActions();
