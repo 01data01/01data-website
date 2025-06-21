@@ -67,7 +67,8 @@ class AIChatModule {
         // Send chat button
         const sendChatBtn = utils.getElementById('sendChatBtn');
         if (sendChatBtn) {
-            const clickListener = utils.addEventListener(sendChatBtn, 'click', () => {
+            const clickListener = utils.addEventListener(sendChatBtn, 'click', (e) => {
+                e.preventDefault();
                 this.handleSendMessage();
             });
             this.eventListeners.push(clickListener);
@@ -82,72 +83,6 @@ class AIChatModule {
             this.eventListeners.push(clickListener);
         }
 
-        // Export chat button
-        const exportChatBtn = utils.getElementById('exportChatBtn');
-        if (exportChatBtn) {
-            const clickListener = utils.addEventListener(exportChatBtn, 'click', () => {
-                this.exportChat();
-            });
-            this.eventListeners.push(clickListener);
-        }
-
-        // Clear chat button
-        const clearChatBtn = utils.getElementById('clearChatBtn');
-        if (clearChatBtn) {
-            const clickListener = utils.addEventListener(clearChatBtn, 'click', () => {
-                this.clearAllChats();
-            });
-            this.eventListeners.push(clickListener);
-        }
-
-        // Quick action buttons
-        const quickActionBtns = utils.querySelectorAll('.quick-action-btn');
-        quickActionBtns.forEach(btn => {
-            const clickListener = utils.addEventListener(btn, 'click', (e) => {
-                const action = e.currentTarget.dataset.action;
-                this.handleQuickAction(action);
-            });
-            this.eventListeners.push(clickListener);
-        });
-
-        // Suggestion cards
-        const suggestionCards = utils.querySelectorAll('.suggestion-card');
-        suggestionCards.forEach(card => {
-            const clickListener = utils.addEventListener(card, 'click', (e) => {
-                const suggestion = e.currentTarget.dataset.suggestion;
-                this.useSuggestion(suggestion);
-            });
-            this.eventListeners.push(clickListener);
-        });
-
-        // Voice input button
-        const voiceBtn = utils.querySelector('.voice-input-btn');
-        if (voiceBtn) {
-            const clickListener = utils.addEventListener(voiceBtn, 'click', () => {
-                this.startVoiceInput();
-            });
-            this.eventListeners.push(clickListener);
-        }
-
-        // Attachment button
-        const attachBtn = utils.querySelector('.attachment-btn');
-        if (attachBtn) {
-            const clickListener = utils.addEventListener(attachBtn, 'click', () => {
-                this.showAttachmentOptions();
-            });
-            this.eventListeners.push(clickListener);
-        }
-
-        // Model selection
-        const modelSelect = utils.getElementById('aiModelSelect');
-        if (modelSelect) {
-            const changeListener = utils.addEventListener(modelSelect, 'change', (e) => {
-                this.changeAIModel(e.target.value);
-            });
-            this.eventListeners.push(changeListener);
-        }
-        }
-
         // Conversation history items
         this.setupConversationListeners();
 
@@ -156,6 +91,7 @@ class AIChatModule {
 
         // Suggestion buttons
         this.setupSuggestionButtons();
+
     }
 
     /**
@@ -203,11 +139,9 @@ class AIChatModule {
      * Setup chat interface
      */
     setupChatInterface() {
-        this.createEnhancedChatInterface();
         this.updateConnectionStatus();
         this.displayWelcomeMessage();
         this.updateConversationList();
-        this.showSmartSuggestions();
     }
 
     /**
@@ -513,7 +447,7 @@ class AIChatModule {
      */
     autoResizeInput() {
         const chatInput = utils.getElementById('chatInput');
-        if (chatInput) {
+        if (chatInput && chatInput.tagName === 'TEXTAREA') {
             chatInput.style.height = 'auto';
             chatInput.style.height = Math.min(chatInput.scrollHeight, 150) + 'px';
         }
