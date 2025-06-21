@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test AI Streaming</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .chat-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: 50px;
+        }
+        .assistant-message {
+            background: #f8f9fa;
+            margin-right: 50px;
+        }
+        .streaming {
+            position: relative;
+        }
+        .streaming::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 8px;
+            height: 8px;
+            background: #007bff;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.5; }
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI Streaming Test</h1>
+    
+    <div class="chat-container" id="chatContainer">
+        <div class="message assistant-message">
+            <strong>AI:</strong> Hello! Send me a message to test streaming.
+        </div>
+    </div>
+    
+    <div class="input-container">
+        <input type="text" id="messageInput" placeholder="Type a message..." />
+        <button id="sendBtn">Send</button>
+    </div>
+    
+    <script>
+        document.getElementById('sendBtn').addEventListener('click', sendMessage);
+        document.getElementById('messageInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+        
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage('user', message);
+            input.value = '';
+            
+            // Simulate streaming response
+            const streamingMessage = createStreamingMessage();
+            await simulateStreaming(streamingMessage, `I received your message: "${message}". This is a test of the streaming functionality. The text should appear word by word as if it's being typed in real time. This creates a much better user experience compared to waiting for the entire response.`);
+            finishStreaming(streamingMessage);
+        }
+        
+        function addMessage(role, content) {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+            messageDiv.innerHTML = `<strong>${role === 'user' ? 'You' : 'AI'}:</strong> ${content}`;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function createStreamingMessage() {
+            const container = document.getElementById('chatContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant-message streaming';
+            messageDiv.innerHTML = '<strong>AI:</strong> <span class="content"></span>';
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            return messageDiv;
+        }
+        
+        async function simulateStreaming(messageElement, fullText) {
+            const contentSpan = messageElement.querySelector('.content');
+            const words = fullText.split(' ');
+            let currentText = '';
+            
+            for (let i = 0; i < words.length; i++) {
+                const word = words[i] + (i < words.length - 1 ? ' ' : '');
+                currentText += word;
+                contentSpan.textContent = currentText;
+                
+                // Scroll to bottom
+                const container = document.getElementById('chatContainer');
+                container.scrollTop = container.scrollHeight;
+                
+                // Simulate realistic typing delay
+                await new Promise(resolve => setTimeout(resolve, Math.random() * 100 + 50));
+            }
+        }
+        
+        function finishStreaming(messageElement) {
+            messageElement.classList.remove('streaming');
+        }
+    </script>
+</body>
+</html>
