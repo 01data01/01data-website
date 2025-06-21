@@ -32,10 +32,14 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Get current date and time
+    const currentDateTime = new Date().toISOString();
+    
     // Prepare Claude API request body
     const claudeRequestBody = {
       model: 'claude-3-5-sonnet-20241022',
       max_tokens: 4000,
+      system: `You are a helpful AI assistant. The current date and time is: ${currentDateTime}`,
       messages: [
         {
           role: 'user',
