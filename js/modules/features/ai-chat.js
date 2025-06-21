@@ -103,14 +103,8 @@ class AIChatModule {
             // Show typing indicator
             this.showTypingIndicator();
             
-            // Send to AI (mock for now)
-            const aiResponse = await this.sendToAI(message);
-            
-            // Hide typing indicator
-            this.hideTypingIndicator();
-            
-            // Add AI response to chat
-            this.addMessageToChat('assistant', aiResponse);
+            // Send to AI using streaming
+            await this.sendToAIStreaming(message);
             
         } catch (error) {
             console.error('Error sending message:', error);
@@ -240,6 +234,57 @@ class AIChatModule {
     }
 
     /**
+     * Send message to AI using streaming
+     */
+    async sendToAIStreaming(message) {
+        console.log('Sending to AI with streaming:', message);
+        
+        // Check if AI service is available
+        if (window.aiService && window.aiService.initialized) {
+            try {
+                console.log('Using AI service with streaming');
+                
+                // Create a streaming message element
+                const streamingMessage = this.createStreamingMessage();
+                
+                await window.aiService.chatStream(message, 'default', (chunk, fullContent) => {
+                    this.updateStreamingMessage(streamingMessage, chunk, fullContent);
+                });
+                
+                // Finish streaming animation
+                this.finishStreamingMessage(streamingMessage);
+                
+                // Hide typing indicator after streaming is complete
+                this.hideTypingIndicator();
+                
+            } catch (error) {
+                console.error('AI service streaming error:', error);
+                this.hideTypingIndicator();
+                this.addMessageToChat('assistant', `Error: ${error.message}`);
+            }
+        } else {
+            // Mock streaming response for testing
+            console.log('AI service not available, using mock streaming response');
+            
+            this.hideTypingIndicator();
+            const streamingMessage = this.createStreamingMessage();
+            
+            const fullResponse = `I received your message: "${message}". I'm here to help with your productivity and task management! I can assist you with organizing tasks, scheduling meetings, creating projects, and providing intelligent insights about your workflow.`;
+            
+            // Simulate streaming by adding text character by character
+            let currentText = '';
+            for (let i = 0; i < fullResponse.length; i++) {
+                currentText += fullResponse[i];
+                this.updateStreamingMessage(streamingMessage, fullResponse[i], currentText);
+                await new Promise(resolve => setTimeout(resolve, 20)); // Simulate typing delay
+            }
+            
+            // Finish streaming animation
+            this.finishStreamingMessage(streamingMessage);
+        }
+    }
+
+    /**
      * Create new chat
      */
     createNewChat() {
@@ -282,6 +327,64 @@ class AIChatModule {
         if (statusText) {
             statusText.textContent = this.connectionStatus === 'connected' ? 'Claude AI Ready' : 'Claude AI Disconnected';
         }
+    }
+
+    /**
+     * Create streaming message element
+     */
+    createStreamingMessage() {
+        const messagesContainer = document.getElementById('chatMessages');
+        if (!messagesContainer) {
+            console.error('Chat messages container not found');
+            return null;
+        }
+
+        // Hide typing indicator
+        this.hideTypingIndicator();
+
+        const messageElement = document.createElement('div');
+        messageElement.className = 'message assistant-message streaming';
+        
+        const timestamp = new Date().toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit' 
+        });
+
+        messageElement.innerHTML = `
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <div class="message-text"></div>
+                <div class="message-timestamp">${timestamp}</div>
+            </div>
+        `;
+
+        messagesContainer.appendChild(messageElement);
+        this.scrollToBottom();
+        
+        return messageElement;
+    }
+
+    /**
+     * Update streaming message content
+     */
+    updateStreamingMessage(messageElement, chunk, fullContent) {
+        if (!messageElement) return;
+        
+        const messageText = messageElement.querySelector('.message-text');
+        if (messageText) {
+            messageText.innerHTML = this.formatMessage(fullContent);
+            this.scrollToBottom();
+        }
+    }
+
+    /**
+     * Finish streaming message
+     */
+    finishStreamingMessage(messageElement) {
+        if (!messageElement) return;
+        
+        // Remove streaming class to stop the pulse animation
+        messageElement.classList.remove('streaming');
     }
 
     /**
