@@ -98,7 +98,7 @@
     box-shadow: 0 2px 8px rgba(77, 182, 172, 0.3);
 }
 
-/* Animated Navigation Icons */
+/* Contemporary Navigation Icons */
 .nav-icon {
     width: 18px;
     height: 18px;
@@ -109,465 +109,99 @@
     flex-shrink: 0;
 }
 
-/* Dashboard Icon - Animated Grid */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2px;
-    width: 16px;
-    height: 16px;
-}
-
-.grid-item {
+.nav-icon::before,
+.nav-icon::after {
+    content: '';
+    position: absolute;
     background: currentColor;
-    border-radius: 2px;
-    animation: gridPulse 3s ease-in-out infinite;
-    opacity: 0.8;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.grid-item:nth-child(1) { animation-delay: 0s; }
-.grid-item:nth-child(2) { animation-delay: 0.2s; }
-.grid-item:nth-child(3) { animation-delay: 0.4s; }
-.grid-item:nth-child(4) { animation-delay: 0.6s; }
-
-/* Tasks Icon - Animated Checklist */
-.tasks-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+/* Dashboard Icon - Grid */
+.icon-dashboard::before {
     width: 18px;
+    height: 18px;
+    background: 
+        linear-gradient(currentColor, currentColor) 0 0/6px 6px,
+        linear-gradient(currentColor, currentColor) 8px 0/6px 6px,
+        linear-gradient(currentColor, currentColor) 0 8px/6px 6px,
+        linear-gradient(currentColor, currentColor) 8px 8px/6px 6px;
+    background-repeat: no-repeat;
 }
 
-.task-item {
-    display: flex;
-    align-items: center;
-    gap: 3px;
+/* Tasks Icon - Checkmark List */
+.icon-tasks::before {
+    width: 16px;
+    height: 2px;
+    background: currentColor;
+    box-shadow: 
+        0 -6px 0 currentColor,
+        0 6px 0 currentColor;
 }
 
-.task-checkbox {
-    width: 4px;
-    height: 4px;
-    border: 1px solid currentColor;
-    border-radius: 1px;
-    position: relative;
+.icon-tasks::after {
+    width: 6px;
+    height: 3px;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    background: transparent;
+    transform: rotate(-45deg) translateX(-8px);
+    box-shadow: 0 -6px 0 0 currentColor, 0 6px 0 0 currentColor;
+}
+
+/* Calendar Icon */
+.icon-calendar::before {
+    width: 14px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
     background: transparent;
 }
 
-.task-checkbox.checked {
+.icon-calendar::after {
+    width: 10px;
+    height: 2px;
     background: currentColor;
-    animation: checkPulse 2s ease-in-out infinite;
+    top: 6px;
+    box-shadow: 0 4px 0 currentColor;
 }
 
-.task-checkbox.checked::after {
-    content: '';
-    position: absolute;
-    width: 2px;
-    height: 1px;
-    background: var(--accent-color);
-    top: 1px;
-    left: 1px;
-    border-radius: 0.5px;
-}
-
-.task-line {
-    width: 8px;
-    height: 1px;
-    background: currentColor;
-    border-radius: 0.5px;
-    animation: taskLineFade 3s ease-in-out infinite;
-    opacity: 0.7;
-}
-
-/* Calendar Icon - Animated Calendar */
-.calendar-container {
+/* Projects Icon - Folder */
+.icon-projects::before {
     width: 16px;
-    height: 18px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    background: transparent;
+    border-top: 6px solid currentColor;
 }
 
-.calendar-header {
-    width: 100%;
-    height: 3px;
-    background: currentColor;
-    border-radius: 1px 1px 0 0;
-    margin-bottom: 1px;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1px;
-    width: 100%;
-}
-
-.calendar-day {
-    width: 4px;
-    height: 4px;
-    background: currentColor;
-    border-radius: 1px;
-    animation: calendarPulse 4s ease-in-out infinite;
-    opacity: 0.6;
-}
-
-.calendar-day.active-day {
-    background: currentColor;
-    animation: activeDayPulse 2s ease-in-out infinite;
-    opacity: 1;
-}
-
-/* Projects Icon - Animated Folder with Nodes */
-.projects-container {
-    position: relative;
-    width: 18px;
-    height: 16px;
-}
-
-.project-folder {
-    position: relative;
-    width: 12px;
-    height: 10px;
-}
-
-.folder-tab {
+.icon-projects::after {
     width: 6px;
     height: 2px;
     background: currentColor;
-    border-radius: 1px 1px 0 0;
-    margin-bottom: 1px;
-}
-
-.folder-body {
-    width: 100%;
-    height: 7px;
-    background: currentColor;
-    border-radius: 1px;
-    animation: folderPulse 3s ease-in-out infinite;
-    opacity: 0.9;
-}
-
-.project-nodes {
-    position: absolute;
-    top: 2px;
-    right: 0;
-    width: 6px;
-    height: 12px;
-}
-
-.project-node {
-    width: 3px;
-    height: 3px;
-    background: currentColor;
-    border-radius: 50%;
-    margin-bottom: 3px;
-    animation: nodePulse 2s ease-in-out infinite;
-    opacity: 0.8;
-}
-
-.project-node:nth-child(3) {
-    animation-delay: 0.5s;
-}
-
-.project-connection {
-    width: 1px;
-    height: 6px;
-    background: currentColor;
-    margin: -3px auto 0;
-    animation: connectionPulse 3s ease-in-out infinite;
-    opacity: 0.6;
-}
-
-/* AI Assistant Icon - Complex Animation Cycle */
-.assistant-container {
-    position: relative;
-    width: 18px;
-    height: 16px;
-}
-
-.ai-cycle {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 16px;
-    height: 14px;
-}
-
-.cycle-element {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    animation: aiCycle 8s ease-in-out infinite;
-}
-
-/* Sound Wave Input (Phase 1) */
-.sound-wave-in {
-    animation-delay: 0s;
-}
-
-.sound-wave-in .wave-bar {
-    width: 1px;
-    background: currentColor;
-    border-radius: 1px;
-    display: inline-block;
-    margin: 0 0.5px;
-    animation: waveInput 0.6s ease-in-out infinite;
-}
-
-.sound-wave-in .bar-1 { height: 4px; animation-delay: 0s; }
-.sound-wave-in .bar-2 { height: 8px; animation-delay: 0.1s; }
-.sound-wave-in .bar-3 { height: 12px; animation-delay: 0.2s; }
-.sound-wave-in .bar-4 { height: 8px; animation-delay: 0.3s; }
-.sound-wave-in .bar-5 { height: 4px; animation-delay: 0.4s; }
-
-/* Processing Cloud (Phase 2) */
-.processing-cloud {
-    animation-delay: 2s;
-}
-
-.cloud-main {
-    width: 10px;
-    height: 6px;
-    background: currentColor;
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    position: relative;
-    animation: cloudProcess 1s ease-in-out infinite;
-}
-
-.cloud-puff-1 {
-    position: absolute;
     top: -2px;
     left: 2px;
-    width: 3px;
-    height: 3px;
-    background: currentColor;
+    border-radius: 1px 1px 0 0;
+}
+
+/* AI Icon - Brain/Circuit */
+.icon-ai::before {
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
     border-radius: 50%;
-    animation: cloudPuff 1.2s ease-in-out infinite;
+    background: transparent;
 }
 
-.cloud-puff-2 {
-    position: absolute;
-    top: -1px;
-    right: 1px;
-    width: 2px;
-    height: 2px;
-    background: currentColor;
+.icon-ai::after {
+    width: 6px;
+    height: 6px;
+    background: 
+        linear-gradient(45deg, transparent 30%, currentColor 30%, currentColor 70%, transparent 70%),
+        linear-gradient(-45deg, transparent 30%, currentColor 30%, currentColor 70%, transparent 70%);
+    background-size: 2px 2px;
     border-radius: 50%;
-    animation: cloudPuff 1.2s ease-in-out infinite 0.3s;
-}
-
-/* Supernova Burst (Phase 3) */
-.supernova-burst {
-    animation-delay: 4s;
-}
-
-.supernova-core {
-    width: 4px;
-    height: 4px;
-    background: currentColor;
-    border-radius: 50%;
-    position: relative;
-    animation: supernovaCore 2s ease-out;
-}
-
-.supernova-dot {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    background: currentColor;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    animation: supernovaExplode 2s ease-out;
-}
-
-/* Sound Wave Output (Phase 4) */
-.sound-wave-out {
-    animation-delay: 6s;
-}
-
-.sound-wave-out .wave-bar {
-    width: 1px;
-    background: currentColor;
-    border-radius: 1px;
-    display: inline-block;
-    margin: 0 0.5px;
-    animation: waveOutput 0.5s ease-in-out infinite;
-}
-
-.sound-wave-out .bar-1 { height: 6px; animation-delay: 0s; }
-.sound-wave-out .bar-2 { height: 10px; animation-delay: 0.1s; }
-.sound-wave-out .bar-3 { height: 14px; animation-delay: 0.2s; }
-.sound-wave-out .bar-4 { height: 10px; animation-delay: 0.3s; }
-.sound-wave-out .bar-5 { height: 6px; animation-delay: 0.4s; }
-
-.ai-sparkle {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    z-index: 3;
-}
-
-.sparkle {
-    width: 2px;
-    height: 2px;
-    background: currentColor;
-    border-radius: 50%;
-    position: absolute;
-    animation: sparkleFloat 2s ease-in-out infinite;
-}
-
-.sparkle:nth-child(1) {
-    top: 0;
-    right: 0;
-}
-
-.sparkle:nth-child(2) {
-    top: 3px;
-    right: 4px;
-    animation-delay: 0.5s;
-}
-
-/* Keyframe Animations */
-@keyframes gridPulse {
-    0%, 100% { 
-        opacity: 0.8; 
-        transform: scale(1);
-    }
-    50% { 
-        opacity: 1; 
-        transform: scale(1.1);
-    }
-}
-
-@keyframes checkPulse {
-    0%, 100% { opacity: 0.9; }
-    50% { opacity: 1; }
-}
-
-@keyframes taskLineFade {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 1; }
-}
-
-@keyframes calendarPulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 0.9; }
-}
-
-@keyframes activeDayPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.2); }
-}
-
-@keyframes folderPulse {
-    0%, 100% { opacity: 0.9; }
-    50% { opacity: 1; }
-}
-
-@keyframes nodePulse {
-    0%, 100% { opacity: 0.8; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.3); }
-}
-
-@keyframes connectionPulse {
-    0%, 100% { opacity: 0.6; }
-    50% { opacity: 1; }
-}
-
-@keyframes aiCycle {
-    0%, 15% { 
-        opacity: 0; 
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-    20%, 30% { 
-        opacity: 1; 
-        transform: translate(-50%, -50%) scale(1);
-    }
-    35%, 100% { 
-        opacity: 0; 
-        transform: translate(-50%, -50%) scale(0.8);
-    }
-}
-
-@keyframes waveInput {
-    0%, 100% { 
-        transform: scaleY(0.7);
-        opacity: 0.7;
-    }
-    50% { 
-        transform: scaleY(1.2);
-        opacity: 1;
-    }
-}
-
-@keyframes waveOutput {
-    0%, 100% { 
-        transform: scaleY(0.8);
-        opacity: 0.8;
-    }
-    50% { 
-        transform: scaleY(1.4);
-        opacity: 1;
-    }
-}
-
-@keyframes cloudProcess {
-    0%, 100% { 
-        transform: scale(1);
-        opacity: 0.9;
-    }
-    50% { 
-        transform: scale(1.1);
-        opacity: 1;
-    }
-}
-
-@keyframes cloudPuff {
-    0%, 100% { 
-        transform: scale(1) translateY(0px);
-        opacity: 0.6;
-    }
-    50% { 
-        transform: scale(1.3) translateY(-1px);
-        opacity: 1;
-    }
-}
-
-@keyframes supernovaCore {
-    0% { 
-        transform: scale(1);
-        opacity: 1;
-    }
-    30% { 
-        transform: scale(2);
-        opacity: 1;
-    }
-    100% { 
-        transform: scale(0.5);
-        opacity: 0;
-    }
-}
-
-@keyframes supernovaExplode {
-    0% { 
-        transform: translate(-50%, -50%) scale(0);
-        opacity: 0;
-    }
-    20% { 
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    100% { 
-        transform: translate(-50%, -50%) translate(var(--explode-x), var(--explode-y)) scale(0.3);
-        opacity: 0;
-    }
-}
-
-@keyframes sparkleFloat {
-    0%, 100% { opacity: 0.8; transform: translateY(0px); }
-    50% { opacity: 1; transform: translateY(-2px); }
 }
 
 /* Mobile menu button - hidden on desktop */
@@ -882,32 +516,6 @@
     }
 }
 
-/* Enhanced animations for active/hover states */
-.nav-btn:hover .grid-item,
-.nav-btn.active .grid-item {
-    animation-duration: 2s;
-}
-
-.nav-btn:hover .task-checkbox.checked,
-.nav-btn.active .task-checkbox.checked {
-    animation-duration: 1.5s;
-}
-
-.nav-btn:hover .calendar-day.active-day,
-.nav-btn.active .calendar-day.active-day {
-    animation-duration: 1.5s;
-}
-
-.nav-btn:hover .project-node,
-.nav-btn.active .project-node {
-    animation-duration: 1.5s;
-}
-
-.nav-btn:hover .cycle-element,
-.nav-btn.active .cycle-element {
-    animation-duration: 6s;
-}
-
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .nav-btn,
@@ -923,25 +531,5 @@
     
     .app-main::before {
         display: none;
-    }
-    
-    /* Disable all icon animations */
-    .grid-item,
-    .task-checkbox,
-    .task-line,
-    .calendar-day,
-    .calendar-day.active-day,
-    .folder-body,
-    .project-node,
-    .project-connection,
-    .cycle-element,
-    .wave-bar,
-    .cloud-main,
-    .cloud-puff-1,
-    .cloud-puff-2,
-    .supernova-core,
-    .supernova-dot,
-    .sparkle {
-        animation: none !important;
     }
 }
