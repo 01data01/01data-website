@@ -26,6 +26,7 @@ class DashboardModule {
             console.log('Initializing Dashboard Module...');
             
             this.createStatsCards();
+            this.initializeAnimatedIcons();
             this.setupEventListeners();
             this.loadDashboardData();
             this.updateStats();
@@ -41,77 +42,87 @@ class DashboardModule {
     }
 
     /**
-     * Create enhanced stats cards HTML structure
+     * Create enhanced stats cards HTML structure with animated icons
      */
     createStatsCards() {
         const statsContainer = utils.getElementById('dashboardContent');
         if (!statsContainer) return;
 
         const statsHTML = `
-            <div class="stats-container">
-                <div class="stat-card clickable" data-stat="due-today" data-filter="due-today">
-                    <div class="stat-icon icon-today">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12,6 12,12 16,14"/>
-                        </svg>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" data-count="0">0</div>
-                        <div class="stat-label">Due Today</div>
-                        <div class="stat-trend">📈 <span class="trend-text">Track progress</span></div>
-                    </div>
-                    <div class="stat-action">→</div>
-                </div>
-
-                <div class="stat-card urgent clickable" data-stat="overdue" data-filter="overdue">
-                    <div class="stat-icon icon-warning">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                            <line x1="12" y1="9" x2="12" y2="13"/>
-                            <line x1="12" y1="17" x2="12.01" y2="17"/>
-                        </svg>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" data-count="0">0</div>
-                        <div class="stat-label">Overdue</div>
-                        <div class="stat-trend urgent-text">⚡ <span class="trend-text">Needs attention</span></div>
-                    </div>
-                    <div class="stat-action">→</div>
-                </div>
-
-                <div class="stat-card success clickable" data-stat="completed" data-filter="completed">
-                    <div class="stat-icon icon-completed">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22,4 12,14.01 9,11.01"/>
-                        </svg>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" data-count="0">0</div>
-                        <div class="stat-label">Completed</div>
-                        <div class="stat-trend success-text">🎉 <span class="trend-text">Well done!</span></div>
-                    </div>
-                    <div class="stat-action">→</div>
-                </div>
-
-                <div class="stat-card info" data-stat="completion-rate">
-                    <div class="stat-icon icon-chart">
-                        <div class="progress-ring-container">
-                            <svg class="progress-ring" viewBox="0 0 60 60">
-                                <circle class="progress-ring-bg" cx="30" cy="30" r="25" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="4"/>
-                                <circle class="progress-ring-fill" cx="30" cy="30" r="25" fill="none" stroke="currentColor" stroke-width="4" 
-                                        stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="157" transform="rotate(-90 30 30)"/>
-                            </svg>
-                            <div class="progress-center">
-                                <span class="progress-percentage">0%</span>
+            <div class="animated-stats-wrapper">
+                <div class="animated-stat-card blue-theme clickable" data-stat="due-today" data-filter="due-today">
+                    <div class="animated-card-content">
+                        <div class="animated-icon-container">
+                            <div class="animated-icon-circle blue">
+                                <div class="animated-clock">
+                                    <div class="animated-clock-face"></div>
+                                    <div class="animated-clock-hand animated-hour-hand"></div>
+                                    <div class="animated-clock-hand animated-minute-hand"></div>
+                                    <div class="animated-clock-center"></div>
+                                </div>
                             </div>
+                            <div class="animated-glow-ring" style="--glow-color: rgba(44, 95, 93, 0.4);"></div>
+                            <div class="animated-particles" data-color="blue"></div>
+                        </div>
+                        <div class="animated-metrics">
+                            <div class="animated-metric-value" data-metric="due-today">0</div>
+                            <div class="animated-metric-label blue">Due Today</div>
                         </div>
                     </div>
-                    <div class="stat-content">
-                        <div class="stat-number">0%</div>
-                        <div class="stat-label">Completion Rate</div>
-                        <div class="stat-trend">📊 <span class="trend-text">This week</span></div>
+                </div>
+
+                <div class="animated-stat-card red-theme clickable" data-stat="overdue" data-filter="overdue">
+                    <div class="animated-card-content">
+                        <div class="animated-icon-container">
+                            <div class="animated-icon-circle red">
+                                <div class="animated-warning"></div>
+                            </div>
+                            <div class="animated-glow-ring" style="--glow-color: rgba(239, 68, 68, 0.4);"></div>
+                            <div class="animated-particles" data-color="red"></div>
+                        </div>
+                        <div class="animated-metrics">
+                            <div class="animated-metric-value" data-metric="overdue">0</div>
+                            <div class="animated-metric-label red">Overdue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="animated-stat-card green-theme clickable" data-stat="completed" data-filter="completed">
+                    <div class="animated-card-content">
+                        <div class="animated-icon-container">
+                            <div class="animated-icon-circle green">
+                                <svg class="animated-checkmark" viewBox="0 0 24 24" fill="none">
+                                    <path class="animated-checkmark-path" d="M6 12l4 4L18 8"/>
+                                </svg>
+                            </div>
+                            <div class="animated-glow-ring" style="--glow-color: rgba(16, 185, 129, 0.4);"></div>
+                            <div class="animated-particles" data-color="green"></div>
+                        </div>
+                        <div class="animated-metrics">
+                            <div class="animated-metric-value" data-metric="completed">0</div>
+                            <div class="animated-metric-label green">Completed</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="animated-stat-card purple-theme" data-stat="completion-rate">
+                    <div class="animated-card-content">
+                        <div class="animated-icon-container">
+                            <div class="animated-icon-circle purple">
+                                <div class="animated-chart">
+                                    <div class="animated-bar"></div>
+                                    <div class="animated-bar"></div>
+                                    <div class="animated-bar"></div>
+                                    <div class="animated-bar"></div>
+                                </div>
+                            </div>
+                            <div class="animated-glow-ring" style="--glow-color: rgba(139, 92, 246, 0.4);"></div>
+                            <div class="animated-particles" data-color="purple"></div>
+                        </div>
+                        <div class="animated-metrics">
+                            <div class="animated-metric-value" data-metric="completion-rate">0%</div>
+                            <div class="animated-metric-label purple">Completion Rate</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -174,6 +185,42 @@ class DashboardModule {
     }
 
     /**
+     * Initialize animated icons particles and effects
+     */
+    initializeAnimatedIcons() {
+        setTimeout(() => {
+            this.createParticles();
+        }, 500);
+    }
+
+    /**
+     * Create orbiting particles around animated icons
+     */
+    createParticles() {
+        const particleContainers = utils.querySelectorAll('.animated-particles');
+        const colors = {
+            blue: '#4db6ac',
+            red: '#ef4444', 
+            green: '#10b981',
+            purple: '#8b5cf6'
+        };
+        
+        particleContainers.forEach((container, index) => {
+            const color = container.dataset.color;
+            const particleColor = colors[color];
+            
+            for (let i = 0; i < 3; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'animated-particle';
+                particle.style.setProperty('--particle-color', particleColor);
+                particle.style.setProperty('--orbit-duration', `${8 + index}s`);
+                particle.style.animationDelay = `${i * 2 + index * 0.5}s`;
+                container.appendChild(particle);
+            }
+        });
+    }
+
+    /**
      * Setup event listeners
      */
     setupEventListeners() {
@@ -209,7 +256,7 @@ class DashboardModule {
         }
 
         // Stats card clicks for navigation
-        const statsCards = utils.querySelectorAll('.stat-card[data-filter]');
+        const statsCards = utils.querySelectorAll('.animated-stat-card[data-filter]');
         statsCards.forEach(card => {
             const clickListener = utils.addEventListener(card, 'click', (e) => {
                 const filter = e.currentTarget.dataset.filter;
@@ -409,7 +456,7 @@ class DashboardModule {
         };
 
         Object.entries(statsMapping).forEach(([key, value]) => {
-            const statElement = utils.querySelector(`[data-stat="${key}"] .stat-number`);
+            const statElement = utils.querySelector(`[data-metric="${key}"]`);
             if (statElement) {
                 const currentValue = key === 'completion-rate' 
                     ? parseInt(statElement.textContent.replace('%', '')) || 0
@@ -417,7 +464,6 @@ class DashboardModule {
                 
                 if (key === 'completion-rate') {
                     this.animateNumber(statElement, currentValue, this.stats.completionRate, 800, '%');
-                    this.updateProgressRing(this.stats.completionRate);
                 } else {
                     this.animateNumber(statElement, currentValue, value);
                 }
@@ -429,10 +475,16 @@ class DashboardModule {
     }
 
     /**
-     * Animate number changes
+     * Animate number changes with enhanced visual effects
      */
     animateNumber(element, fromValue, toValue, duration = 800, suffix = '') {
         if (fromValue === toValue) return;
+
+        // Add visual update animation
+        element.style.animation = 'animatedValueUpdate 0.6s ease';
+        setTimeout(() => {
+            element.style.animation = '';
+        }, 600);
 
         const startTime = performance.now();
         const difference = toValue - fromValue;
@@ -469,26 +521,52 @@ class DashboardModule {
     }
 
     /**
-     * Update urgency indicators
+     * Update urgency indicators for animated cards
      */
     updateUrgencyIndicators() {
         // Overdue card urgency
-        const overdueCard = utils.querySelector('[data-stat="overdue"]');
+        const overdueCard = utils.querySelector('.animated-stat-card[data-stat="overdue"]');
         if (overdueCard) {
             if (this.stats.overdue > 0) {
                 overdueCard.classList.add('urgent');
+                // Add pulsing effect to overdue icon
+                const overdueIcon = overdueCard.querySelector('.animated-warning');
+                if (overdueIcon) {
+                    overdueIcon.style.animationDuration = '1.5s';
+                }
             } else {
                 overdueCard.classList.remove('urgent');
+                const overdueIcon = overdueCard.querySelector('.animated-warning');
+                if (overdueIcon) {
+                    overdueIcon.style.animationDuration = '3s';
+                }
             }
         }
 
         // Due today urgency
-        const dueTodayCard = utils.querySelector('[data-stat="due-today"]');
+        const dueTodayCard = utils.querySelector('.animated-stat-card[data-stat="due-today"]');
         if (dueTodayCard) {
             if (this.stats.dueToday > 3) {
                 dueTodayCard.classList.add('warning');
+                // Speed up clock animation when many tasks due
+                const clockHands = dueTodayCard.querySelectorAll('.animated-clock-hand');
+                clockHands.forEach(hand => {
+                    if (hand.classList.contains('animated-hour-hand')) {
+                        hand.style.animationDuration = '12s';
+                    } else {
+                        hand.style.animationDuration = '2s';
+                    }
+                });
             } else {
                 dueTodayCard.classList.remove('warning');
+                const clockHands = dueTodayCard.querySelectorAll('.animated-clock-hand');
+                clockHands.forEach(hand => {
+                    if (hand.classList.contains('animated-hour-hand')) {
+                        hand.style.animationDuration = '24s';
+                    } else {
+                        hand.style.animationDuration = '4s';
+                    }
+                });
             }
         }
     }
@@ -923,11 +1001,15 @@ class DashboardModule {
      * Animate stats cards on load
      */
     animateStatsCards() {
-        const statsCards = utils.querySelectorAll('.stat-card');
+        const statsCards = utils.querySelectorAll('.animated-stat-card');
         statsCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
             setTimeout(() => {
-                utils.animate(card, 'fadeInUp');
-            }, index * 100);
+                card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 150);
         });
     }
 
