@@ -116,12 +116,7 @@ class MainApp {
                 this.user = urlUser;
                 utils.saveToStorage('user', this.user);
                 
-                // Initialize AI service with user email
-                if (window.aiService) {
-                    window.aiService.setUserEmail(this.user.email).catch(error => {
-                        console.warn('AI service initialization failed:', error);
-                    });
-                }
+                // AI service will be initialized when showApp() is called
                 
                 this.showApp();
                 resolve();
@@ -133,12 +128,7 @@ class MainApp {
             if (savedUser) {
                 this.user = savedUser;
                 
-                // Initialize AI service with user email
-                if (window.aiService) {
-                    window.aiService.setUserEmail(this.user.email).catch(error => {
-                        console.warn('AI service initialization failed:', error);
-                    });
-                }
+                // AI service will be initialized when showApp() is called
                 
                 this.showApp();
                 resolve();
@@ -224,12 +214,7 @@ class MainApp {
             
             utils.saveToStorage('user', this.user);
             
-            // Initialize AI service with user email
-            if (window.aiService) {
-                window.aiService.setUserEmail(this.user.email).catch(error => {
-                    console.warn('AI service initialization failed:', error);
-                });
-            }
+            // AI service will be initialized when showApp() is called
             
             this.showApp();
             
@@ -289,6 +274,15 @@ class MainApp {
         
         // Update user info in header
         this.updateUserInfo();
+        
+        // Initialize AI service now that user is authenticated
+        if (window.aiService && this.user) {
+            window.aiService.setUserEmail(this.user.email).then(() => {
+                window.aiService.initialize();
+            }).catch(error => {
+                console.warn('AI service initialization failed:', error);
+            });
+        }
     }
 
     /**
@@ -644,6 +638,12 @@ window.onSignIn = function(googleUser) {
 
 // Make the class globally accessible
 window.MainApp = MainApp;
+
+// Create auth module interface for compatibility
+window.authModule = {
+    getCurrentUser: () => window.mainApp?.getCurrentUser() || null,
+    isAuthenticated: () => window.mainApp?.isAuthenticated() || false
+};
 
 // Auto-initialize will be handled by HTML
 // No need to create instance here since HTML will do it
