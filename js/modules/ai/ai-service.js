@@ -71,6 +71,13 @@ class AIService {
     async initializeUserAPI() {
         if (!this.userEmail) return;
 
+        // Check if running locally (file:// protocol)
+        if (window.location.protocol === 'file:') {
+            console.log('Running locally, skipping API key assignment');
+            this.connectionStatus = 'disconnected';
+            return { apiKey: null, isNewUser: false };
+        }
+
         try {
             const response = await fetch('/.netlify/functions/assign-api-key', {
                 method: 'POST',
