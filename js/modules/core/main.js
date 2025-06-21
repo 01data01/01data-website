@@ -106,18 +106,18 @@ class MainApp {
     }
 
     /**
-     * Initialize authentication
+     * Initialize authentication with better error handling
      */
     async initializeAuth() {
         return new Promise((resolve) => {
+            // Hide loading screen first
+            this.hideLoadingScreen();
+            
             // First check for user data passed from main website URL
             const urlUser = this.checkForURLUserData();
             if (urlUser) {
                 this.user = urlUser;
                 utils.saveToStorage('user', this.user);
-                
-                // AI service will be initialized when showApp() is called
-                
                 this.showApp();
                 resolve();
                 return;
@@ -127,35 +127,88 @@ class MainApp {
             const savedUser = utils.loadFromStorage('user');
             if (savedUser) {
                 this.user = savedUser;
-                
-                // AI service will be initialized when showApp() is called
-                
                 this.showApp();
                 resolve();
                 return;
             }
 
-            // Initialize Google Sign-In
-            if (typeof gapi !== 'undefined') {
-                gapi.load('auth2', () => {
-                    gapi.auth2.init({
-                        client_id: '336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com'
-                    }).then(() => {
-                        const authInstance = gapi.auth2.getAuthInstance();
-                        if (authInstance.isSignedIn.get()) {
-                            this.handleSignIn(authInstance.currentUser.get());
-                        } else {
-                            this.showSignIn();
-                        }
-                        resolve();
-                    });
-                });
-            } else {
-                // Fallback if Google API is not loaded
-                setTimeout(() => {
+            // For development/testing - create a demo user
+            const demoUser = {
+                id: 'demo-user',
+                name: 'Demo User',
+                email: 'demo@example.com',
+                image: 'https://ui-avatars.com/api/?name=Demo+User&background=4db6ac&color=fff',
+                signedIn: true
+            };
+            
+            // Check if we should use demo mode (for development)
+            const useDemo = window.location.search.includes('demo=true') || 
+                           localStorage.getItem('useDemoMode') === 'true';
+            
+            if (useDemo) {
+                this.user = demoUser;
+                utils.saveToStorage('user', this.user);
+                this.showApp();
+                resolve();
+                return;
+            }
+
+            // Initialize Google Sign-In with timeout
+            let authResolved = false;
+            const authTimeout = setTimeout(() => {
+                if (!authResolved) {
+                    console.warn('Google Auth timeout, showing sign-in screen');
                     this.showSignIn();
                     resolve();
-                }, 1000);
+                    authResolved = true;
+                }
+            }, 3000);
+
+            if (typeof gapi !== 'undefined') {
+                try {
+                    gapi.load('auth2', () => {
+                        gapi.auth2.init({
+                            client_id: '336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com'
+                        }).then(() => {
+                            if (!authResolved) {
+                                clearTimeout(authTimeout);
+                                const authInstance = gapi.auth2.getAuthInstance();
+                                if (authInstance.isSignedIn.get()) {
+                                    this.handleSignIn(authInstance.currentUser.get());
+                                } else {
+                                    this.showSignIn();
+                                }
+                                resolve();
+                                authResolved = true;
+                            }
+                        }).catch((error) => {
+                            console.error('Google Auth initialization failed:', error);
+                            if (!authResolved) {
+                                clearTimeout(authTimeout);
+                                this.showSignIn();
+                                resolve();
+                                authResolved = true;
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error loading Google API:', error);
+                    if (!authResolved) {
+                        clearTimeout(authTimeout);
+                        this.showSignIn();
+                        resolve();
+                        authResolved = true;
+                    }
+                }
+            } else {
+                // Google API not available, show sign-in screen
+                console.warn('Google API not available');
+                if (!authResolved) {
+                    clearTimeout(authTimeout);
+                    this.showSignIn();
+                    resolve();
+                    authResolved = true;
+                }
             }
         });
     }
@@ -253,6 +306,13 @@ class MainApp {
         utils.show('#loadingScreen');
         utils.hide('#signInScreen');
         utils.hide('#app');
+    }
+
+    /**
+     * Hide loading screen
+     */
+    hideLoadingScreen() {
+        utils.hide('#loadingScreen');
     }
 
     /**
