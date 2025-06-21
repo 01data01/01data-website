@@ -22,7 +22,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    const { userEmail, message, apiKey } = JSON.parse(event.body);
+    const { userEmail, message, apiKey, stream } = JSON.parse(event.body);
     
     if (!userEmail || !message || !apiKey) {
       return {
@@ -30,6 +30,23 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({ error: 'Missing required fields' })
       };
+    }
+
+    // Prepare Claude API request body
+    const claudeRequestBody = {
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 4000,
+      messages: [
+        {
+          role: 'user',
+          content: message
+        }
+      ]
+    };
+
+    // Add streaming parameter if requested
+    if (stream) {
+      claudeRequestBody.stream = true;
     }
 
     // Make request to Claude API
@@ -40,16 +57,7 @@ exports.handler = async (event, context) => {
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01'
       },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 4000,
-        messages: [
-          {
-            role: 'user',
-            content: message
-          }
-        ]
-      })
+      body: JSON.stringify(claudeRequestBody)
     });
 
     if (!claudeResponse.ok) {
@@ -64,6 +72,46 @@ exports.handler = async (event, context) => {
       };
     }
 
+    // Handle streaming response
+    if (stream) {
+      const streamHeaders = {
+        ...headers,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+      };
+
+      // Create a readable stream to pass through the Claude response
+      const reader = claudeResponse.body.getReader();
+      const decoder = new TextDecoder();
+      let streamedData = '';
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          const chunk = decoder.decode(value, { stream: true });
+          streamedData += chunk;
+        }
+      } catch (streamError) {
+        console.error('Streaming error:', streamError);
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ error: 'Streaming error: ' + streamError.message })
+        };
+      }
+
+      return {
+        statusCode: 200,
+        headers: streamHeaders,
+        body: streamedData,
+        isBase64Encoded: false
+      };
+    }
+
+    // Handle regular (non-streaming) response
     const claudeData = await claudeResponse.json();
     const responseText = claudeData.content[0].text;
 
