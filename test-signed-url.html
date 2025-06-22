@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test ElevenLabs Signed URL</title>
+</head>
+<body>
+    <h1>Test ElevenLabs Signed URL Function</h1>
+    <button id="testBtn">Test Signed URL Function</button>
+    <div id="output"></div>
+
+    <script>
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                console.log('Testing signed URL function...');
+                const response = await fetch('/.netlify/functions/elevenlabs-signed-url');
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Response data:', data);
+                    output.innerHTML = `
+                        <h3>✅ Success!</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Agent ID:</strong> ${data.agent_id}</p>
+                        <p><strong>Signed URL:</strong> ${data.signed_url ? 'Generated' : 'Missing'}</p>
+                        <p><strong>URL Preview:</strong> ${data.signed_url?.substring(0, 100)}...</p>
+                    `;
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    output.innerHTML = `
+                        <h3>❌ Error</h3>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Error:</strong> ${errorText}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Test failed:', error);
+                output.innerHTML = `
+                    <h3>❌ Test Failed</h3>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>
