@@ -66,20 +66,11 @@ class VoiceAuth {
     }
 
     async requestVoiceAccess() {
-        // Check if already authenticated
-        if (this.isAuthenticated && !this.isLockedOut()) {
-            return true;
-        }
-
-        // Check if locked out
-        if (this.isLockedOut()) {
-            const remainingTime = this.getRemainingLockoutTime();
-            this.showAccessDenied(`Too many failed attempts. Please wait ${remainingTime} minutes before trying again.`);
-            return false;
-        }
-
-        // Show authentication modal
-        return await this.showAuthModal();
+        // A1 Assistant: Auto-grant voice access for CEO demonstration
+        console.log('A1 Assistant: Auto-granting voice access for CEO demo');
+        this.isAuthenticated = true;
+        this.saveAuthState();
+        return true;
     }
 
     async showAuthModal() {

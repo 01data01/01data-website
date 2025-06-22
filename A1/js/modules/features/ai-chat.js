@@ -799,25 +799,35 @@ class AIChatModule {
      * Toggle voice mode on/off
      */
     async toggleVoiceMode() {
+        console.log('A1 Assistant: Voice button clicked - toggleVoiceMode called');
+        
         if (!this.voiceChat || !this.voiceAuth) {
             console.error('Voice chat or voice auth not initialized');
+            this.addMessageToChat('system', 'Voice modules not initialized. Please refresh the page.');
             return;
         }
 
         try {
             if (this.isVoiceMode) {
                 // Stop voice conversation
+                console.log('Stopping voice conversation...');
                 this.voiceChat.stopConversation();
                 this.isVoiceMode = false;
                 this.updateVoiceModeUI(false);
                 this.addMessageToChat('system', 'Voice mode disabled');
             } else {
+                console.log('Starting voice mode - checking authentication...');
+                
                 // Check authentication first
                 const hasAccess = await this.voiceAuth.requestVoiceAccess();
                 if (!hasAccess) {
                     console.log('Voice access denied');
+                    this.addMessageToChat('system', 'Voice access denied');
                     return;
                 }
+
+                console.log('Voice access granted - starting conversation...');
+                this.addMessageToChat('system', 'Starting voice mode... Please allow microphone access when prompted.');
 
                 // Start voice conversation
                 await this.voiceChat.startConversation();
