@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Dashboard Icons - Example</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/animated-dashboard-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .page-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .dashboard-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #4db6ac, #2c5f5d);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5cc8bc, #3a7a77);
+        }
+        
+        /* Custom Dashboard Styles */
+        #custom-dashboard {
+            margin-top: 3rem;
+        }
+        
+        .animated-icon-svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .page-header h1 { font-size: 2rem; }
+            .dashboard-section { padding: 1.5rem; }
+            .controls { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1>Animated Dashboard Icons</h1>
+        <p>Professional animated dashboard components for your projects</p>
+    </div>
+    
+    <div class="dashboard-section">
+        <h2 class="section-title">Default Dashboard</h2>
+        <div id="animated-dashboard-container"></div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" onclick="updateRandomValues()">Update Values</button>
+            <button class="btn" onclick="resetValues()">Reset</button>
+            <button class="btn" onclick="createCustomDashboard()">Custom Dashboard</button>
+        </div>
+    </div>
+    
+    <div id="custom-dashboard" class="dashboard-section" style="display: none;">
+        <h2 class="section-title">Custom Dashboard Example</h2>
+        <div id="custom-dashboard-container"></div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" onclick="updateCustomValues()">Update Custom</button>
+            <button class="btn" onclick="hideCustomDashboard()">Hide Custom</button>
+        </div>
+    </div>
+
+    <script src="js/animated-dashboard-icons.js"></script>
+    <script>
+        // Initialize dashboard
+        let customDashboard = null;
+        
+        // Example functions
+        function updateRandomValues() {
+            if (window.animatedDashboard) {
+                const values = [
+                    Math.floor(Math.random() * 50),
+                    Math.floor(Math.random() * 20),
+                    Math.floor(Math.random() * 100),
+                    Math.floor(Math.random() * 100) + '%'
+                ];
+                window.animatedDashboard.updateValues(values);
+            }
+        }
+        
+        function resetValues() {
+            if (window.animatedDashboard) {
+                window.animatedDashboard.updateValues(['0', '0', '0', '0%']);
+            }
+        }
+        
+        function createCustomDashboard() {
+            document.getElementById('custom-dashboard').style.display = 'block';
+            
+            if (!customDashboard) {
+                customDashboard = new AnimatedDashboardIcons('custom-dashboard-container', {
+                    customCards: [
+                        { label: 'Total Users', value: '1,234', color: 'blue', icon: 'users' },
+                        { label: 'Revenue', value: '$12.5K', color: 'green', icon: 'dollar', theme: 'green-theme' },
+                        { label: 'Rating', value: '4.8', color: 'purple', icon: 'star', theme: 'purple-theme' },
+                        { label: 'Growth', value: '+23%', color: 'blue', icon: 'chart' }
+                    ]
+                });
+                
+                // Add click handlers
+                customDashboard.addClickHandlers([
+                    () => alert('Users clicked!'),
+                    () => alert('Revenue clicked!'),
+                    () => alert('Rating clicked!'),
+                    () => alert('Growth clicked!')
+                ]);
+            }
+        }
+        
+        function updateCustomValues() {
+            if (customDashboard) {
+                customDashboard.updateSingleValue('total-users', Math.floor(Math.random() * 5000));
+                customDashboard.updateSingleValue('revenue', '$' + (Math.random() * 50).toFixed(1) + 'K');
+                customDashboard.updateSingleValue('rating', (Math.random() * 2 + 3).toFixed(1));
+                customDashboard.updateSingleValue('growth', '+' + Math.floor(Math.random() * 50) + '%');
+            }
+        }
+        
+        function hideCustomDashboard() {
+            document.getElementById('custom-dashboard').style.display = 'none';
+        }
+        
+        // Add click handlers to default dashboard
+        setTimeout(() => {
+            if (window.animatedDashboard) {
+                window.animatedDashboard.addClickHandlers([
+                    () => console.log('Due Today clicked'),
+                    () => console.log('Overdue clicked'),
+                    () => console.log('Completed clicked'),
+                    () => console.log('Completion Rate clicked')
+                ]);
+            }
+        }, 1000);
+        
+        // Auto-update demo
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                updateRandomValues();
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
