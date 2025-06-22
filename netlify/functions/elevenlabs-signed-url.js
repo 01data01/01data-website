@@ -35,15 +35,13 @@ exports.handler = async (event, context) => {
         const a1AgentId = process.env.ELEVENLABS_AGENT_ID_3; // A1 Assistant preferred agent (problematic)
         const a1AgentId4 = process.env.ELEVENLABS_AGENT_ID_4; // A1 Assistant new agent (clean setup)
         
-        // Use AGENT_ID_4 for A1 Assistant if available, otherwise fall back to original
-        let AGENT_ID = a1AgentId4 || originalAgentId; // Prefer AGENT_ID_4, fallback to original
-        let API_KEY = ELEVENLABS_API_KEY_4 || ELEVENLABS_API_KEY; // Corresponding API key
+        // Temporarily force original working agent until AGENT_ID_4 is properly configured
+        // The current AGENT_ID_3/4 values cause WebSocket connection issues
+        let AGENT_ID = originalAgentId; // Force original working agent
+        let API_KEY = ELEVENLABS_API_KEY; // Use original API key
         
-        if (a1AgentId4 && ELEVENLABS_API_KEY_4) {
-            console.log('A1: Using ELEVENLABS_AGENT_ID_4 for A1 Assistant');
-        } else {
-            console.log('A1: Using original working agent (AGENT_ID_4 not configured yet)');
-        }
+        console.log('A1: Forcing original working agent due to WebSocket issues with current AGENT_ID_3/4');
+        console.log(`A1: Original agent ID: ${originalAgentId}`);
         
         // Allow switching between multiple agents and their corresponding API keys
         if (requestedAgentId) {
