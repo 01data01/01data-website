@@ -170,14 +170,33 @@ class AIChatModule {
         const messageElement = document.createElement('div');
         messageElement.className = `message ${role}-message`;
         
-        const avatar = role === 'user' ? '👤' : '🤖';
         const timestamp = new Date().toLocaleTimeString('en-US', { 
             hour: 'numeric', 
             minute: '2-digit' 
         });
 
+        // Create modern avatar based on role
+        let avatarHTML;
+        if (role === 'user') {
+            avatarHTML = '<div class="user-avatar">👤</div>';
+        } else if (role === 'assistant' || role === 'ai') {
+            avatarHTML = `
+                <div class="ai-avatar-soundwave">
+                    <div class="soundwave-container">
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                    </div>
+                </div>
+            `;
+        } else {
+            avatarHTML = '<div class="system-avatar">⚙️</div>';
+        }
+
         messageElement.innerHTML = `
-            <div class="message-avatar">${avatar}</div>
+            <div class="message-avatar">${avatarHTML}</div>
             <div class="message-content">
                 <div class="message-text">${this.formatMessage(content)}</div>
                 <div class="message-timestamp">${timestamp}</div>
