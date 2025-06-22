@@ -83,9 +83,10 @@ const API_KEYS = getApiKeys();
 // ElevenLabs Configuration for A1 Assistant
 const ELEVENLABS_CONFIG = {
   // A1 Assistant uses ELEVENLABS_AGENT_ID_3 as default (configured in Netlify environment)
+  // Falls back to original working agent if AGENT_ID_3 is not available
   agentId: null, // Will be fetched securely from Netlify function (defaults to ELEVENLABS_AGENT_ID_3)
   agentId3: null, // A1 Assistant primary agent (ELEVENLABS_AGENT_ID_3)
-  agentId2: null, // Secondary agent for ELA mode
+  agentId2: null, // Secondary agent for ELA mode (ELEVENLABS_AGENT_ID_2)
   apiKey: null, // Set this to your ElevenLabs API key for server-side operations
   // Voice configuration
   voiceSettings: {

@@ -24,28 +24,47 @@ exports.handler = async (event, context) => {
         // Get ElevenLabs API keys from environment variables
         const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
         const ELEVENLABS_API_KEY_2 = process.env.ELEVENLABS_API_KEY_2;
+        const ELEVENLABS_API_KEY_3 = process.env.ELEVENLABS_API_KEY_3;
         
-        // Get agent ID from query parameter or environment variable
+        // Get agent IDs from environment variables
         const requestedAgentId = event.queryStringParameters?.agent_id;
-        // Temporarily use the known working agent ID until environment variables are sorted
-        const defaultAgentId = 'DpUHUaJeMXPge91Sev0l'; // Original working agent ID
+        const originalAgentId = 'DpUHUaJeMXPge91Sev0l'; // Known working agent ID
+        const defaultAgentId = process.env.ELEVENLABS_AGENT_ID || originalAgentId;
         const secondaryAgentId = process.env.ELEVENLABS_AGENT_ID_2;
+        const a1AgentId = process.env.ELEVENLABS_AGENT_ID_3; // A1 Assistant preferred agent
         
-        let AGENT_ID = defaultAgentId;
-        let API_KEY = ELEVENLABS_API_KEY;
+        // Default to A1 Agent (ELEVENLABS_AGENT_ID_3) for A1 Assistant, with fallback
+        let AGENT_ID = a1AgentId || defaultAgentId;
+        let API_KEY = ELEVENLABS_API_KEY_3 || ELEVENLABS_API_KEY;
         
         // Allow switching between multiple agents and their corresponding API keys
         if (requestedAgentId) {
-            if (requestedAgentId === secondaryAgentId && ELEVENLABS_API_KEY_2) {
+            if (requestedAgentId === a1AgentId && ELEVENLABS_API_KEY_3) {
+                // A1 Assistant agent (highest priority)
+                AGENT_ID = requestedAgentId;
+                API_KEY = ELEVENLABS_API_KEY_3;
+                console.log('Using A1 Agent (ELEVENLABS_AGENT_ID_3)');
+            } else if (requestedAgentId === secondaryAgentId && ELEVENLABS_API_KEY_2) {
+                // Secondary agent (ELA)
                 AGENT_ID = requestedAgentId;
                 API_KEY = ELEVENLABS_API_KEY_2;
-            } else if (requestedAgentId === defaultAgentId) {
+                console.log('Using Secondary Agent (ELEVENLABS_AGENT_ID_2)');
+            } else if (requestedAgentId === defaultAgentId && ELEVENLABS_API_KEY) {
+                // Original default agent
                 AGENT_ID = requestedAgentId;
                 API_KEY = ELEVENLABS_API_KEY;
+                console.log('Using Original Default Agent');
+            } else if (requestedAgentId === originalAgentId && ELEVENLABS_API_KEY) {
+                // Fallback to known working agent
+                AGENT_ID = requestedAgentId;
+                API_KEY = ELEVENLABS_API_KEY;
+                console.log('Using Known Working Agent (fallback)');
             } else {
                 console.warn(`Requested agent ID ${requestedAgentId} not in allowed list`);
             }
         }
+        
+        console.log(`Final Agent Selection - ID: ${AGENT_ID}, Available: A1=${!!a1AgentId}, Secondary=${!!secondaryAgentId}, Default=${!!defaultAgentId}`);
 
         if (!API_KEY) {
             console.error('ElevenLabs API key not configured');
