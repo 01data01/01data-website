@@ -24,9 +24,9 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        // Use ELEVENLABS_AGENT_ID_4 as primary, with fallback to original working agent
-        const AGENT_ID = process.env.ELEVENLABS_AGENT_ID_4 || process.env.ELEVENLABS_AGENT_ID || 'DpUHUaJeMXPge91Sev0l';
-        const API_KEY = process.env.ELEVENLABS_API_KEY_4 || process.env.ELEVENLABS_API_KEY;
+        // Use your configured ELEVENLABS_AGENT_ID and ELEVENLABS_API_KEY
+        const AGENT_ID = process.env.ELEVENLABS_AGENT_ID || 'DpUHUaJeMXPge91Sev0l';
+        const API_KEY = process.env.ELEVENLABS_API_KEY;
         
         console.log('Using Agent ID:', AGENT_ID);
         console.log('API Key available:', !!API_KEY);
