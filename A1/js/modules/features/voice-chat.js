@@ -82,12 +82,18 @@ class VoiceChat {
     }
 
     async startConversation() {
+        console.log('A1: VoiceChat.startConversation() called');
+        
         if (this.isConnected) {
-            console.log('Conversation already active');
+            console.log('A1: Conversation already active');
             return;
         }
 
         try {
+            console.log('A1: Requesting microphone permission...');
+            console.log('A1: navigator.mediaDevices available:', !!navigator.mediaDevices);
+            console.log('A1: getUserMedia available:', !!navigator.mediaDevices?.getUserMedia);
+            
             // Request microphone permission
             const stream = await navigator.mediaDevices.getUserMedia({ 
                 audio: {
@@ -98,16 +104,22 @@ class VoiceChat {
                 }
             });
 
+            console.log('A1: Microphone permission granted, stream obtained:', !!stream);
+
             // Set up WebSocket connection
+            console.log('A1: Setting up WebSocket connection...');
             await this.connectWebSocket();
             
             // Set up audio recording
+            console.log('A1: Setting up audio recording...');
             await this.setupAudioRecording(stream);
             
-            console.log('Voice conversation started');
+            console.log('A1: Voice conversation started successfully');
             
         } catch (error) {
-            console.error('Failed to start conversation:', error);
+            console.error('A1: Failed to start conversation:', error);
+            console.log('A1: Error type:', error.name);
+            console.log('A1: Error message:', error.message);
             this.handleError('Failed to start voice conversation: ' + error.message);
         }
     }

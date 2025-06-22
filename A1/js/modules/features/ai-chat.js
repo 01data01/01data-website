@@ -826,10 +826,15 @@ class AIChatModule {
      * Toggle voice mode on/off
      */
     async toggleVoiceMode() {
-        console.log('A1 Assistant: Voice button clicked - toggleVoiceMode called');
+        console.log('A1: Voice button clicked - toggleVoiceMode called');
+        console.log('A1: Current voice mode state:', this.isVoiceMode);
+        console.log('A1: Voice chat available:', !!this.voiceChat);
+        console.log('A1: Voice auth available:', !!this.voiceAuth);
         
         if (!this.voiceChat || !this.voiceAuth) {
-            console.error('Voice chat or voice auth not initialized');
+            console.error('A1: Voice chat or voice auth not initialized');
+            console.log('A1: voiceChat:', this.voiceChat);
+            console.log('A1: voiceAuth:', this.voiceAuth);
             this.addMessageToChat('system', 'Voice modules not initialized. Please refresh the page.');
             return;
         }
@@ -837,33 +842,40 @@ class AIChatModule {
         try {
             if (this.isVoiceMode) {
                 // Stop voice conversation
-                console.log('Stopping voice conversation...');
+                console.log('A1: Stopping voice conversation...');
                 this.voiceChat.stopConversation();
                 this.isVoiceMode = false;
                 this.updateVoiceModeUI(false);
                 this.addMessageToChat('system', 'Voice mode disabled');
             } else {
-                console.log('Starting voice mode - checking authentication...');
+                console.log('A1: Starting voice mode - checking authentication...');
                 
                 // Check authentication first
+                console.log('A1: Requesting voice access...');
                 const hasAccess = await this.voiceAuth.requestVoiceAccess();
+                console.log('A1: Voice access result:', hasAccess);
+                
                 if (!hasAccess) {
-                    console.log('Voice access denied');
+                    console.log('A1: Voice access denied');
                     this.addMessageToChat('system', 'Voice access denied');
                     return;
                 }
 
-                console.log('Voice access granted - starting conversation...');
+                console.log('A1: Voice access granted - starting conversation...');
                 this.addMessageToChat('system', 'Starting voice mode... Please allow microphone access when prompted.');
 
-                // Start voice conversation
+                // Start voice conversation - this should trigger microphone permission
+                console.log('A1: Calling voiceChat.startConversation()...');
                 await this.voiceChat.startConversation();
+                
+                console.log('A1: Voice conversation started successfully');
                 this.isVoiceMode = true;
                 this.updateVoiceModeUI(true);
                 this.addMessageToChat('system', 'Voice mode enabled - You can now speak to the AI');
             }
         } catch (error) {
-            console.error('Error toggling voice mode:', error);
+            console.error('A1: Error toggling voice mode:', error);
+            console.log('A1: Error details:', error.stack);
             this.addMessageToChat('system', `Failed to ${this.isVoiceMode ? 'stop' : 'start'} voice mode: ${error.message}`);
         }
     }
