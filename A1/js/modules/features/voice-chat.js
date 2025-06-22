@@ -156,11 +156,12 @@ class VoiceChat {
                     throw new Error('No signed URL received from server');
                 }
                 
-                console.log('Connecting with signed URL...');
+                console.log('A1: Connecting with signed URL:', signedUrl);
+                console.log('A1: Using agent ID:', data.agent_id);
                 this.websocket = new WebSocket(signedUrl);
 
                 this.websocket.onopen = () => {
-                console.log('WebSocket connected');
+                console.log('A1: WebSocket connected successfully');
                 this.isConnected = true;
                 this.updateConnectionStatus(true);
                 
@@ -172,6 +173,7 @@ class VoiceChat {
                 };
 
                 // Send conversation initiation
+                console.log('A1: Sending conversation initiation...');
                 this.sendMessage({
                     type: 'conversation_initiation_client_data',
                     conversation_config_override: {
@@ -215,14 +217,18 @@ class VoiceChat {
                 this.handleWebSocketMessage(event);
             };
 
-            this.websocket.onclose = () => {
-                console.log('WebSocket disconnected');
+            this.websocket.onclose = (event) => {
+                console.log('A1: WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
+                console.log('A1: Was clean:', event.wasClean);
+                this.isConnected = false;
                 this.cleanup();
-                reject(new Error('WebSocket connection closed'));
+                reject(new Error(`WebSocket connection closed: ${event.code} - ${event.reason}`));
             };
 
             this.websocket.onerror = (error) => {
-                console.error('WebSocket error:', error);
+                console.error('A1: WebSocket error:', error);
+                console.log('A1: WebSocket readyState:', this.websocket?.readyState);
+                this.isConnected = false;
                 this.cleanup();
                 reject(error);
             };
@@ -249,7 +255,11 @@ class VoiceChat {
             });
 
             // Create audio processing for real-time streaming
+            console.log('A1: Setting up audio processing...');
             const source = this.audioContext.createMediaStreamSource(stream);
+            
+            // Note: createScriptProcessor is deprecated but still used for compatibility
+            // TODO: Migrate to AudioWorkletNode in future update
             const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
             
             processor.onaudioprocess = (event) => {
@@ -258,6 +268,7 @@ class VoiceChat {
                     const audioData = this.convertFloat32ToPCM16(inputData);
                     const base64Audio = this.arrayBufferToBase64(audioData);
                     
+                    console.log('A1: Sending audio chunk, size:', base64Audio.length);
                     this.sendMessage({
                         user_audio_chunk: base64Audio
                     });
@@ -268,7 +279,7 @@ class VoiceChat {
             processor.connect(this.audioContext.destination);
 
             this.isRecording = true;
-            console.log('Audio recording started');
+            console.log('A1: Audio recording started successfully');
             
         } catch (error) {
             console.error('Failed to setup audio recording:', error);
@@ -279,7 +290,8 @@ class VoiceChat {
     handleWebSocketMessage(event) {
         try {
             const data = JSON.parse(event.data);
-            console.log('Received WebSocket message:', data.type, data);
+            console.log('A1: Received WebSocket message:', data.type);
+            console.log('A1: Full message data:', data);
             
             switch (data.type) {
                 case 'conversation_initiation_metadata':
@@ -305,8 +317,13 @@ class VoiceChat {
                 case 'audio':
                     const audioData = data.audio_event.audio_base_64;
                     const eventId = data.audio_event.event_id;
-                    console.log('Received audio data, length:', audioData?.length, 'eventId:', eventId);
-                    this.playAudioResponse(audioData, eventId);
+                    console.log('A1: Received audio data, length:', audioData?.length, 'eventId:', eventId);
+                    if (audioData && audioData.length > 0) {
+                        console.log('A1: Playing audio response...');
+                        this.playAudioResponse(audioData, eventId);
+                    } else {
+                        console.warn('A1: Received empty audio data');
+                    }
                     break;
                     
                 case 'ping':
@@ -342,32 +359,38 @@ class VoiceChat {
 
     async playAudioResponse(base64Audio, eventId) {
         try {
-            console.log('Playing audio response, eventId:', eventId, 'base64 length:', base64Audio?.length);
+            console.log('A1: Playing audio response, eventId:', eventId, 'base64 length:', base64Audio?.length);
             
             if (!base64Audio) {
-                console.warn('No audio data received');
+                console.warn('A1: No audio data received');
                 return;
             }
             
             // Decode base64 audio
             const audioBuffer = this.base64ToArrayBuffer(base64Audio);
-            console.log('Decoded audio buffer size:', audioBuffer.byteLength);
+            console.log('A1: Decoded audio buffer size:', audioBuffer.byteLength);
             
             // Add to audio queue for sequential playback
             this.audioQueue.push({ buffer: audioBuffer, eventId });
-            console.log('Audio queue length:', this.audioQueue.length);
+            console.log('A1: Audio queue length:', this.audioQueue.length);
             
             // Start playback if not already playing
             if (!this.isPlaying) {
+                console.log('A1: Starting audio queue processing...');
                 this.processAudioQueue();
+            } else {
+                console.log('A1: Audio already playing, added to queue');
             }
         } catch (error) {
-            console.error('Error playing audio response:', error);
+            console.error('A1: Error playing audio response:', error);
         }
     }
 
     async processAudioQueue() {
+        console.log('A1: processAudioQueue called, queue length:', this.audioQueue.length);
+        
         if (this.audioQueue.length === 0) {
+            console.log('A1: Audio queue empty, stopping playback');
             this.isPlaying = false;
             return;
         }
@@ -378,22 +401,22 @@ class VoiceChat {
         try {
             // Resume audio context if suspended
             if (this.audioContext.state === 'suspended') {
-                console.log('Resuming audio context...');
+                console.log('A1: Resuming audio context...');
                 await this.audioContext.resume();
             }
             
-            console.log('Processing audio queue item, buffer size:', audioItem.buffer.byteLength);
+            console.log('A1: Processing audio queue item, buffer size:', audioItem.buffer.byteLength);
             
             // Convert PCM data to audio buffer
             const audioBuffer = await this.pcmToAudioBuffer(audioItem.buffer);
             
             if (!audioBuffer) {
-                console.warn('Skipping invalid audio buffer');
+                console.warn('A1: Skipping invalid audio buffer');
                 this.processAudioQueue(); // Continue with next audio
                 return;
             }
             
-            console.log('Created audio buffer:', audioBuffer.length, 'frames,', audioBuffer.duration, 'seconds');
+            console.log('A1: Created audio buffer:', audioBuffer.length, 'frames,', audioBuffer.duration, 'seconds');
             
             // Create audio source and play
             const source = this.audioContext.createBufferSource();
@@ -401,13 +424,14 @@ class VoiceChat {
             source.connect(this.audioContext.destination);
             
             source.onended = () => {
-                console.log('Audio playback ended');
+                console.log('A1: Audio playback ended');
                 // Process next audio in queue
                 this.processAudioQueue();
             };
             
-            console.log('Starting audio playback...');
+            console.log('A1: Starting audio playback...');
             source.start();
+            console.log('A1: Audio source started successfully');
             
         } catch (error) {
             console.error('Error processing audio queue:', error);
@@ -449,9 +473,11 @@ class VoiceChat {
 
     sendMessage(message) {
         if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+            console.log('A1: Sending WebSocket message:', message.type);
             this.websocket.send(JSON.stringify(message));
         } else {
-            console.warn('WebSocket not connected, cannot send message');
+            console.warn('A1: WebSocket not connected, cannot send message. ReadyState:', this.websocket?.readyState);
+            console.log('A1: WebSocket states - CONNECTING:', WebSocket.CONNECTING, 'OPEN:', WebSocket.OPEN, 'CLOSING:', WebSocket.CLOSING, 'CLOSED:', WebSocket.CLOSED);
         }
     }
 
