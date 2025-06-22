@@ -531,8 +531,10 @@
 .chat-input-container {
     background: white;
     border-top: 1px solid #e0e0e0;
-    padding: 1.5rem 3rem;
+    padding: 1.5rem 4rem;
     flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .input-wrapper {
@@ -546,6 +548,7 @@
     overflow: hidden;
     width: 100%;
     max-width: none;
+    order: 2;
 }
 
 .input-wrapper:focus-within {
@@ -557,7 +560,7 @@
     flex: 1;
     border: none;
     background: transparent;
-    padding: 15px 25px;
+    padding: 15px 30px;
     color: var(--a1-dark);
     font-size: 1rem;
     font-family: inherit;
@@ -611,7 +614,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    order: 1;
 }
 
 .suggestion-btn {
