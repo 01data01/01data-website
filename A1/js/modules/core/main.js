@@ -122,7 +122,7 @@ class MainApp {
             };
             
             // Save user session
-            utils.saveToStorage('a1_user', this.user);
+            utils.saveToStorage('user', this.user);
             
             // Show app immediately
             this.showApp();
@@ -253,10 +253,13 @@ class MainApp {
         
         // Initialize AI service now that user is authenticated
         if (window.aiService && this.user) {
+            console.log('A1: Initializing AI service with user email:', this.user.email);
             window.aiService.setUserEmail(this.user.email).then(() => {
-                window.aiService.initialize();
+                return window.aiService.initialize();
+            }).then(() => {
+                console.log('A1: AI service initialized successfully');
             }).catch(error => {
-                console.warn('AI service initialization failed:', error);
+                console.warn('A1: AI service initialization failed:', error);
             });
         }
     }
@@ -459,18 +462,28 @@ class MainApp {
     initializeAIChat() {
         // Initialize AI Service first
         if (typeof AIService !== 'undefined' && !window.aiService) {
+            console.log('A1: Creating new AI Service instance');
             window.aiService = new AIService();
-            window.aiService.setUserEmail(this.user.email);
-            window.aiService.initialize();
+            if (this.user && this.user.email) {
+                console.log('A1: Setting AI service user email:', this.user.email);
+                window.aiService.setUserEmail(this.user.email).then(() => {
+                    return window.aiService.initialize();
+                }).then(() => {
+                    console.log('A1: AI service ready');
+                }).catch(error => {
+                    console.warn('A1: AI service initialization error:', error);
+                });
+            }
         }
 
         // Ensure voice modules are available globally
-        console.log('Checking voice modules availability:');
+        console.log('A1: Checking voice modules availability:');
         console.log('VoiceChat available:', typeof window.VoiceChat !== 'undefined');
         console.log('VoiceAuth available:', typeof window.VoiceAuth !== 'undefined');
 
         // AI chat initialization will be handled by ai-chat.js module
         if (typeof AIChatModule !== 'undefined' && !window.aiChatModule) {
+            console.log('A1: Creating new AI Chat Module instance');
             window.aiChatModule = new AIChatModule();
             window.aiChatModule.initialize();
         }

@@ -46,25 +46,33 @@ class AIService {
         if (this.initialized) return;
         
         try {
-            console.log('Initializing AI Service...');
+            console.log('A1: Initializing AI Service...');
             
-            // Get user email from auth module
+            // Get user email from auth module or localStorage
             if (window.authModule && window.authModule.getCurrentUser()) {
                 this.userEmail = window.authModule.getCurrentUser().email;
-                console.log('User email set:', this.userEmail);
+                console.log('A1: User email from authModule:', this.userEmail);
                 await this.initializeUserAPI();
             } else {
-                console.log('No user found, AI service will run in disconnected mode');
-                this.connectionStatus = 'disconnected';
+                // Fallback to localStorage for A1 auto-login
+                const savedUser = window.utils?.loadFromStorage('user');
+                if (savedUser && savedUser.email) {
+                    this.userEmail = savedUser.email;
+                    console.log('A1: User email from localStorage:', this.userEmail);
+                    await this.initializeUserAPI();
+                } else {
+                    console.log('A1: No user found, AI service will run in disconnected mode');
+                    this.connectionStatus = 'disconnected';
+                }
             }
             
             this.setupRequestQueue();
             
             this.initialized = true;
-            console.log('AI Service initialized successfully. Status:', this.connectionStatus);
+            console.log('A1: AI Service initialized successfully. Status:', this.connectionStatus);
             
         } catch (error) {
-            console.error('AI Service Initialization error:', error);
+            console.error('A1: AI Service Initialization error:', error);
             this.connectionStatus = 'error';
         }
     }

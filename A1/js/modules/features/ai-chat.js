@@ -700,9 +700,23 @@ class AIChatModule {
      * Get current user email
      */
     getCurrentUserEmail() {
+        console.log('A1: Getting current user email...');
+        console.log('A1: authModule available:', !!window.authModule);
+        
         if (window.authModule && window.authModule.getCurrentUser()) {
-            return window.authModule.getCurrentUser().email;
+            const user = window.authModule.getCurrentUser();
+            console.log('A1: Current user:', user);
+            return user.email;
         }
+        
+        // Fallback to check localStorage directly for A1 user
+        const savedUser = window.utils.loadFromStorage('user');
+        console.log('A1: Saved user from storage:', savedUser);
+        if (savedUser && savedUser.email) {
+            return savedUser.email;
+        }
+        
+        console.log('A1: No user email found');
         return null;
     }
 
@@ -749,22 +763,28 @@ class AIChatModule {
      */
     initializeVoiceChat() {
         try {
+            console.log('A1: Initializing voice chat...');
+            
             // Wait for VoiceChat and VoiceAuth to be available
             if (typeof window.VoiceChat === 'undefined' || typeof window.VoiceAuth === 'undefined') {
-                console.log('VoiceChat or VoiceAuth not yet available, retrying...');
+                console.log('A1: VoiceChat or VoiceAuth not yet available, retrying...');
                 setTimeout(() => this.initializeVoiceChat(), 100);
                 return;
             }
             
+            console.log('A1: Voice modules available, initializing...');
+            
             // Initialize voice authentication
             this.voiceAuth = new window.VoiceAuth();
+            console.log('A1: VoiceAuth initialized');
             
             this.voiceChat = new window.VoiceChat();
+            console.log('A1: VoiceChat initialized');
             
             // Configure voice chat with ElevenLabs agent ID
             const agentId = window.config?.elevenlabs?.agentId;
-            console.log('Configuring voice chat with agent ID:', agentId);
-            console.log('Full config:', window.config);
+            console.log('A1: Configuring voice chat with agent ID:', agentId);
+            console.log('A1: Full config:', window.config);
             
             this.voiceChat.setConfig({
                 agentId: agentId || null
@@ -773,25 +793,28 @@ class AIChatModule {
             // Set up voice chat callbacks
             this.voiceChat.setCallbacks({
                 onConnectionChange: (connected) => {
+                    console.log('A1: Voice connection status changed:', connected);
                     this.updateVoiceConnectionStatus(connected);
                 },
                 onTranscript: (transcript, role) => {
+                    console.log('A1: Voice transcript received:', transcript, 'role:', role);
                     if (role === 'user') {
                         this.addMessageToChat('user', transcript);
                     }
                 },
                 onAgentResponse: (response) => {
+                    console.log('A1: Voice agent response:', response);
                     this.addMessageToChat('assistant', response);
                 },
                 onError: (error) => {
-                    console.error('Voice chat error:', error);
+                    console.error('A1: Voice chat error:', error);
                     this.addMessageToChat('system', `Voice error: ${error}`);
                 }
             });
 
-            console.log('Voice chat initialized');
+            console.log('A1: Voice chat initialized successfully');
         } catch (error) {
-            console.error('Failed to initialize voice chat:', error);
+            console.error('A1: Failed to initialize voice chat:', error);
         }
     }
 
