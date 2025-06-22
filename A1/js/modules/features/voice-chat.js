@@ -22,7 +22,7 @@ class VoiceChat {
             audioFormat: 'pcm_16000'
         };
         
-        this.selectedAgent = 'primary'; // Default to primary agent
+        this.selectedAgent = 'primary'; // Default to primary agent (SMART - uses ELEVENLABS_AGENT_ID_3)
 
         this.callbacks = {
             onConnectionChange: null,
@@ -58,7 +58,7 @@ class VoiceChat {
 
     setSelectedAgent(agentType) {
         this.selectedAgent = agentType;
-        console.log(`Voice chat agent selected: ${agentType === 'primary' ? 'SMART' : 'ELA'}`);
+        console.log(`A1: Voice chat agent selected: ${agentType === 'primary' ? 'SMART (ELEVENLABS_AGENT_ID_3)' : 'ELA (ELEVENLABS_AGENT_ID_2)'}`);
     }
 
     /**
@@ -129,11 +129,18 @@ class VoiceChat {
             try {
                 console.log('Getting signed URL from server...');
                 
-                // Build URL with agent selection
+                // Build URL with agent selection for A1 Assistant
                 let url = '/.netlify/functions/elevenlabs-signed-url';
+                
+                // A1 Assistant: Primary agent uses ELEVENLABS_AGENT_ID_3 (default)
+                // Secondary agent uses ELEVENLABS_AGENT_ID_2 for ELA mode
                 if (this.selectedAgent === 'secondary') {
-                    // Add agent_id parameter for secondary agent
+                    // Add agent_id parameter for secondary agent (ELA)
                     url += '?agent_id=' + encodeURIComponent(window.config?.elevenlabs?.agentId2 || 'secondary');
+                } else {
+                    // Primary agent (SMART) uses A1 default - no parameter needed 
+                    // as the server now defaults to ELEVENLABS_AGENT_ID_3
+                    console.log('A1: Using primary agent (ELEVENLABS_AGENT_ID_3 default)');
                 }
                 
                 // Get signed URL from Netlify function

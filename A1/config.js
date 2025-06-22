@@ -80,10 +80,12 @@ function getApiKeys() {
 // Get keys with immediate validation
 const API_KEYS = getApiKeys();
 
-// ElevenLabs Configuration
+// ElevenLabs Configuration for A1 Assistant
 const ELEVENLABS_CONFIG = {
-  // Agent ID will be obtained securely from server via signed URL
-  agentId: null, // Will be fetched securely from Netlify function
+  // A1 Assistant uses ELEVENLABS_AGENT_ID_3 as default (configured in Netlify environment)
+  agentId: null, // Will be fetched securely from Netlify function (defaults to ELEVENLABS_AGENT_ID_3)
+  agentId3: null, // A1 Assistant primary agent (ELEVENLABS_AGENT_ID_3)
+  agentId2: null, // Secondary agent for ELA mode
   apiKey: null, // Set this to your ElevenLabs API key for server-side operations
   // Voice configuration
   voiceSettings: {

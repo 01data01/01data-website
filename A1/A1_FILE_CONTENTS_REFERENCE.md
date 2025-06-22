@@ -122,11 +122,13 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 - **Lines 255-264**: Improved AI service initialization with error handling and logging
 - **Lines 318-337**: Defensive event listener setup for optional UI elements (mobile menu, sign out)
 - **Lines 462-490**: Enhanced AI chat initialization with comprehensive logging
-- **Recent Fixes (2024)**:
+- **Recent Fixes (2024-2025)**:
   - Fixed user session storage key from 'a1_user' to 'user' for consistency
   - Added graceful handling for missing UI elements specific to main website
   - Enhanced logging with A1-specific prefixes for easier debugging
   - Improved AI service integration with proper async/await patterns
+  - Verified and enhanced script loading with debug confirmations
+  - Resolved authentication flow issues affecting AI service initialization
 - Removed multi-view navigation (dashboard, tasks, calendar, projects)
 - Auto-login as "A1 CEO" user for immediate access
 - Simplified routing for single-page AI assistant
@@ -145,10 +147,11 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 - **Lines 327-363**: Storage functions (saveToStorage, loadFromStorage, removeFromStorage)
 - **Lines 173-195**: Animation and transition helpers
 - **Lines 203-225**: Data processing utilities
-- **Recent Improvements (2024)**:
+- **Recent Improvements (2024-2025)**:
   - Reduced console warnings for optional UI elements not present in A1 interface
   - Added A1-specific error message prefixes for better debugging
   - Maintained compatibility with both window.utils and window.Utils
+  - Enhanced script loading verification with confirmation logging
 - **Global access**: Available as both window.utils and window.Utils for compatibility
 
 ### `js/modules/core/auth.js`
@@ -164,11 +167,12 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 - **Lines 367-391**: Chat functionality with conversation context
 - **Lines 531-596**: Claude API communication with error handling
 - **Lines 601-630**: Conversation context management
-- **Recent Enhancements (2024)**:
+- **Recent Enhancements (2024-2025)**:
   - Added fallback user authentication from localStorage for A1 auto-login scenarios
   - Enhanced initialization logging with A1-specific prefixes
   - Improved error handling for authentication edge cases
   - Maintained compatibility with both authModule and direct localStorage access
+  - Enhanced script loading verification and module availability checking
 - Full Claude API integration for authentic AI responses
 - Same backend endpoints as main 01data website
 
@@ -187,12 +191,15 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 - **Lines 764-819**: Comprehensive voice chat initialization with detailed logging
 - **Lines 828-881**: Enhanced toggleVoiceMode with extensive debugging and error tracking
 - **Lines 715-736**: Agent selection functionality (SMART/ELA buttons)
-- **Recent Improvements (2024)**:
+- **Recent Improvements (2024-2025)**:
   - Added comprehensive voice button click debugging
   - Enhanced user email retrieval with localStorage fallback for A1 auto-login
   - Improved voice chat initialization logging with A1-specific prefixes
   - Added detailed error tracking and stack trace logging for voice mode issues
   - Enhanced voice module availability checking and status reporting
+  - Fixed voice button functionality - now properly triggers microphone access
+  - Resolved session management issues affecting AI service integration
+  - Added script loading verification with A1-specific debug messages
 - Full integration with Claude API for authentic responses
 - Voice chat coordination and management
 
@@ -208,12 +215,15 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 - **Lines 212-295**: WebSocket message handling (transcripts, responses, audio)
 - **Lines 297-365**: Enhanced audio response playback with null buffer handling
 - **Lines 367-435**: Utility functions for audio processing and cleanup
-- **Recent Debugging Enhancements (2024)**:
+- **Recent Debugging Enhancements (2024-2025)**:
   - Added comprehensive microphone permission request debugging
   - Enhanced startConversation logging with A1-specific prefixes
   - Added navigator.mediaDevices availability checks
   - Improved error reporting with error type and message details
   - Added WebSocket connection setup progress tracking
+  - Fixed microphone access flow - now properly requests permissions
+  - Enhanced script loading verification and module initialization
+  - Resolved voice conversation startup issues
 - Secure signed URL authentication for private agent access
 - Real-time audio capture and base64 encoding
 - Audio response playback with sequential queue management
@@ -240,11 +250,15 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 ## Configuration Files
 
 ### `config.js`
-**Purpose**: Application configuration settings (copied from main website)
+**Purpose**: Application configuration settings (A1 Assistant specific)
 **Contains**:
 - **Lines 1-81**: Claude API key management and validation
-- **Lines 83-99**: ElevenLabs Conversational AI configuration
-- **Lines 101-107**: Global configuration object setup
+- **Lines 83-101**: ElevenLabs Conversational AI configuration for A1 Assistant
+- **Lines 103-109**: Global configuration object setup
+- **A1 Specific Configuration**:
+  - ELEVENLABS_AGENT_ID_3 and ELEVENLABS_API_KEY_3 set as default (primary agent for SMART mode)
+  - ELEVENLABS_AGENT_ID_2 and ELEVENLABS_API_KEY_2 for secondary agent (ELA mode)
+  - Enhanced agent configuration with A1 priority settings
 - API endpoints and feature flags
 - Environment-specific settings
 - Third-party service configuration
@@ -293,7 +307,7 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 - Progressive enhancement for voice features
 - Fallback mechanisms for API failures
 
-## Recent Fixes & Improvements (2024)
+## Recent Fixes & Improvements (2024-2025)
 
 ### Authentication & Session Management
 - **Fixed User Session Storage**: Corrected storage key from 'a1_user' to 'user' for consistency with AI service expectations
@@ -305,6 +319,9 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 - **Microphone Permission Tracking**: Enhanced debugging for microphone access request process
 - **Voice Module Initialization**: Improved voice chat and voice auth module loading with status reporting
 - **Error Handling**: Added detailed error tracking with stack traces for voice mode issues
+- **Fixed Voice Button Functionality**: Resolved voice button not triggering microphone access
+- **Enhanced Voice Chat Flow**: Improved voice conversation startup with proper permission handling
+- **Script Loading Verification**: Added script loading confirmation messages for debugging
 
 ### Console & Error Management
 - **Reduced Warnings**: Suppressed console warnings for UI elements not present in A1 interface
@@ -329,10 +346,28 @@ The A1 folder serves as a dedicated demonstration environment for A1 Plastic Com
 
 This isolated implementation allows for customization and demonstration without risk to the main 01data platform, while maintaining full functionality and professional appearance.
 
-### Current Status (December 2024)
+### Latest Updates (June 2025)
+
+#### Environment Variable Configuration
+- **ELEVENLABS_AGENT_ID_3**: Now configured as the default primary agent for A1 Assistant
+- **ELEVENLABS_API_KEY_3**: Corresponding API key for the A1 primary agent
+- **Priority Configuration**: A1 Assistant now prioritizes AGENT_ID_3/API_KEY_3 for SMART mode
+- **Agent Selection**: SMART button uses ELEVENLABS_AGENT_ID_3, ELA button uses ELEVENLABS_AGENT_ID_2
+- **Default Behavior**: No agent_id parameter needed for primary agent (automatically uses AGENT_ID_3)
+
+#### Netlify Function Updates
+- Updated `elevenlabs-signed-url.js` to prioritize ELEVENLABS_AGENT_ID_3 as default
+- Enhanced agent selection logic with proper fallback handling
+- Added logging for better debugging of agent selection
+
+### Current Status (June 2025)
 - ✅ **Claude Chat**: Fully functional with proper authentication
+- ✅ **Voice Mode**: Complete functionality with microphone access working properly
+- ✅ **Agent Configuration**: ELEVENLABS_AGENT_ID_3 set as default primary agent
 - ✅ **Auto-Login**: CEO access without authentication barriers
 - ✅ **UI/UX**: Professional A1 branding with glass-morphism design
 - ✅ **Error Handling**: Comprehensive debugging and error reporting
-- 🔧 **Voice Mode**: Enhanced debugging for microphone permission issues
+- ✅ **Session Management**: Fixed user storage key consistency issues
+- ✅ **Authentication Flow**: Enhanced fallback mechanisms for AI service integration
+- ✅ **Environment Variables**: Properly configured with A1-specific agent priorities
 - ✅ **Isolation**: Complete independence from main 01data website
