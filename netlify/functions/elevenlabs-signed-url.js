@@ -87,7 +87,14 @@ exports.handler = async (event, context) => {
             }
         }
         
-        console.log(`Final Agent Selection - ID: ${AGENT_ID}, Available: A1_ID_4=${!!a1AgentId4}, A1_ID_3=${!!a1AgentId}, Secondary=${!!secondaryAgentId}, Default=${!!defaultAgentId}`);
+        console.log(`Final Agent Selection - ID: ${AGENT_ID}`);
+        console.log(`Environment Variables Status:`);
+        console.log(`- ELEVENLABS_AGENT_ID_4: ${!!a1AgentId4} (length: ${a1AgentId4?.length || 0})`);
+        console.log(`- ELEVENLABS_AGENT_ID_3: ${!!a1AgentId} (length: ${a1AgentId?.length || 0})`);
+        console.log(`- ELEVENLABS_AGENT_ID_2: ${!!secondaryAgentId} (length: ${secondaryAgentId?.length || 0})`);
+        console.log(`- ELEVENLABS_AGENT_ID: ${!!defaultAgentId} (length: ${defaultAgentId?.length || 0})`);
+        console.log(`- ELEVENLABS_API_KEY_4: ${!!ELEVENLABS_API_KEY_4} (length: ${ELEVENLABS_API_KEY_4?.length || 0})`);
+        console.log(`- ELEVENLABS_API_KEY_3: ${!!ELEVENLABS_API_KEY_3} (length: ${ELEVENLABS_API_KEY_3?.length || 0})`);
 
         if (!API_KEY) {
             console.error('ElevenLabs API key not configured');
