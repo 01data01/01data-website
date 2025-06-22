@@ -90,6 +90,7 @@ exports.handler = async (event, context) => {
         }
         
         console.log(`Final Agent Selection - ID: ${AGENT_ID}`);
+        console.log(`Final API Key Selection - Length: ${API_KEY?.length || 0}`);
         console.log(`Environment Variables Status:`);
         console.log(`- ELEVENLABS_AGENT_ID_4: ${!!a1AgentId4} (length: ${a1AgentId4?.length || 0})`);
         console.log(`- ELEVENLABS_AGENT_ID_3: ${!!a1AgentId} (length: ${a1AgentId?.length || 0})`);
@@ -97,6 +98,8 @@ exports.handler = async (event, context) => {
         console.log(`- ELEVENLABS_AGENT_ID: ${!!defaultAgentId} (length: ${defaultAgentId?.length || 0})`);
         console.log(`- ELEVENLABS_API_KEY_4: ${!!ELEVENLABS_API_KEY_4} (length: ${ELEVENLABS_API_KEY_4?.length || 0})`);
         console.log(`- ELEVENLABS_API_KEY_3: ${!!ELEVENLABS_API_KEY_3} (length: ${ELEVENLABS_API_KEY_3?.length || 0})`);
+        console.log(`- ELEVENLABS_API_KEY_2: ${!!ELEVENLABS_API_KEY_2} (length: ${ELEVENLABS_API_KEY_2?.length || 0})`);
+        console.log(`- ELEVENLABS_API_KEY: ${!!ELEVENLABS_API_KEY} (length: ${ELEVENLABS_API_KEY?.length || 0})`);
 
         if (!API_KEY) {
             console.error('ElevenLabs API key not configured');
@@ -110,21 +113,29 @@ exports.handler = async (event, context) => {
         }
 
         // Request signed URL from ElevenLabs
-        const response = await fetch(
-            `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${AGENT_ID}`,
-            {
-                method: 'GET',
-                headers: {
-                    'xi-api-key': API_KEY
-                }
+        const elevenlabsUrl = `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${AGENT_ID}`;
+        console.log(`Requesting signed URL from: ${elevenlabsUrl}`);
+        console.log(`Using API key ending with: ...${API_KEY?.slice(-8) || 'N/A'}`);
+        
+        const response = await fetch(elevenlabsUrl, {
+            method: 'GET',
+            headers: {
+                'xi-api-key': API_KEY,
+                'Content-Type': 'application/json'
             }
-        );
+        });
+
+        console.log(`ElevenLabs API response status: ${response.status}`);
+        console.log(`ElevenLabs API response headers:`, Object.fromEntries(response.headers.entries()));
 
         if (!response.ok) {
-            throw new Error(`ElevenLabs API error: ${response.status}`);
+            const errorText = await response.text();
+            console.error(`ElevenLabs API error response: ${errorText}`);
+            throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
+        console.log(`ElevenLabs API response data:`, data);
 
         return {
             statusCode: 200,

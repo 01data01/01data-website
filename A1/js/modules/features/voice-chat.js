@@ -145,10 +145,22 @@ class VoiceChat {
                 
                 console.log('A1: Fetching signed URL from:', url);
                 
-                // Get signed URL from Netlify function
-                const response = await fetch(url);
+                // Get signed URL from Netlify function with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+                
+                const response = await fetch(url, {
+                    signal: controller.signal,
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                });
+                clearTimeout(timeoutId);
+                
                 console.log('A1: Signed URL response status:', response.status);
                 console.log('A1: Signed URL response headers:', Object.fromEntries(response.headers.entries()));
+                console.log('A1: Response ok:', response.ok);
                 
                 if (!response.ok) {
                     const errorText = await response.text();
@@ -166,12 +178,23 @@ class VoiceChat {
                     throw new Error('No signed URL received from server');
                 }
                 
+                // Validate signed URL format
+                if (!signedUrl.startsWith('wss://api.elevenlabs.io/v1/convai/conversation')) {
+                    console.error('A1: Invalid signed URL format:', signedUrl);
+                    throw new Error('Invalid signed URL format received');
+                }
+                
                 console.log('A1: Connecting with signed URL:', signedUrl);
                 console.log('A1: Using agent ID:', data.agent_id);
+                console.log('A1: Agent ID length:', data.agent_id?.length);
                 console.log('A1: Creating WebSocket connection...');
+                
+                // Add connection state tracking
+                let connectionAttempted = false;
                 
                 this.websocket = new WebSocket(signedUrl);
                 console.log('A1: WebSocket created, readyState:', this.websocket.readyState);
+                connectionAttempted = true;
 
                 this.websocket.onopen = () => {
                 console.log('A1: WebSocket connected successfully');
