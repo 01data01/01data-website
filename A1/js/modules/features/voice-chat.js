@@ -220,9 +220,26 @@ class VoiceChat {
             this.websocket.onclose = (event) => {
                 console.log('A1: WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
                 console.log('A1: Was clean:', event.wasClean);
+                console.log('A1: Agent ID being used:', data.agent_id);
+                
+                // Common WebSocket close codes
+                const closeCodes = {
+                    1000: 'Normal Closure',
+                    1001: 'Going Away',
+                    1002: 'Protocol Error',
+                    1003: 'Unsupported Data',
+                    1006: 'Abnormal Closure',
+                    1007: 'Invalid frame payload data',
+                    1008: 'Policy Violation',
+                    1011: 'Internal Error',
+                    1015: 'TLS Handshake'
+                };
+                
+                console.log('A1: Close code meaning:', closeCodes[event.code] || 'Unknown');
+                
                 this.isConnected = false;
                 this.cleanup();
-                reject(new Error(`WebSocket connection closed: ${event.code} - ${event.reason}`));
+                reject(new Error(`WebSocket connection closed: ${event.code} - ${event.reason || closeCodes[event.code] || 'Unknown'}`));
             };
 
             this.websocket.onerror = (error) => {

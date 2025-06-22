@@ -33,14 +33,22 @@ exports.handler = async (event, context) => {
         const secondaryAgentId = process.env.ELEVENLABS_AGENT_ID_2;
         const a1AgentId = process.env.ELEVENLABS_AGENT_ID_3; // A1 Assistant preferred agent
         
-        // Default to A1 Agent (ELEVENLABS_AGENT_ID_3) for A1 Assistant, with fallback
-        let AGENT_ID = a1AgentId || defaultAgentId;
-        let API_KEY = ELEVENLABS_API_KEY_3 || ELEVENLABS_API_KEY;
+        // Temporarily use original working agent until AGENT_ID_3 is verified to work
+        // TODO: Switch back to a1AgentId when ELEVENLABS_AGENT_ID_3 is confirmed working
+        let AGENT_ID = originalAgentId; // Use known working agent
+        let API_KEY = ELEVENLABS_API_KEY; // Use original API key
+        
+        console.log('A1: Temporarily using original working agent for stability');
         
         // Allow switching between multiple agents and their corresponding API keys
         if (requestedAgentId) {
-            if (requestedAgentId === a1AgentId && ELEVENLABS_API_KEY_3) {
-                // A1 Assistant agent (highest priority)
+            if (requestedAgentId === 'test-agent-3' && a1AgentId && ELEVENLABS_API_KEY_3) {
+                // Test AGENT_ID_3 when explicitly requested
+                AGENT_ID = a1AgentId;
+                API_KEY = ELEVENLABS_API_KEY_3;
+                console.log('Testing A1 Agent (ELEVENLABS_AGENT_ID_3)');
+            } else if (requestedAgentId === a1AgentId && ELEVENLABS_API_KEY_3) {
+                // A1 Assistant agent (when directly requested by ID)
                 AGENT_ID = requestedAgentId;
                 API_KEY = ELEVENLABS_API_KEY_3;
                 console.log('Using A1 Agent (ELEVENLABS_AGENT_ID_3)');
