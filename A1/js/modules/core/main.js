@@ -464,6 +464,11 @@ class MainApp {
             window.aiService.initialize();
         }
 
+        // Ensure voice modules are available globally
+        console.log('Checking voice modules availability:');
+        console.log('VoiceChat available:', typeof window.VoiceChat !== 'undefined');
+        console.log('VoiceAuth available:', typeof window.VoiceAuth !== 'undefined');
+
         // AI chat initialization will be handled by ai-chat.js module
         if (typeof AIChatModule !== 'undefined' && !window.aiChatModule) {
             window.aiChatModule = new AIChatModule();
