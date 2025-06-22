@@ -486,10 +486,19 @@ class MainApp {
         console.log('VoiceAuth available:', typeof window.VoiceAuth !== 'undefined');
 
         // AI chat initialization will be handled by ai-chat.js module
+        console.log('A1: Checking for AIChatModule...');
+        console.log('A1: AIChatModule available:', typeof AIChatModule !== 'undefined');
+        console.log('A1: window.aiChatModule exists:', !!window.aiChatModule);
+        
         if (typeof AIChatModule !== 'undefined' && !window.aiChatModule) {
             console.log('A1: Creating new AI Chat Module instance');
             window.aiChatModule = new AIChatModule();
             window.aiChatModule.initialize();
+        } else if (window.aiChatModule && !window.aiChatModule.initialized) {
+            console.log('A1: Initializing existing AI Chat Module instance');
+            window.aiChatModule.initialize();
+        } else {
+            console.log('A1: AI Chat Module already initialized or not available');
         }
     }
 

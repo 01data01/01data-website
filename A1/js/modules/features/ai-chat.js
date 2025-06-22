@@ -22,7 +22,7 @@ class AIChatModule {
         if (this.initialized) return;
         
         try {
-            console.log('Initializing AI Chat Module...');
+            console.log('A1: Initializing AI Chat Module...');
             
             this.setupEventListeners();
             this.initializeVoiceChat();
@@ -31,10 +31,10 @@ class AIChatModule {
             this.createNewChat(); // Start with a new chat
             
             this.initialized = true;
-            console.log('AI Chat Module initialized successfully');
+            console.log('A1: AI Chat Module initialized successfully');
             
         } catch (error) {
-            console.error('AI Chat Module Initialization error:', error);
+            console.error('A1: AI Chat Module Initialization error:', error);
         }
     }
 
@@ -42,7 +42,7 @@ class AIChatModule {
      * Setup event listeners
      */
     setupEventListeners() {
-        console.log('Setting up AI Chat event listeners...');
+        console.log('A1: Setting up AI Chat event listeners...');
         
         // Agent selection buttons
         const agentSmartBtn = document.getElementById('agentSmartBtn');
@@ -948,10 +948,12 @@ class AIChatModule {
 }
 
 // Create and export singleton instance
+console.log('A1: Creating AIChatModule instance...');
 const aiChatModule = new AIChatModule();
 
 // Make it globally accessible
 window.aiChatModule = aiChatModule;
+console.log('A1: AIChatModule instance created and assigned to window.aiChatModule');
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
