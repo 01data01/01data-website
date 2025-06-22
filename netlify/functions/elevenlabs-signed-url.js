@@ -1,6 +1,6 @@
 /**
  * Netlify Function: Generate ElevenLabs Signed URL
- * For enhanced security - creates signed URLs for private agents
+ * Simplified approach using direct API calls with better error handling
  */
 
 const headers = {
@@ -11,10 +11,8 @@ const headers = {
 };
 
 exports.handler = async (event, context) => {
-    console.log('=== ELEVENLABS SIGNED URL FUNCTION CALLED - ENHANCED VERSION ===');
+    console.log('🚀 ElevenLabs Signed URL Function - Enhanced Version 2.0');
     console.log('Timestamp:', new Date().toISOString());
-    console.log('HTTP Method:', event.httpMethod);
-    console.log('Query Parameters:', event.queryStringParameters);
     
     // Handle CORS preflight
     if (event.httpMethod === 'OPTIONS') {
@@ -26,88 +24,16 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        // Get ElevenLabs API keys from environment variables
-        const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
-        const ELEVENLABS_API_KEY_2 = process.env.ELEVENLABS_API_KEY_2;
-        const ELEVENLABS_API_KEY_3 = process.env.ELEVENLABS_API_KEY_3;
-        const ELEVENLABS_API_KEY_4 = process.env.ELEVENLABS_API_KEY_4;
+        // Use ELEVENLABS_AGENT_ID_4 as primary, with fallback to original working agent
+        const AGENT_ID = process.env.ELEVENLABS_AGENT_ID_4 || process.env.ELEVENLABS_AGENT_ID || 'DpUHUaJeMXPge91Sev0l';
+        const API_KEY = process.env.ELEVENLABS_API_KEY_4 || process.env.ELEVENLABS_API_KEY;
         
-        // Get agent IDs from environment variables
-        const requestedAgentId = event.queryStringParameters?.agent_id;
-        const originalAgentId = 'DpUHUaJeMXPge91Sev0l'; // Known working agent ID
-        const defaultAgentId = process.env.ELEVENLABS_AGENT_ID || originalAgentId;
-        const secondaryAgentId = process.env.ELEVENLABS_AGENT_ID_2;
-        const a1AgentId = process.env.ELEVENLABS_AGENT_ID_3; // A1 Assistant preferred agent (problematic)
-        const a1AgentId4 = process.env.ELEVENLABS_AGENT_ID_4; // A1 Assistant new agent (clean setup)
-        
-        // Use AGENT_ID_4 for A1 Assistant (now properly configured), with fallback protection
-        let AGENT_ID = a1AgentId4 || originalAgentId; // Prefer AGENT_ID_4, fallback to original working agent
-        let API_KEY = ELEVENLABS_API_KEY_4 || ELEVENLABS_API_KEY; // Corresponding API key
-        
-        if (a1AgentId4 && ELEVENLABS_API_KEY_4) {
-            console.log('A1: Using ELEVENLABS_AGENT_ID_4 for A1 Assistant');
-            console.log(`A1: Agent ID 4: ${a1AgentId4}`);
-        } else {
-            console.log('A1: Using original working agent (AGENT_ID_4 not available)');
-            console.log(`A1: Original agent ID: ${originalAgentId}`);
-        }
-        
-        // Allow switching between multiple agents and their corresponding API keys
-        if (requestedAgentId) {
-            if (requestedAgentId === a1AgentId4 && ELEVENLABS_API_KEY_4) {
-                // A1 Assistant Agent ID 4 (preferred)
-                AGENT_ID = requestedAgentId;
-                API_KEY = ELEVENLABS_API_KEY_4;
-                console.log('Using A1 Agent (ELEVENLABS_AGENT_ID_4)');
-            } else if (requestedAgentId === 'test-agent-4' && a1AgentId4 && ELEVENLABS_API_KEY_4) {
-                // Test AGENT_ID_4 when explicitly requested
-                AGENT_ID = a1AgentId4;
-                API_KEY = ELEVENLABS_API_KEY_4;
-                console.log('Testing A1 Agent (ELEVENLABS_AGENT_ID_4)');
-            } else if (requestedAgentId === 'test-agent-3' && a1AgentId && ELEVENLABS_API_KEY_3) {
-                // Test AGENT_ID_3 when explicitly requested
-                AGENT_ID = a1AgentId;
-                API_KEY = ELEVENLABS_API_KEY_3;
-                console.log('Testing A1 Agent (ELEVENLABS_AGENT_ID_3)');
-            } else if (requestedAgentId === a1AgentId && ELEVENLABS_API_KEY_3) {
-                // A1 Assistant agent ID 3 (when directly requested by ID)
-                AGENT_ID = requestedAgentId;
-                API_KEY = ELEVENLABS_API_KEY_3;
-                console.log('Using A1 Agent (ELEVENLABS_AGENT_ID_3)');
-            } else if (requestedAgentId === secondaryAgentId && ELEVENLABS_API_KEY_2) {
-                // Secondary agent (ELA)
-                AGENT_ID = requestedAgentId;
-                API_KEY = ELEVENLABS_API_KEY_2;
-                console.log('Using Secondary Agent (ELEVENLABS_AGENT_ID_2)');
-            } else if (requestedAgentId === defaultAgentId && ELEVENLABS_API_KEY) {
-                // Original default agent
-                AGENT_ID = requestedAgentId;
-                API_KEY = ELEVENLABS_API_KEY;
-                console.log('Using Original Default Agent');
-            } else if (requestedAgentId === originalAgentId && ELEVENLABS_API_KEY) {
-                // Fallback to known working agent
-                AGENT_ID = requestedAgentId;
-                API_KEY = ELEVENLABS_API_KEY;
-                console.log('Using Known Working Agent (fallback)');
-            } else {
-                console.warn(`Requested agent ID ${requestedAgentId} not in allowed list`);
-            }
-        }
-        
-        console.log(`Final Agent Selection - ID: ${AGENT_ID}`);
-        console.log(`Final API Key Selection - Length: ${API_KEY?.length || 0}`);
-        console.log(`Environment Variables Status:`);
-        console.log(`- ELEVENLABS_AGENT_ID_4: ${!!a1AgentId4} (length: ${a1AgentId4?.length || 0})`);
-        console.log(`- ELEVENLABS_AGENT_ID_3: ${!!a1AgentId} (length: ${a1AgentId?.length || 0})`);
-        console.log(`- ELEVENLABS_AGENT_ID_2: ${!!secondaryAgentId} (length: ${secondaryAgentId?.length || 0})`);
-        console.log(`- ELEVENLABS_AGENT_ID: ${!!defaultAgentId} (length: ${defaultAgentId?.length || 0})`);
-        console.log(`- ELEVENLABS_API_KEY_4: ${!!ELEVENLABS_API_KEY_4} (length: ${ELEVENLABS_API_KEY_4?.length || 0})`);
-        console.log(`- ELEVENLABS_API_KEY_3: ${!!ELEVENLABS_API_KEY_3} (length: ${ELEVENLABS_API_KEY_3?.length || 0})`);
-        console.log(`- ELEVENLABS_API_KEY_2: ${!!ELEVENLABS_API_KEY_2} (length: ${ELEVENLABS_API_KEY_2?.length || 0})`);
-        console.log(`- ELEVENLABS_API_KEY: ${!!ELEVENLABS_API_KEY} (length: ${ELEVENLABS_API_KEY?.length || 0})`);
+        console.log('Using Agent ID:', AGENT_ID);
+        console.log('API Key available:', !!API_KEY);
+        console.log('API Key length:', API_KEY?.length || 0);
 
         if (!API_KEY) {
-            console.error('ElevenLabs API key not configured');
+            console.error('No ElevenLabs API key configured');
             return {
                 statusCode: 500,
                 headers,
@@ -117,30 +43,65 @@ exports.handler = async (event, context) => {
             };
         }
 
+        if (!AGENT_ID) {
+            console.error('No ElevenLabs Agent ID configured');
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ 
+                    error: 'ElevenLabs Agent ID not configured' 
+                })
+            };
+        }
+
         // Request signed URL from ElevenLabs
         const elevenlabsUrl = `https://api.elevenlabs.io/v1/convai/conversation/get-signed-url?agent_id=${AGENT_ID}`;
-        console.log(`Requesting signed URL from: ${elevenlabsUrl}`);
-        console.log(`Using API key ending with: ...${API_KEY?.slice(-8) || 'N/A'}`);
+        console.log('Requesting signed URL from ElevenLabs API...');
         
         const response = await fetch(elevenlabsUrl, {
             method: 'GET',
             headers: {
-                'xi-api-key': API_KEY,
-                'Content-Type': 'application/json'
+                'xi-api-key': API_KEY
             }
         });
 
-        console.log(`ElevenLabs API response status: ${response.status}`);
-        console.log(`ElevenLabs API response headers:`, Object.fromEntries(response.headers.entries()));
+        console.log('ElevenLabs API response status:', response.status);
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(`ElevenLabs API error response: ${errorText}`);
-            throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`);
+            console.error('ElevenLabs API error:', errorText);
+            
+            // Return specific error based on status code
+            if (response.status === 401) {
+                return {
+                    statusCode: 401,
+                    headers,
+                    body: JSON.stringify({ 
+                        error: 'Invalid API key' 
+                    })
+                };
+            } else if (response.status === 404) {
+                return {
+                    statusCode: 404,
+                    headers,
+                    body: JSON.stringify({ 
+                        error: 'Agent not found' 
+                    })
+                };
+            } else {
+                return {
+                    statusCode: response.status,
+                    headers,
+                    body: JSON.stringify({ 
+                        error: `ElevenLabs API error: ${response.status}`,
+                        details: errorText 
+                    })
+                };
+            }
         }
 
         const data = await response.json();
-        console.log(`ElevenLabs API response data:`, data);
+        console.log('✅ Successfully generated signed URL');
 
         return {
             statusCode: 200,
@@ -152,12 +113,12 @@ exports.handler = async (event, context) => {
         };
 
     } catch (error) {
-        console.error('Error generating signed URL:', error);
+        console.error('❌ Function error:', error.message);
         return {
             statusCode: 500,
             headers,
             body: JSON.stringify({ 
-                error: 'Failed to generate signed URL',
+                error: 'Internal server error',
                 details: error.message 
             })
         };

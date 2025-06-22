@@ -3,6 +3,9 @@
  * Provides real-time voice conversation capabilities using WebSocket
  */
 
+// ENHANCED VERSION MARKER - THIS SHOULD APPEAR IN CONSOLE
+console.log('🚀 A1: ENHANCED VOICE-CHAT.JS LOADED - VERSION 2.0 - TIMESTAMP:', new Date().toISOString());
+
 class VoiceChat {
     constructor() {
         this.websocket = null;
