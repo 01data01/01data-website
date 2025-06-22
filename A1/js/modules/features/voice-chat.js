@@ -209,29 +209,14 @@ class VoiceChat {
                     day: new Date().toLocaleDateString('en-US', { weekday: 'long' })
                 };
 
-                // Send conversation initiation
-                console.log('A1: Sending conversation initiation...');
+                // Send conversation initiation according to official ElevenLabs docs
+                console.log('A1: Sending conversation initiation (official format)...');
                 this.sendMessage({
                     type: 'conversation_initiation_client_data',
                     conversation_config_override: {
                         agent: {
-                            language: 'en',
-                            first_message: 'Hello! I\'m your AI assistant. How can I help you today?'
-                        },
-                        tts: {
-                            agent_output_audio_format: this.config.audioFormat,
-                            model_id: 'eleven_turbo_v2_5'
-                        },
-                        conversation: {
-                            text_only: false,
-                            client_events: [
-                                'conversation_initiation_metadata',
-                                'audio',
-                                'user_transcript',
-                                'agent_response',
-                                'ping',
-                                'interruption'
-                            ]
+                            first_message: 'Hello! I\'m your AI assistant. How can I help you today?',
+                            language: 'en'
                         }
                     },
                     dynamic_variables: {
