@@ -115,6 +115,30 @@ class AIChatModule {
         } else {
             console.error('A1: Voice toggle button not found!');
         }
+
+        // Suggestion buttons
+        const suggestionButtons = document.querySelectorAll('.suggestion-btn');
+        if (suggestionButtons.length > 0) {
+            console.log(`A1: Found ${suggestionButtons.length} suggestion buttons, adding click handlers`);
+            suggestionButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const message = button.textContent.trim();
+                    console.log(`A1: Suggestion button clicked: "${message}"`);
+                    
+                    // Set the message in the input field
+                    const chatInput = document.getElementById('chatInput');
+                    if (chatInput) {
+                        chatInput.value = message;
+                        
+                        // Trigger the send message function
+                        this.handleSendMessage();
+                    }
+                });
+            });
+        } else {
+            console.warn('A1: No suggestion buttons found!');
+        }
     }
 
     /**
