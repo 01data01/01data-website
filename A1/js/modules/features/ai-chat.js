@@ -238,7 +238,17 @@ class AIChatModule {
         typingElement.className = 'message ai-message typing-indicator';
         typingElement.id = 'typingIndicator';
         typingElement.innerHTML = `
-            <div class="message-avatar">🤖</div>
+            <div class="message-avatar">
+                <div class="ai-avatar-soundwave">
+                    <div class="soundwave-container">
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                    </div>
+                </div>
+            </div>
             <div class="message-content">
                 <div class="typing-dots">
                     <span></span>
@@ -395,7 +405,17 @@ class AIChatModule {
         if (messagesContainer) {
             messagesContainer.innerHTML = `
                 <div class="message ai-message">
-                    <div class="message-avatar">🤖</div>
+                    <div class="message-avatar">
+                        <div class="ai-avatar-soundwave">
+                            <div class="soundwave-container">
+                                <div class="soundwave-bar"></div>
+                                <div class="soundwave-bar"></div>
+                                <div class="soundwave-bar"></div>
+                                <div class="soundwave-bar"></div>
+                                <div class="soundwave-bar"></div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="message-content">
                         <p>Hello! I'm your AI assistant. I can help you manage tasks, schedule appointments, and organize your projects. Try saying something like:</p>
                         <ul>
@@ -464,7 +484,17 @@ class AIChatModule {
         });
 
         messageElement.innerHTML = `
-            <div class="message-avatar">🤖</div>
+            <div class="message-avatar">
+                <div class="ai-avatar-soundwave">
+                    <div class="soundwave-container">
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                        <div class="soundwave-bar"></div>
+                    </div>
+                </div>
+            </div>
             <div class="message-content">
                 <div class="message-text"></div>
                 <div class="message-timestamp">${timestamp}</div>
@@ -563,7 +593,7 @@ class AIChatModule {
      * Update history display in sidebar
      */
     updateHistoryDisplay() {
-        const historyList = document.getElementById('historyList');
+        const historyList = document.getElementById('chatHistoryList');
         if (!historyList) return;
 
         if (this.chatHistory.length === 0) {
@@ -606,7 +636,7 @@ class AIChatModule {
      * Setup event listeners for history items
      */
     setupHistoryEventListeners() {
-        const historyList = document.getElementById('historyList');
+        const historyList = document.getElementById('chatHistoryList');
         if (!historyList) return;
 
         // Load chat buttons
@@ -664,14 +694,29 @@ class AIChatModule {
                 const messageElement = document.createElement('div');
                 messageElement.className = `message ${message.role}-message`;
                 
-                const avatar = message.role === 'user' ? '👤' : '🤖';
+                let avatarHTML;
+                if (message.role === 'user') {
+                    avatarHTML = '👤';
+                } else {
+                    avatarHTML = `
+                        <div class="ai-avatar-soundwave">
+                            <div class="soundwave-container">
+                                <div class="soundwave-bar"></div>
+                                <div class="soundwave-bar"></div>
+                                <div class="soundwave-bar"></div>
+                                <div class="soundwave-bar"></div>
+                                <div class="soundwave-bar"></div>
+                            </div>
+                        </div>
+                    `;
+                }
                 const timestamp = new Date(message.timestamp).toLocaleTimeString('en-US', { 
                     hour: 'numeric', 
                     minute: '2-digit' 
                 });
 
                 messageElement.innerHTML = `
-                    <div class="message-avatar">${avatar}</div>
+                    <div class="message-avatar">${avatarHTML}</div>
                     <div class="message-content">
                         <div class="message-text">${this.formatMessage(message.content)}</div>
                         <div class="message-timestamp">${timestamp}</div>

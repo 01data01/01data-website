@@ -60,6 +60,24 @@
                 </div>
             </div>
             <div class="header-right">
+                <!-- Voice Controls in Header -->
+                <div class="header-voice-controls">
+                    <button id="voiceToggleBtn" class="header-voice-btn" title="Toggle Voice Chat">
+                        <span class="voice-icon">🎤</span>
+                        <span class="voice-status">VOICE DISCONNECTED</span>
+                    </button>
+                    
+                    <div class="voice-activity">
+                        <div class="voice-indicator"></div>
+                        <div class="voice-indicator"></div>
+                        <div class="voice-indicator"></div>
+                    </div>
+                    
+                    <div id="connectionStatus" class="header-connection-status">
+                        <span class="status-text">Ready</span>
+                    </div>
+                </div>
+                
                 <div class="user-info">
                     <img src="" alt="User Avatar" class="user-avatar">
                     <span class="user-name">Loading...</span>
@@ -84,22 +102,7 @@
                     <div class="chat-history">
                         <h3>Chat History</h3>
                         <div id="chatHistoryList" class="history-list">
-                            <!-- Sample chat history items for demonstration -->
-                            <div class="chat-history-item active">
-                                <div class="chat-history-title">A1 PVC Ürünleri</div>
-                                <div class="chat-history-preview">PVC profil ürünleri hakkında bilgi aldım...</div>
-                                <div class="chat-history-time">2 saat önce</div>
-                            </div>
-                            <div class="chat-history-item">
-                                <div class="chat-history-title">İhracat Bilgileri</div>
-                                <div class="chat-history-preview">50+ ülkeye ihracat yapan şirket...</div>
-                                <div class="chat-history-time">1 gün önce</div>
-                            </div>
-                            <div class="chat-history-item">
-                                <div class="chat-history-title">Kenar Bandı Çeşitleri</div>
-                                <div class="chat-history-preview">Farklı kenar bandı seçenekleri...</div>
-                                <div class="chat-history-time">3 gün önce</div>
-                            </div>
+                            <!-- Chat history will be loaded dynamically -->
                         </div>
                         <div class="history-empty" style="display: none;">
                             <p>Henüz sohbet geçmişi yok</p>
@@ -126,23 +129,6 @@
                             </button>
                         </div>
                         
-                        <!-- Voice Controls -->
-                        <div class="voice-controls">
-                            <button id="voiceToggleBtn" class="voice-toggle-btn" title="Toggle Voice Chat">
-                                <span class="voice-icon">🎤</span>
-                                <span class="voice-status">Voice</span>
-                            </button>
-                            
-                            <div class="voice-activity">
-                                <div class="voice-indicator"></div>
-                                <div class="voice-indicator"></div>
-                                <div class="voice-indicator"></div>
-                            </div>
-                            
-                            <div id="connectionStatus" class="connection-status">
-                                <span class="status-text">Ready</span>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Chat Messages -->
@@ -172,7 +158,7 @@
                             <textarea id="chatInput" 
                                       class="chat-input" 
                                       placeholder="A1 PVC ürünleri ve hizmetleri hakkında soru sorun..."
-                                      rows="1"></textarea>
+                                      rows="3"></textarea>
                             <button id="sendChatBtn" class="send-btn" disabled>
                                 <span class="send-icon">→</span>
                             </button>
