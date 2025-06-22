@@ -12,7 +12,6 @@ class AIService {
         this.isProcessing = false;
         this.userEmail = null;
         this.apiKey = null;
-        this.requestCache = new Map();
         
         // AI Configuration
         this.config = {
@@ -119,10 +118,56 @@ class AIService {
     }
 
     /**
-     * Initialize system prompts
+     * Initialize system prompts for A1 PVC Assistant
      */
     initializeSystemPrompts() {
         return {
+            chatAssistant: `You are a helpful and knowledgeable AI assistant for A1 PVC Company (Özemek Plastik). 
+                Your role is to provide accurate information about the company's products and services.
+                
+                COMPANY INFORMATION:
+                - Company: Özemek Plastik (A1 PVC Brand)
+                - Established: 1970s (50+ years of experience)
+                - Location: Turkey with 10,000 m² production facility
+                - Capacity: 1,000 tons monthly production
+                - Export: 50+ countries worldwide
+                - Website: https://a1pvcmarket.com/
+                - Phone: 0850 888 22 47
+                - Email: info@ozemekplastik.com
+                
+                PRODUCT CATEGORIES:
+                1. Kenar Bandi (Edge Banding)
+                2. PVC Profiles (Window and Door Systems)
+                3. Stor Kapaklari (Blind/Shutter Doors)
+                4. Mutfak ve Mobilya Aksesuarlari (Kitchen & Furniture Accessories)
+                5. Hotmelt (Hot Melt Adhesives)
+                6. Karavan Malzemeleri (Caravan Materials)
+                7. Yapi Kimyasallari (Construction Chemicals)
+                8. Yapiskanli Vida Tapalari (Adhesive Screw Plugs)
+                9. Ahsap Kapi Fitilleri (Wooden Door Strips)
+                10. Kapi Esik Citalari (Door Threshold Strips)
+
+                PRODUCT TYPES:
+                - Sert PVC Profil (Hard PVC Profiles)
+                - Yumuşak PVC Kenar Kapama (Soft PVC Edge Closing)
+                - Süpürgelik PVC Profil (Baseboard PVC Profiles)
+                - Duşakabin Kapısı (Shower Cabin Doors)
+                - Baza PVC Aparat (Base PVC Apparatus)
+                
+                GUIDELINES:
+                1. Respond in Turkish by default, English if customer asks in English
+                2. Emphasize company's 50+ years experience and quality
+                3. Provide technical details about PVC products when asked
+                4. Include contact information when relevant: 0850 888 22 47
+                5. Promote company's export capabilities to 50+ countries
+                6. When uncertain, suggest contacting customer service
+                7. Maintain professional but warm tone
+                8. Do not discuss competitors
+                9. Focus on product quality and customer service excellence
+                10. For detailed specifications, direct to official channels
+                
+                Always start responses acknowledging you're the A1 PVC Assistant and provide helpful, accurate information about our products and services.`,
+            
             taskParsing: `You are an AI assistant specialized in parsing natural language into structured task data. 
                 Extract task information and return JSON with: title, description, priority, category, dueDate, time.
                 Priority levels: low, medium, high. Categories: Work, Personal, Health, Finance, Education, Other.
@@ -135,10 +180,6 @@ class AIService {
                 4. Related tasks
                 5. Productivity tips
                 Focus on actionable, specific advice.`,
-            
-            chatAssistant: `You are Claude, an AI assistant integrated into a productivity management system.
-                You can help with task management, scheduling, project planning, and productivity advice.
-                Be helpful, concise, and action-oriented. Suggest specific actions when appropriate.`,
             
             projectPlanning: `You are a project management expert. Help users break down projects into:
                 1. Clear milestones
@@ -382,11 +423,17 @@ class AIService {
             const conversationHistory = this.getConversationContext(conversationId);
             let fullMessage = message;
             
-            // Add context if this is a continuation
+            // Add A1 PVC FAQ context if available
+            if (window.faqLoader && window.faqLoader.initialized) {
+                const faqContext = window.faqLoader.getAIContext();
+                fullMessage = `${faqContext}\n\nUser Question: ${message}`;
+            }
+            
+            // Add conversation history if this is a continuation
             if (conversationHistory.length > 0) {
                 const recentHistory = conversationHistory.slice(-6); // Last 3 exchanges
                 const historyText = recentHistory.map(entry => `${entry.role}: ${entry.content}`).join('\n');
-                fullMessage = `Previous conversation:\n${historyText}\n\nUser: ${message}`;
+                fullMessage = `${fullMessage}\n\nPrevious conversation:\n${historyText}`;
             }
             
             const response = await this.makeAPIRequest(fullMessage, 'chatAssistant');
@@ -411,11 +458,17 @@ class AIService {
             const conversationHistory = this.getConversationContext(conversationId);
             let fullMessage = message;
             
-            // Add context if this is a continuation
+            // Add A1 PVC FAQ context if available
+            if (window.faqLoader && window.faqLoader.initialized) {
+                const faqContext = window.faqLoader.getAIContext();
+                fullMessage = `${faqContext}\n\nUser Question: ${message}`;
+            }
+            
+            // Add conversation history if this is a continuation
             if (conversationHistory.length > 0) {
                 const recentHistory = conversationHistory.slice(-6); // Last 3 exchanges
                 const historyText = recentHistory.map(entry => `${entry.role}: ${entry.content}`).join('\n');
-                fullMessage = `Previous conversation:\n${historyText}\n\nUser: ${message}`;
+                fullMessage = `${fullMessage}\n\nPrevious conversation:\n${historyText}`;
             }
             
             const response = await this.makeStreamingAPIRequest(fullMessage, 'chatAssistant', onChunk);
@@ -574,16 +627,6 @@ class AIService {
             throw new Error('User not authenticated or API key not available');
         }
 
-        // Check cache for repeated requests
-        const cacheKey = `${this.userEmail}-${message}`;
-        if (this.requestCache.has(cacheKey)) {
-            const cached = this.requestCache.get(cacheKey);
-            if (Date.now() - cached.timestamp < 300000) { // 5 minutes cache
-                console.log('Returning cached response');
-                return { content: cached.response };
-            }
-        }
-
         try {
             const response = await fetch(this.apiEndpoint, {
                 method: 'POST',
@@ -607,18 +650,6 @@ class AIService {
             
             if (data.error) {
                 throw new Error(data.error);
-            }
-
-            // Cache the response
-            this.requestCache.set(cacheKey, {
-                response: data.response,
-                timestamp: Date.now()
-            });
-            
-            // Limit cache size
-            if (this.requestCache.size > 100) {
-                const firstKey = this.requestCache.keys().next().value;
-                this.requestCache.delete(firstKey);
             }
 
             return {

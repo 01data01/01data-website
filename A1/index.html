@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A1 Assistant - 01data</title>
+    <title>A1 PVC Assistant - Özemek Plastik</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -27,6 +27,7 @@
     <script src="js/modules/ai/ai-service.js"></script>
     <script src="js/modules/features/voice-auth.js"></script>
     <script src="js/modules/features/voice-chat.js"></script>
+    <script src="js/modules/features/faq-loader.js"></script>
     <script src="js/modules/features/ai-chat.js"></script>
     <script src="js/modules/core/main.js"></script>
 </head>
@@ -42,8 +43,8 @@
                     <div class="loading-neural-line"></div>
                 </div>
             </div>
-            <h2 class="loading-title">A1 Assistant</h2>
-            <p class="loading-subtitle">Connecting to AI Assistant...</p>
+            <h2 class="loading-title">A1 PVC Assistant</h2>
+            <p class="loading-subtitle">Özemek Plastik AI Assistant Başlatılıyor...</p>
         </div>
     </div>
 
@@ -54,7 +55,8 @@
         <header class="app-header">
             <div class="header-left">
                 <div class="logo-container">
-                    <h1>A1 Assistant</h1>
+                    <img src="logo_2.png" alt="Company Logo" style="height: 40px; margin-right: 15px; vertical-align: middle;">
+                    <h1>A1 PVC Assistant</h1>
                 </div>
             </div>
             <div class="header-right">
@@ -134,18 +136,19 @@
                     <div id="chatMessages" class="chat-messages">
                         <div class="welcome-message">
                             <div class="assistant-avatar">
-                                <div class="avatar-icon">🤖</div>
+                                <img src="logo.png" alt="A1 PVC Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
                             </div>
                             <div class="message-content">
-                                <h3>Welcome to A1 Assistant!</h3>
-                                <p>I'm here to help you with information about A1 Plastic Company and assist with your business needs. You can:</p>
+                                <h3>Welcome to A1 PVC Assistant!</h3>
+                                <p>I'm your AI assistant for <strong>Özemek Plastik (A1 PVC)</strong> - serving the industry since 1970s with 50+ years of expertise. I can help you with:</p>
                                 <ul>
-                                    <li>Ask questions about our products and services</li>
-                                    <li>Get assistance with business operations</li>
-                                    <li>Use voice mode for hands-free interaction</li>
-                                    <li>Access real-time AI-powered insights</li>
+                                    <li><strong>PVC Products:</strong> Edge Banding, Profiles, Window & Door Systems</li>
+                                    <li><strong>Technical Information:</strong> Product specifications and applications</li>
+                                    <li><strong>Company Services:</strong> Export capabilities to 50+ countries</li>
+                                    <li><strong>Voice Mode:</strong> Hands-free interaction for convenient communication</li>
                                 </ul>
-                                <p>How can I assist you today?</p>
+                                <p><strong>📞 Contact:</strong> 0850 888 22 47 | <strong>🌐 Website:</strong> <a href="https://a1pvcmarket.com/" target="_blank">a1pvcmarket.com</a></p>
+                                <p>How can I assist you with A1 PVC products and services today?</p>
                             </div>
                         </div>
                     </div>
@@ -155,7 +158,7 @@
                         <div class="input-wrapper">
                             <textarea id="chatInput" 
                                       class="chat-input" 
-                                      placeholder="Ask me anything about A1 Plastic Company..."
+                                      placeholder="A1 PVC ürünleri ve hizmetleri hakkında soru sorun..."
                                       rows="1"></textarea>
                             <button id="sendChatBtn" class="send-btn" disabled>
                                 <span class="send-icon">→</span>
@@ -163,9 +166,10 @@
                         </div>
                         
                         <div class="input-suggestions">
-                            <button class="suggestion-btn">Tell me about A1 Plastic Company</button>
-                            <button class="suggestion-btn">What products do you offer?</button>
-                            <button class="suggestion-btn">Company history and background</button>
+                            <button class="suggestion-btn">PVC Profil ürünleri hakkında bilgi</button>
+                            <button class="suggestion-btn">Kenar bandı çeşitleri nelerdir?</button>
+                            <button class="suggestion-btn">İhracat ülkeleri ve referanslar</button>
+                            <button class="suggestion-btn">Teknik özellikler ve kalite</button>
                         </div>
                     </div>
                 </div>

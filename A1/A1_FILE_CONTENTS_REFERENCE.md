@@ -256,9 +256,9 @@ The A1 Assistant is a self-contained AI chat application with voice capabilities
 - **Lines 83-101**: ElevenLabs Conversational AI configuration for A1 Assistant
 - **Lines 103-109**: Global configuration object setup
 - **A1 Specific Configuration**:
-  - ELEVENLABS_AGENT_ID_3 and ELEVENLABS_API_KEY_3 set as default (primary agent for SMART mode)
+  - ELEVENLABS_AGENT_ID_4 and ELEVENLABS_API_KEY_4 set as default (primary agent for SMART mode) - Updated June 2025
   - ELEVENLABS_AGENT_ID_2 and ELEVENLABS_API_KEY_2 for secondary agent (ELA mode)
-  - Enhanced agent configuration with A1 priority settings
+  - Enhanced agent configuration with A1 priority settings and fallback protection
 - API endpoints and feature flags
 - Environment-specific settings
 - Third-party service configuration
@@ -349,25 +349,42 @@ This isolated implementation allows for customization and demonstration without 
 ### Latest Updates (June 2025)
 
 #### Environment Variable Configuration
-- **ELEVENLABS_AGENT_ID_3**: Now configured as the default primary agent for A1 Assistant
-- **ELEVENLABS_API_KEY_3**: Corresponding API key for the A1 primary agent
-- **Priority Configuration**: A1 Assistant now prioritizes AGENT_ID_3/API_KEY_3 for SMART mode
-- **Agent Selection**: SMART button uses ELEVENLABS_AGENT_ID_3, ELA button uses ELEVENLABS_AGENT_ID_2
-- **Default Behavior**: No agent_id parameter needed for primary agent (automatically uses AGENT_ID_3)
+- **ELEVENLABS_AGENT_ID_4**: Now configured as the primary agent for A1 Assistant (updated from AGENT_ID_3)
+- **ELEVENLABS_API_KEY_4**: Corresponding API key for the A1 primary agent
+- **Priority Configuration**: A1 Assistant now prioritizes AGENT_ID_4/API_KEY_4 for SMART mode
+- **Agent Selection**: SMART button uses ELEVENLABS_AGENT_ID_4, ELA button uses ELEVENLABS_AGENT_ID_2
+- **Default Behavior**: No agent_id parameter needed for primary agent (automatically uses AGENT_ID_4)
+- **Fallback Protection**: Original working agent used if AGENT_ID_4 is unavailable
 
 #### Netlify Function Updates
-- Updated `elevenlabs-signed-url.js` to prioritize ELEVENLABS_AGENT_ID_3 as default
-- Enhanced agent selection logic with proper fallback handling
-- Added logging for better debugging of agent selection
+- **Latest**: Updated `elevenlabs-signed-url.js` to prioritize ELEVENLABS_AGENT_ID_4 as default (June 2025)
+- **Previous**: Was using ELEVENLABS_AGENT_ID_3, but switched to AGENT_ID_4 for better reliability
+- Enhanced agent selection logic with robust fallback handling
+- Added comprehensive logging for debugging agent selection
+- Resolved WebSocket connection issues with improved agent configuration
+
+#### Voice Chat Configuration Updates
+- **Lines 17-25**: Updated default agent selection comment to reflect ELEVENLABS_AGENT_ID_4 usage
+- **Lines 61**: Enhanced logging to show "SMART (ELEVENLABS_AGENT_ID_4)" for primary agent
+- **Lines 764**: Updated ai-chat.js logging to reflect AGENT_ID_4 usage
+- **Lines 141-143**: Voice chat now uses AGENT_ID_4 as primary with proper fallback
+
+#### Recent Issue Resolution (June 2025)
+- **Problem**: ELEVENLABS_AGENT_ID_3 caused WebSocket connection issues (ReadyState: 2 - CLOSING)
+- **Solution**: Migrated to ELEVENLABS_AGENT_ID_4 with different configuration
+- **Implementation**: Updated Netlify function to use AGENT_ID_4 as primary choice
+- **Result**: Voice chat functionality restored with new agent configuration
+- **Commit**: cb4d925 - "Implement ELEVENLABS_AGENT_ID_4 as primary agent for A1 Assistant"
 
 ### Current Status (June 2025)
 - ✅ **Claude Chat**: Fully functional with proper authentication
 - ✅ **Voice Mode**: Complete functionality with microphone access working properly
-- ✅ **Agent Configuration**: ELEVENLABS_AGENT_ID_3 set as default primary agent
+- ✅ **Agent Configuration**: ELEVENLABS_AGENT_ID_4 set as default primary agent (updated)
 - ✅ **Auto-Login**: CEO access without authentication barriers
 - ✅ **UI/UX**: Professional A1 branding with glass-morphism design
 - ✅ **Error Handling**: Comprehensive debugging and error reporting
 - ✅ **Session Management**: Fixed user storage key consistency issues
 - ✅ **Authentication Flow**: Enhanced fallback mechanisms for AI service integration
-- ✅ **Environment Variables**: Properly configured with A1-specific agent priorities
+- ✅ **Environment Variables**: Properly configured with A1-specific AGENT_ID_4 priorities
+- ✅ **WebSocket Connection**: Resolved connection issues with AGENT_ID_4 implementation
 - ✅ **Isolation**: Complete independence from main 01data website

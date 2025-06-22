@@ -466,7 +466,17 @@ class MainApp {
      * Initialize AI chat view
      */
     initializeAIChat() {
-        // Initialize AI Service first
+        // Initialize FAQ Loader first
+        if (typeof window.faqLoader !== 'undefined') {
+            console.log('A1: Initializing FAQ Loader...');
+            window.faqLoader.initialize().then(() => {
+                console.log('A1: FAQ Loader ready with', window.faqLoader.getStats().totalFAQs, 'FAQs');
+            }).catch(error => {
+                console.warn('A1: FAQ Loader initialization error:', error);
+            });
+        }
+
+        // Initialize AI Service
         if (typeof AIService !== 'undefined' && !window.aiService) {
             console.log('A1: Creating new AI Service instance');
             window.aiService = new AIService();
