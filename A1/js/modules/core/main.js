@@ -233,12 +233,12 @@ class MainApp {
     }
 
     /**
-     * Show sign-in screen
+     * Show sign-in screen (not used in A1 - auto-login)
      */
     showSignIn() {
-        utils.hide('#loadingScreen');
-        utils.show('#signInScreen');
-        utils.hide('#app');
+        // A1 Assistant uses auto-login, this should not be called
+        console.warn('showSignIn called in A1 Assistant - using auto-login instead');
+        this.showApp();
     }
 
     /**
@@ -246,7 +246,6 @@ class MainApp {
      */
     showApp() {
         utils.hide('#loadingScreen');
-        utils.hide('#signInScreen');
         utils.show('#app');
         
         // Update user info in header
@@ -602,8 +601,8 @@ window.authModule = {
     isAuthenticated: () => window.mainApp?.isAuthenticated() || false
 };
 
-// Auto-initialize will be handled by HTML
-// No need to create instance here since HTML will do it
+// Auto-initialize the A1 Assistant application
+window.mainApp = new MainApp();
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {
