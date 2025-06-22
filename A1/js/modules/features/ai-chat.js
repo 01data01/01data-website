@@ -761,7 +761,7 @@ class AIChatModule {
             this.voiceChat.setSelectedAgent(agentType);
         }
         
-        console.log(`A1: Selected agent: ${agentType === 'primary' ? 'SMART (ELEVENLABS_AGENT_ID_3)' : 'ELA (ELEVENLABS_AGENT_ID_2)'}`);
+        console.log(`A1: Selected agent: ${agentType === 'primary' ? 'SMART (Original Default Agent)' : 'ELA (ELEVENLABS_AGENT_ID_2)'}`);
     }
 
     /**
