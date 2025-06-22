@@ -427,25 +427,52 @@ class AIChatModule {
 
         const messagesContainer = document.getElementById('chatMessages');
         if (messagesContainer) {
-            messagesContainer.innerHTML = `
-                <div class="welcome-message">
-                    <div class="assistant-avatar">
-                        <img src="logo.png" alt="A1 PVC Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
+            // Detect language from page
+            const isTurkish = document.documentElement.lang === 'tr' || window.location.pathname.includes('index-tr');
+            
+            if (isTurkish) {
+                // Turkish welcome message
+                messagesContainer.innerHTML = `
+                    <div class="welcome-message">
+                        <div class="assistant-avatar">
+                            <img src="logo.png" alt="A1 PVC Logosu" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
+                        </div>
+                        <div class="message-content">
+                            <h3>A1 PVC Asistanına Hoş Geldiniz!</h3>
+                            <p><strong>Özemek Plastik (A1 PVC)</strong> için AI asistanınızım - 1970'lerden beri 50+ yıllık deneyimle sektöre hizmet vermekteyiz. Size şu konularda yardımcı olabilirim:</p>
+                            <ul>
+                                <li><strong>PVC Ürünleri:</strong> Kenar Bandı, Profiller, Pencere & Kapı Sistemleri</li>
+                                <li><strong>Teknik Bilgiler:</strong> Ürün özellikleri ve uygulamaları</li>
+                                <li><strong>Şirket Hizmetleri:</strong> 50+ ülkeye ihracat kapasitesi</li>
+                                <li><strong>Sesli Mod:</strong> Rahat iletişim için eller serbest etkileşim</li>
+                            </ul>
+                            <p><strong>📞 İletişim:</strong> 0850 888 22 47 | <strong>🌐 Website:</strong> <a href="https://a1pvcmarket.com/" target="_blank">a1pvcmarket.com</a></p>
+                            <p>Bugün A1 PVC ürünleri ve hizmetleri konusunda size nasıl yardımcı olabilirim?</p>
+                        </div>
                     </div>
-                    <div class="message-content">
-                        <h3>Welcome to A1 PVC Assistant!</h3>
-                        <p>I'm your AI assistant for <strong>Özemek Plastik (A1 PVC)</strong> - serving the industry since 1970s with 50+ years of expertise. I can help you with:</p>
-                        <ul>
-                            <li><strong>PVC Products:</strong> Edge Banding, Profiles, Window & Door Systems</li>
-                            <li><strong>Technical Information:</strong> Product specifications and applications</li>
-                            <li><strong>Company Services:</strong> Export capabilities to 50+ countries</li>
-                            <li><strong>Voice Mode:</strong> Hands-free interaction for convenient communication</li>
-                        </ul>
-                        <p><strong>📞 Contact:</strong> 0850 888 22 47 | <strong>🌐 Website:</strong> <a href="https://a1pvcmarket.com/" target="_blank">a1pvcmarket.com</a></p>
-                        <p>How can I assist you with A1 PVC products and services today?</p>
+                `;
+            } else {
+                // English welcome message
+                messagesContainer.innerHTML = `
+                    <div class="welcome-message">
+                        <div class="assistant-avatar">
+                            <img src="logo.png" alt="A1 PVC Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
+                        </div>
+                        <div class="message-content">
+                            <h3>Welcome to A1 PVC Assistant!</h3>
+                            <p>I'm your AI assistant for <strong>Özemek Plastik (A1 PVC)</strong> - serving the industry since 1970s with 50+ years of expertise. I can help you with:</p>
+                            <ul>
+                                <li><strong>PVC Products:</strong> Edge Banding, Profiles, Window & Door Systems</li>
+                                <li><strong>Technical Information:</strong> Product specifications and applications</li>
+                                <li><strong>Company Services:</strong> Export capabilities to 50+ countries</li>
+                                <li><strong>Voice Mode:</strong> Hands-free interaction for convenient communication</li>
+                            </ul>
+                            <p><strong>📞 Contact:</strong> 0850 888 22 47 | <strong>🌐 Website:</strong> <a href="https://a1pvcmarket.com/" target="_blank">a1pvcmarket.com</a></p>
+                            <p>How can I assist you with A1 PVC products and services today?</p>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }
 
         // Add welcome message to current messages
@@ -617,11 +644,16 @@ class AIChatModule {
         if (!historyList) return;
 
         if (this.chatHistory.length === 0) {
+            // Detect language from page
+            const isTurkish = document.documentElement.lang === 'tr' || window.location.pathname.includes('index-tr');
+            const noConversationsText = isTurkish ? 'Henüz konuşma yok' : 'No conversations yet';
+            const startChattingText = isTurkish ? 'Geçmişi görmek için sohbet etmeye başlayın' : 'Start chatting to see history';
+            
             historyList.innerHTML = `
                 <div class="empty-history">
                     <div class="empty-icon">💭</div>
-                    <p>No conversations yet</p>
-                    <span>Start chatting to see history</span>
+                    <p>${noConversationsText}</p>
+                    <span>${startChattingText}</span>
                 </div>
             `;
             return;
