@@ -3,6 +3,8 @@
  * Handles app initialization, routing, and core application logic
  */
 
+console.log('A1: main.js script loaded');
+
 class MainApp {
     constructor() {
         // A1 Assistant - simplified for AI chat only
@@ -633,7 +635,9 @@ window.authModule = {
 };
 
 // Auto-initialize the A1 Assistant application
+console.log('A1: Initializing MainApp...');
 window.mainApp = new MainApp();
+console.log('A1: MainApp initialized and assigned to window.mainApp');
 
 // Export for module systems
 if (typeof module !== 'undefined' && module.exports) {

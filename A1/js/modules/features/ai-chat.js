@@ -3,6 +3,8 @@
  * Handles AI chat interface and Claude API integration with voice capabilities
  */
 
+console.log('A1: ai-chat.js script loaded');
+
 class AIChatModule {
     constructor() {
         this.initialized = false;

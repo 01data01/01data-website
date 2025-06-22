@@ -3,6 +3,8 @@
  * Shared utility functions, DOM helpers, and common functionality
  */
 
+console.log('A1: utils.js script loaded');
+
 class Utils {
     constructor() {
         this.dateFormats = {
