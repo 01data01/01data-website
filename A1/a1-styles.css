@@ -531,7 +531,7 @@
 .chat-input-container {
     background: white;
     border-top: 1px solid #e0e0e0;
-    padding: 1.5rem 2rem;
+    padding: 1.5rem 3rem;
     flex: 0 0 auto;
 }
 
@@ -557,7 +557,7 @@
     flex: 1;
     border: none;
     background: transparent;
-    padding: 15px 20px;
+    padding: 15px 25px;
     color: var(--a1-dark);
     font-size: 1rem;
     font-family: inherit;
@@ -566,6 +566,7 @@
     min-height: 40px;
     max-height: 80px;
     line-height: 1.4;
+    width: 100%;
 }
 
 .chat-input::placeholder {
