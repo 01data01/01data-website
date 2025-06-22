@@ -82,7 +82,8 @@ class VoiceChat {
     }
 
     async startConversation() {
-        console.log('A1: VoiceChat.startConversation() called');
+        console.log('A1: VoiceChat.startConversation() called - ENHANCED VERSION');
+        console.log('A1: Timestamp:', new Date().toISOString());
         
         if (this.isConnected) {
             console.log('A1: Conversation already active');

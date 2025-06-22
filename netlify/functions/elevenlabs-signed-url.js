@@ -11,6 +11,11 @@ const headers = {
 };
 
 exports.handler = async (event, context) => {
+    console.log('=== ELEVENLABS SIGNED URL FUNCTION CALLED - ENHANCED VERSION ===');
+    console.log('Timestamp:', new Date().toISOString());
+    console.log('HTTP Method:', event.httpMethod);
+    console.log('Query Parameters:', event.queryStringParameters);
+    
     // Handle CORS preflight
     if (event.httpMethod === 'OPTIONS') {
         return {
