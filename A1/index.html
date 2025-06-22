@@ -3,170 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A1 PVC Assistant - Özemek Plastik</title>
+    <title>A1 PVC Assistant - Language Selection</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Modular CSS Imports -->
-    <link rel="stylesheet" href="css/modules/base.css">
-    <link rel="stylesheet" href="css/modules/auth.css">
-    <link rel="stylesheet" href="css/modules/layout.css">
-    <link rel="stylesheet" href="css/modules/ai-chat.css">
-    <link rel="stylesheet" href="css/modules/voice-chat.css">
-    <link rel="stylesheet" href="css/modules/voice-auth.css">
-    <link rel="stylesheet" href="css/modules/components.css">
     <link rel="stylesheet" href="a1-styles.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMKY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <meta name="google-signin-client_id" content="336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com">
-    
-    <!-- Modular JavaScript Imports -->
-    <script src="config.js"></script>
-    <script src="js/modules/core/utils.js?v=20250622-force-reload-v2"></script>
-    <script src="js/modules/core/auth.js?v=20250622-force-reload-v2"></script>
-    <script src="js/modules/ai/ai-service.js?v=20250622-force-reload-v2"></script>
-    <script src="js/modules/features/voice-auth.js?v=20250622-force-reload-v2"></script>
-    <script src="js/modules/features/voice-chat.js?v=20250622-official-docs-fix"></script>
-    <script src="js/modules/features/faq-loader.js?v=20250622-force-reload-v2"></script>
-    <script src="js/modules/features/ai-chat.js?v=20250622-force-reload-v2"></script>
-    <script src="js/modules/core/main.js?v=20250622-force-reload-v2"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--a1-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .language-selection {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .logo-container {
+            margin-bottom: 2rem;
+        }
+        
+        .logo-container img {
+            height: 80px;
+            margin-bottom: 1rem;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--a1-text-dark);
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+        
+        .language-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+        }
+        
+        .language-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 3rem;
+            border: 3px solid var(--a1-border);
+            border-radius: 15px;
+            text-decoration: none;
+            color: var(--a1-text-dark);
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            background: white;
+            min-width: 150px;
+        }
+        
+        .language-btn:hover {
+            background: var(--a1-light);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .language-btn .flag {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .language-btn .label {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        
+        .language-btn .desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .language-buttons {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .title {
+                font-size: 2rem;
+            }
+            
+            .language-selection {
+                padding: 2rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div id="loadingScreen" class="loading-screen">
-        <div class="loading-content">
-            <div class="loading-brain">
-                <div class="loading-neural-paths">
-                    <div class="loading-neural-line"></div>
-                    <div class="loading-neural-line"></div>
-                    <div class="loading-neural-line"></div>
-                    <div class="loading-neural-line"></div>
-                </div>
-            </div>
-            <h2 class="loading-title">A1 PVC Assistant</h2>
-            <p class="loading-subtitle">Özemek Plastik AI Assistant Başlatılıyor...</p>
+    <div class="language-selection">
+        <div class="logo-container">
+            <img src="logo_2.png" alt="A1 PVC Logo">
+            <h1 class="title">A1 PVC Assistant</h1>
+            <p class="subtitle">Özemek Plastik AI Assistant<br>Choose Your Language / Dilinizi Seçin</p>
         </div>
-    </div>
-
-
-    <!-- Main Application -->
-    <div id="app" class="app-container" style="display: none;">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-left">
-                <div class="logo-container">
-                    <img src="logo_2.png" alt="Company Logo" style="height: 40px; margin-right: 15px; vertical-align: middle;">
-                    <h1>A1 PVC Assistant</h1>
-                </div>
-            </div>
-            <div class="header-right">
-                <!-- Voice Controls in Header -->
-                <div class="header-voice-controls">
-                    <button id="voiceToggleBtn" class="header-voice-btn" title="Toggle Voice Chat">
-                        <span class="voice-icon">🎤</span>
-                        <span class="voice-status">VOICE DISCONNECTED</span>
-                    </button>
-                    
-                    <div class="voice-activity">
-                        <div class="voice-indicator"></div>
-                        <div class="voice-indicator"></div>
-                        <div class="voice-indicator"></div>
-                    </div>
-                    
-                    <div id="connectionStatus" class="header-connection-status">
-                        <span class="status-text">Ready</span>
-                    </div>
-                </div>
-                
-                <div class="user-info">
-                    <img src="" alt="User Avatar" class="user-avatar">
-                    <span class="user-name">Loading...</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- AI Chat View -->
-            <div id="ai-chat-view" class="view active">
-                <div class="ai-chat-container">
-                <!-- Chat Sidebar -->
-                <div class="chat-sidebar">
-                    <div class="sidebar-header">
-                        <!-- Agent Selection in Sidebar -->
-                        <div class="sidebar-agent-selection">
-                            <button id="agentSmartBtn" class="sidebar-agent-btn active" data-agent="primary">
-                                SMART
-                            </button>
-                            <button id="agentElaBtn" class="sidebar-agent-btn" data-agent="secondary">
-                                ELA
-                            </button>
-                        </div>
-                        
-                        <button id="newChatBtn" class="new-chat-btn">
-                            <span class="btn-icon">+</span>
-                            New Chat
-                        </button>
-                    </div>
-                    
-                    <div class="chat-history">
-                        <h3>Chat History</h3>
-                        <div id="chatHistoryList" class="history-list">
-                            <!-- Chat history will be loaded dynamically -->
-                        </div>
-                        <div class="history-empty" style="display: none;">
-                            <p>Henüz sohbet geçmişi yok</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Main Chat Area -->
-                <div class="chat-main">
-
-                    <!-- Chat Messages -->
-                    <div id="chatMessages" class="chat-messages">
-                        <div class="welcome-message">
-                            <div class="assistant-avatar">
-                                <img src="logo.png" alt="A1 PVC Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
-                            </div>
-                            <div class="message-content">
-                                <h3>Welcome to A1 PVC Assistant!</h3>
-                                <p>I'm your AI assistant for <strong>Özemek Plastik (A1 PVC)</strong> - serving the industry since 1970s with 50+ years of expertise. I can help you with:</p>
-                                <ul>
-                                    <li><strong>PVC Products:</strong> Edge Banding, Profiles, Window & Door Systems</li>
-                                    <li><strong>Technical Information:</strong> Product specifications and applications</li>
-                                    <li><strong>Company Services:</strong> Export capabilities to 50+ countries</li>
-                                    <li><strong>Voice Mode:</strong> Hands-free interaction for convenient communication</li>
-                                </ul>
-                                <p><strong>📞 Contact:</strong> 0850 888 22 47 | <strong>🌐 Website:</strong> <a href="https://a1pvcmarket.com/" target="_blank">a1pvcmarket.com</a></p>
-                                <p>How can I assist you with A1 PVC products and services today?</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chat Input -->
-                    <div class="chat-input-container">
-                        <div class="input-suggestions">
-                            <button class="suggestion-btn">PVC Profil ürünleri hakkında bilgi</button>
-                            <button class="suggestion-btn">Kenar bandı çeşitleri nelerdir?</button>
-                            <button class="suggestion-btn">İhracat ülkeleri ve referanslar</button>
-                            <button class="suggestion-btn">Teknik özellikler ve kalite</button>
-                        </div>
-                        
-                        <div class="input-wrapper">
-                            <textarea id="chatInput" 
-                                      class="chat-input" 
-                                      placeholder="A1 PVC ürünleri ve hizmetleri hakkında soru sorun..."
-                                      rows="2"></textarea>
-                            <button id="sendChatBtn" class="send-btn" disabled>
-                                <span class="send-icon">→</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                </div>
-            </div>
-        </main>
+        
+        <div class="language-buttons">
+            <a href="index-tr.html" class="language-btn">
+                <div class="flag">🇹🇷</div>
+                <div class="label">TÜRKÇE</div>
+                <div class="desc">Turkish Interface</div>
+            </a>
+            
+            <a href="index-en.html" class="language-btn">
+                <div class="flag">🇺🇸</div>
+                <div class="label">ENGLISH</div>
+                <div class="desc">English Interface</div>
+            </a>
+        </div>
     </div>
 </body>
 </html>

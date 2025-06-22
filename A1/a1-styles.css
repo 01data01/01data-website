@@ -17,6 +17,41 @@
     --a1-sidebar-bg: #f0f7f0;
 }
 
+/* Language Switch Buttons */
+.language-switch {
+    display: flex;
+    gap: 0.5rem;
+    margin-right: 1rem;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--a1-border);
+    border-radius: 8px;
+    background: white;
+    color: var(--a1-text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+}
+
+.lang-btn:hover {
+    background: var(--a1-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.lang-btn.active {
+    background: var(--a1-accent);
+    color: white;
+    border-color: var(--a1-accent);
+}
+
 /* Main app styling */
 .app-container {
     background-color: var(--a1-background);
