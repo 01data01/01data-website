@@ -109,7 +109,7 @@
 }
 
 .header-voice-btn {
-    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #A52A2A 100%);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -118,7 +118,7 @@
     font-size: 0.9rem;
     transition: all 0.3s ease;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -126,7 +126,7 @@
 
 .header-voice-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+    box-shadow: 0 6px 16px rgba(139, 0, 0, 0.4);
 }
 
 .header-voice-btn.active {
@@ -259,7 +259,7 @@
 .sidebar-agent-selection {
     display: flex;
     gap: 8px;
-    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .sidebar-agent-btn {
