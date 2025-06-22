@@ -4,7 +4,7 @@
  */
 
 // ENHANCED VERSION MARKER - THIS SHOULD APPEAR IN CONSOLE
-console.log('🚀 A1: ENHANCED VOICE-CHAT.JS LOADED - VERSION 2.0 - TIMESTAMP:', new Date().toISOString());
+console.log('🚀 A1: ENHANCED VOICE-CHAT.JS LOADED - VERSION 2.1 (OFFICIAL DOCS) - TIMESTAMP:', new Date().toISOString());
 
 class VoiceChat {
     constructor() {
@@ -213,20 +213,28 @@ class VoiceChat {
                 };
 
                 // Send conversation initiation according to official ElevenLabs docs
-                console.log('A1: Sending conversation initiation (official format)...');
+                console.log('A1: Sending conversation initiation (official format v2.0)...');
                 this.sendMessage({
                     type: 'conversation_initiation_client_data',
                     conversation_config_override: {
                         agent: {
-                            first_message: 'Hello! I\'m your AI assistant. How can I help you today?',
+                            prompt: {
+                                prompt: 'You are a helpful AI assistant for A1 PVC Company (Özemek Plastik). You specialize in PVC products, edge banding, profiles, and construction materials. Provide professional customer support in both Turkish and English.'
+                            },
+                            first_message: 'Hello! I\'m your A1 PVC assistant. How can I help you with our products today?',
                             language: 'en'
                         }
                     },
+                    custom_llm_extra_body: {
+                        temperature: 0.7,
+                        max_tokens: 200
+                    },
                     dynamic_variables: {
+                        user_name: 'Customer',
+                        company: 'A1 PVC',
                         current_date: dateTime.date,
                         current_time: dateTime.time,
-                        current_day: dateTime.day,
-                        user_name: 'User'
+                        current_day: dateTime.day
                     }
                 });
                 
