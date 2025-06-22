@@ -105,9 +105,13 @@ class AIChatModule {
         // Voice mode toggle button
         const voiceToggleBtn = document.getElementById('voiceToggleBtn');
         if (voiceToggleBtn) {
+            console.log('A1: Voice toggle button found, adding click handler');
             voiceToggleBtn.addEventListener('click', () => {
+                console.log('A1: Voice toggle button clicked!');
                 this.toggleVoiceMode();
             });
+        } else {
+            console.error('A1: Voice toggle button not found!');
         }
     }
 

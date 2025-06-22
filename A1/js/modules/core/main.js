@@ -314,22 +314,26 @@ class MainApp {
             this.eventListeners.push(listener);
         });
 
-        // Mobile menu toggle
+        // Mobile menu toggle (A1 doesn't have mobile menu)
         const mobileMenuBtn = utils.getElementById('mobileMenuBtn');
         if (mobileMenuBtn) {
             const listener = utils.addEventListener(mobileMenuBtn, 'click', () => {
                 this.toggleMobileMenu();
             });
             this.eventListeners.push(listener);
+        } else {
+            console.log('A1: Mobile menu not available - simplified interface');
         }
 
-        // Sign out button
+        // Sign out button (A1 doesn't have sign out - auto-login)
         const signOutBtn = utils.getElementById('signOutBtn');
         if (signOutBtn) {
             const listener = utils.addEventListener(signOutBtn, 'click', () => {
                 this.handleSignOut();
             });
             this.eventListeners.push(listener);
+        } else {
+            console.log('A1: Sign out not available - auto-login mode');
         }
 
         // Global keyboard shortcuts

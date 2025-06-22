@@ -36,8 +36,11 @@ class Utils {
      */
     querySelector(selector, parent = document) {
         const element = parent.querySelector(selector);
-        if (!element && !selector.includes('dashboard-refresh-btn')) {
-            console.warn(`Element with selector '${selector}' not found`);
+        // Only warn for important missing elements, not optional ones
+        if (!element && !selector.includes('dashboard-refresh-btn') && 
+            !selector.includes('mobile') && !selector.includes('signOut') &&
+            !selector.includes('profile-dropdown') && !selector.includes('user-profile-btn')) {
+            console.warn(`A1: Element with selector '${selector}' not found`);
         }
         return element;
     }
