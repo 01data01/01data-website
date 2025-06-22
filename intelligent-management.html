@@ -7,10 +7,34 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/intelligent-management.css">
+    <!-- Modular CSS Imports -->
+    <link rel="stylesheet" href="css/modules/base.css">
+    <link rel="stylesheet" href="css/modules/auth.css">
+    <link rel="stylesheet" href="css/modules/layout.css">
+    <link rel="stylesheet" href="css/modules/dashboard.css">
+    <link rel="stylesheet" href="css/modules/tasks.css">
+    <link rel="stylesheet" href="css/modules/calendar.css">
+    <link rel="stylesheet" href="css/modules/ai-chat.css">
+    <link rel="stylesheet" href="css/modules/voice-chat.css">
+    <link rel="stylesheet" href="css/modules/voice-auth.css">
+    <link rel="stylesheet" href="css/modules/components.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMKY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
     <script src="https://apis.google.com/js/platform.js" async defer></script>
     <meta name="google-signin-client_id" content="336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com">
+    
+    <!-- Modular JavaScript Imports -->
+    <script src="config.js"></script>
+    <script src="js/modules/core/utils.js?v=1.1"></script>
+    <script src="js/modules/core/auth.js"></script>
+    <script src="js/modules/ai/ai-service.js"></script>
+    <script src="js/modules/features/dashboard.js"></script>
+    <script src="js/modules/features/tasks.js"></script>
+    <script src="js/modules/features/calendar.js"></script>
+    <script src="js/modules/features/projects.js"></script>
+    <script src="js/modules/features/voice-auth.js"></script>
+    <script src="js/modules/features/voice-chat.js"></script>
+    <script src="js/modules/features/ai-chat.js"></script>
+    <script src="js/modules/core/main.js"></script>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -48,6 +72,16 @@
             </div>
             <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
             <div id="signInError" class="sign-in-error" style="display: none;"></div>
+            
+            <!-- Demo Mode Button for Development -->
+            <div style="margin-top: 20px; text-align: center;">
+                <button onclick="enableDemoMode()" class="btn-secondary" style="font-size: 0.9rem; padding: 8px 16px;">
+                    🚀 Demo Mode (Skip Sign-In)
+                </button>
+                <p style="font-size: 0.8rem; color: #666; margin-top: 8px;">
+                    For testing purposes - bypasses Google Sign-In
+                </p>
+            </div>
         </div>
     </div>
 
@@ -56,6 +90,13 @@
         <!-- Header -->
         <header class="app-header">
             <div class="header-left">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <div class="hamburger">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
                 <div class="logo-container">
                     <div class="mgmt-icon">
                         <div class="mgmt-brain">
@@ -71,516 +112,267 @@
                 </div>
                 <nav class="main-nav">
                     <button class="nav-btn active" data-view="dashboard">
-                        <span class="nav-icon">📊</span>
-                        Dashboard
+                        <span class="nav-icon icon-dashboard"></span>
+                        <span class="nav-text">Dashboard</span>
                     </button>
                     <button class="nav-btn" data-view="tasks">
-                        <span class="nav-icon">✅</span>
-                        Tasks
+                        <span class="nav-icon icon-tasks"></span>
+                        <span class="nav-text">Tasks</span>
                     </button>
                     <button class="nav-btn" data-view="calendar">
-                        <span class="nav-icon">📅</span>
-                        Calendar
+                        <span class="nav-icon icon-calendar"></span>
+                        <span class="nav-text">Calendar</span>
                     </button>
                     <button class="nav-btn" data-view="projects">
-                        <span class="nav-icon">📋</span>
-                        Projects
+                        <span class="nav-icon icon-projects"></span>
+                        <span class="nav-text">Projects</span>
                     </button>
                     <button class="nav-btn" data-view="ai-chat">
-                        <span class="nav-icon">🤖</span>
-                        AI Assistant
+                        <span class="nav-icon icon-ai"></span>
+                        <span class="nav-text">AI Assistant</span>
                     </button>
                 </nav>
             </div>
             <div class="header-right">
-                <div class="user-info" id="userInfo">
-                    <img class="user-avatar" id="userAvatar" src="" alt="">
-                    <span class="user-name" id="userName"></span>
+                <div class="user-info">
+                    <img src="" alt="User Avatar" class="user-avatar">
+                    <span class="user-name">Loading...</span>
                 </div>
-                <button class="settings-btn" id="settingsBtn">⚙️</button>
-                <button class="sign-out-btn" onclick="signOut()">Sign Out</button>
-                <button class="back-btn" onclick="window.location.href='index.html'">← Back to 01data</button>
+                <button class="btn-icon" id="signOutBtn" title="Sign Out">
+                    <span class="icon-signout">⏻</span>
+                </button>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="app-main">
+        <main class="main-content">
             <!-- Dashboard View -->
             <div id="dashboard-view" class="view active">
-                <div class="dashboard-grid">
-                    <!-- Quick Stats -->
-                    <div class="stats-container">
-                        <div class="stat-card">
-                            <div class="stat-icon">📅</div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="dueTodayCount">0</div>
-                                <div class="stat-label">Due Today</div>
-                            </div>
-                        </div>
-                        <div class="stat-card urgent">
-                            <div class="stat-icon">⚠️</div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="overdueCount">0</div>
-                                <div class="stat-label">Overdue</div>
-                            </div>
-                        </div>
-                        <div class="stat-card success">
-                            <div class="stat-icon">✅</div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="completedCount">0</div>
-                                <div class="stat-label">Completed</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon">📊</div>
-                            <div class="stat-content">
-                                <div class="stat-number" id="completionRate">0%</div>
-                                <div class="stat-label">Completion Rate</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Add Task -->
-                    <div class="quick-add-container">
-                        <h3>Quick Add Task</h3>
-                        <div class="quick-add-form">
-                            <input type="text" id="quickTaskInput" placeholder="What needs to be done? (Try: 'Meeting tomorrow at 2pm' or 'Call client next Friday')" />
-                            <button id="quickAddBtn" class="btn-primary">
-                                <span class="btn-icon">🤖</span>
-                                Add with AI
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Today's Tasks -->
-                    <div class="today-tasks-container">
-                        <h3>Today's Schedule</h3>
-                        <div id="todayTasksList" class="tasks-list">
-                            <!-- Tasks will be populated here -->
-                        </div>
-                    </div>
-
-                    <!-- AI Suggestions -->
-                    <div class="suggestions-container">
-                        <h3>AI Suggestions</h3>
-                        <div id="aiSuggestions" class="suggestions-list">
-                            <!-- AI suggestions will be populated here -->
-                        </div>
+                <div class="view-header">
+                    <h2>Dashboard</h2>
+                    <div class="view-actions">
+                        <button class="btn-primary" onclick="window.tasksModule?.showAddTaskModal()">
+                            + Quick Task
+                        </button>
                     </div>
                 </div>
+                <div id="dashboardContent"></div>
             </div>
 
             <!-- Tasks View -->
             <div id="tasks-view" class="view">
                 <div class="view-header">
-                    <h2>All Tasks</h2>
+                    <h2>Tasks</h2>
                     <div class="view-actions">
-                        <button class="filter-btn" data-filter="all">All</button>
-                        <button class="filter-btn" data-filter="pending">Pending</button>
-                        <button class="filter-btn" data-filter="completed">Completed</button>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="pending">Pending</button>
+                            <button class="filter-btn" data-filter="completed">Completed</button>
+                            <button class="filter-btn" data-filter="overdue">Overdue</button>
+                        </div>
                         <button class="btn-primary" id="addTaskBtn">+ Add Task</button>
                     </div>
                 </div>
-                <div class="tasks-container">
-                    <div id="allTasksList" class="tasks-list">
-                        <!-- All tasks will be populated here -->
-                    </div>
-                </div>
+                <div id="allTasksList" class="tasks-list"></div>
             </div>
 
             <!-- Calendar View -->
             <div id="calendar-view" class="view">
                 <div class="view-header">
                     <h2>Calendar</h2>
-                    <div class="calendar-header">
-                        <div class="calendar-view-switcher">
+                    <div class="view-actions">
+                        <div class="calendar-controls">
+                            <button id="prevPeriod" class="btn-secondary">‹</button>
+                            <span id="currentPeriod" class="current-period">Loading...</span>
+                            <button id="nextPeriod" class="btn-secondary">›</button>
+                            <button id="todayBtn" class="btn-secondary">Today</button>
+                        </div>
+                        <div class="view-switcher">
                             <button class="view-btn active" data-view="month">Month</button>
                             <button class="view-btn" data-view="week">Week</button>
                             <button class="view-btn" data-view="day">Day</button>
                         </div>
-                        <div class="calendar-controls">
-                            <button id="prevPeriod" class="nav-btn">‹</button>
-                            <span id="currentPeriod"></span>
-                            <button id="nextPeriod" class="nav-btn">›</button>
-                            <button id="todayBtn" class="today-btn">Today</button>
-                        </div>
                     </div>
                 </div>
-                <div class="calendar-container">
-                    <div id="calendar" class="calendar-grid">
-                        <!-- Calendar will be populated here -->
-                    </div>
-                </div>
+                <div id="calendar" class="calendar-container"></div>
             </div>
 
             <!-- Projects View -->
             <div id="projects-view" class="view">
                 <div class="view-header">
                     <h2>Projects</h2>
-                    <button class="btn-primary" id="addProjectBtn">+ New Project</button>
-                </div>
-                <div class="projects-container">
-                    <div id="projectsList" class="projects-list">
-                        <!-- Projects will be populated here -->
+                    <div class="view-actions">
+                        <button class="btn-primary" id="addProjectBtn">+ Add Project</button>
                     </div>
                 </div>
+                <div id="projectsList" class="projects-container"></div>
             </div>
 
             <!-- AI Chat View -->
             <div id="ai-chat-view" class="view">
-                <div class="chat-container">
-                    <div class="chat-header">
-                        <h2>AI Assistant</h2>
-                        <div class="chat-status">
-                            <span class="status-indicator online"></span>
-                            Claude AI Ready
+                <div class="chat-layout">
+                    <!-- Left Sidebar for Chat History -->
+                    <div class="chat-sidebar" id="chatSidebar">
+                        <div class="sidebar-header">
+                            <button class="new-chat-btn" id="newChatBtn" title="New Chat">
+                                <svg class="new-chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18l-2-2H5L3 6z"/>
+                                    <path d="M5 6v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6"/>
+                                    <path d="M12 11v6"/>
+                                    <path d="M9 14h6"/>
+                                </svg>
+                                <span>New Chat</span>
+                            </button>
                         </div>
-                    </div>
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message ai-message">
-                            <div class="message-avatar">🤖</div>
-                            <div class="message-content">
-                                <p>Hello! I'm your AI assistant. I can help you manage tasks, schedule appointments, and organize your projects. Try saying something like:</p>
-                                <ul>
-                                    <li>"Schedule a meeting with the team tomorrow at 2pm"</li>
-                                    <li>"What do I have planned for next week?"</li>
-                                    <li>"Create a project for the new website redesign"</li>
-                                </ul>
+                        
+                        <div class="sidebar-content">
+                            <div class="history-section">
+                                <h3 class="history-title">Recent</h3>
+                                <div class="history-list" id="historyList">
+                                    <div class="empty-history">
+                                        <div class="empty-icon">💭</div>
+                                        <p>No conversations yet</p>
+                                        <span>Start chatting to see history</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="chat-input-container">
-                        <input type="text" id="chatInput" placeholder="Ask me anything about your tasks and projects..." />
-                        <button id="sendChatBtn" class="btn-primary">Send</button>
+
+                    <!-- Main Chat Area -->
+                    <div class="chat-main">
+                        <div class="chat-header">
+                            <div class="chat-header-left">
+                                <h2>Assistant</h2>
+                                <div class="chat-status">
+                                    <span class="status-indicator online"></span>
+                                    Claude AI Ready
+                                </div>
+                                <div class="voice-status disconnected">Voice Disconnected</div>
+                            </div>
+                            <div class="chat-header-right">
+                                <!-- Agent Selection -->
+                                <div class="agent-selection">
+                                    <button class="agent-btn active" id="agentSmartBtn" data-agent="primary" title="Smart Agent">
+                                        SMART
+                                    </button>
+                                    <button class="agent-btn" id="agentElaBtn" data-agent="secondary" title="ELA Agent">
+                                        ELA
+                                    </button>
+                                </div>
+                                
+                                <!-- Voice Controls -->
+                                <div class="voice-controls">
+                                    <button class="voice-toggle-btn" id="voiceToggleBtn" title="Toggle Voice Mode">
+                                        <span class="voice-icon">🎤</span>
+                                        <span class="voice-text">Voice Mode</span>
+                                    </button>
+                                    <div class="voice-activity-indicator" id="voiceActivity">
+                                        <div class="voice-activity-bar"></div>
+                                        <div class="voice-activity-bar"></div>
+                                        <div class="voice-activity-bar"></div>
+                                        <div class="voice-activity-bar"></div>
+                                        <div class="voice-activity-bar"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="chat-controls">
+                                    <button class="chat-control-btn" id="exportChatBtn" title="Export Chat">
+                                        <svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                            <polyline points="7,10 12,15 17,10"/>
+                                            <line x1="12" y1="15" x2="12" y2="3"/>
+                                        </svg>
+                                    </button>
+                                    <button class="chat-control-btn" id="clearChatBtn" title="Clear All Chats">
+                                        <svg class="control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polyline points="3,6 5,6 21,6"/>
+                                            <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/>
+                                            <line x1="10" y1="11" x2="10" y2="17"/>
+                                            <line x1="14" y1="11" x2="14" y2="17"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message ai-message">
+                                <div class="message-avatar">🤖</div>
+                                <div class="message-content">
+                                    <p>Hello! I'm your AI assistant. I can help you manage tasks, schedule appointments, and organize your projects. Try saying something like:</p>
+                                    <ul>
+                                        <li>"Schedule a meeting with the team tomorrow at 2pm"</li>
+                                        <li>"What do I have planned for next week?"</li>
+                                        <li>"Create a project for the new website redesign"</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input-container">
+                            <input type="text" id="chatInput" placeholder="Ask me anything about your tasks and projects..." />
+                            <button id="sendChatBtn" class="btn-primary">Send</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Modals -->
-    <!-- Add Task Modal -->
-    <div id="addTaskModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add New Task</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="addTaskForm">
-                    <div class="form-group">
-                        <label for="taskTitle">Task Title *</label>
-                        <input type="text" id="taskTitle" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="taskDescription">Description</label>
-                        <textarea id="taskDescription" rows="3"></textarea>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="taskDate">Due Date</label>
-                            <input type="date" id="taskDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="taskTime">Time</label>
-                            <input type="time" id="taskTime">
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="taskPriority">Priority</label>
-                            <select id="taskPriority">
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="taskProject">Project</label>
-                            <select id="taskProject">
-                                <option value="">No Project</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" onclick="closeModal('addTaskModal')">Cancel</button>
-                        <button type="submit" class="btn-primary">Add Task</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Settings</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="settings-section">
-                    <h4>AI Assistant</h4>
-                    <div class="form-group">
-                        <label for="claudeApiKey">Claude API Key</label>
-                        <input type="password" id="claudeApiKey" placeholder="Enter your Claude API key">
-                        <small>Get your API key from <a href="https://console.anthropic.com/" target="_blank">console.anthropic.com</a></small>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" class="btn-secondary" onclick="testClaudeConnection()">Test Connection</button>
-                    </div>
-                </div>
-                <div class="settings-section">
-                    <h4>Data Management</h4>
-                    <div class="settings-actions">
-                        <button id="exportDataBtn" class="btn-secondary">Export Data</button>
-                        <button id="importDataBtn" class="btn-secondary">Import Data</button>
-                        <button id="clearDataBtn" class="btn-danger">Clear All Data</button>
-                    </div>
-                </div>
-                <div class="form-actions">
-                    <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Notification Container -->
     <div id="notifications" class="notifications-container"></div>
 
-    <!-- Scripts -->
-    <script src="js/intelligent-assistant.js"></script>
-    <script src="js/claude-api.js"></script>
-    <script src="js/calendar.js"></script>
-    <script src="js/tasks.js"></script>
-    <script src="js/projects.js"></script>
-    
     <script>
         // Google Sign-In Functions
         function onSignIn(googleUser) {
-            const profile = googleUser.getBasicProfile();
-            const userEmail = profile.getEmail();
-            const userName = profile.getName();
-            const userImage = profile.getImageUrl();
-            
-            console.log('Google Sign-In successful:', userEmail);
-            
-            // Store user data
-            const userData = {
-                email: userEmail,
-                name: userName,
-                image: userImage
-            };
-            
-            localStorage.setItem('userData', JSON.stringify(userData));
-            
-            // Use the centralized authentication function
-            authenticateUser(userData);
+            // Use the new modular authentication system
+            if (window.mainApp) {
+                window.mainApp.handleSignIn(googleUser);
+            } else {
+                console.error('Main app not initialized');
+            }
         }
         
         function signOut() {
-            const auth2 = gapi.auth2.getAuthInstance();
-            auth2.signOut().then(function () {
-                console.log('User signed out.');
-                localStorage.removeItem('userData');
-                // Show sign-in screen again
-                document.getElementById('signInScreen').style.display = 'block';
-                document.getElementById('app').style.display = 'none';
-            });
-        }
-        
-        function initializeClaudeAPI(userEmail) {
-            // Initialize Claude API with user email for automatic API key assignment
-            if (window.ClaudeAPI) {
-                window.claudeAPI = new ClaudeAPI();
-                window.claudeAPI.userEmail = userEmail;
-                console.log('Claude API initialized for user:', userEmail);
-            }
-        }
-
-        // Debug function to show notification
-        function showNotification(message, type = 'info') {
-            console.log(`Notification (${type}): ${message}`);
-            // Create simple notification if assistant not available
-            if (typeof alert !== 'undefined') {
-                alert(message);
-            }
-        }
-        
-        // Function to get URL parameters
-        function getUrlParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
-        }
-
-        // Function to handle automatic authentication from main website
-        function checkForPassedUserData() {
-            console.log('Checking for passed user data...');
-            console.log('Current URL:', window.location.href);
-            
-            const userParam = getUrlParameter('user');
-            console.log('User parameter:', userParam);
-            
-            if (userParam) {
-                try {
-                    const user = JSON.parse(decodeURIComponent(userParam));
-                    console.log('Parsed user data from main website:', user);
-                    
-                    // Convert to expected format
-                    const userData = {
-                        email: user.email,
-                        name: user.name,
-                        image: user.picture || user.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=4db6ac&color=fff`
-                    };
-                    
-                    console.log('Converted user data:', userData);
-                    
-                    // Store user data for future sessions
-                    localStorage.setItem('userData', JSON.stringify(userData));
-                    console.log('Stored user data in localStorage');
-                    
-                    // Auto-authenticate the user
-                    console.log('Calling authenticateUser...');
-                    authenticateUser(userData);
-                    
-                    // Clean up the URL to remove user data for security and cleaner appearance
-                    const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-                    window.history.replaceState({}, document.title, cleanUrl);
-                    console.log('URL cleaned, authentication complete');
-                    
-                    return true;
-                } catch (e) {
-                    console.error('Error parsing user data from URL:', e);
-                    console.error('Raw user parameter:', userParam);
-                }
+            // Use the new modular authentication system
+            if (window.mainApp) {
+                window.mainApp.handleSignOut();
             } else {
-                console.log('No user parameter found in URL');
-            }
-            return false;
-        }
-
-        // Function to authenticate user and show the app
-        function authenticateUser(userData) {
-            console.log('🚀 Starting authenticateUser for:', userData.email);
-            
-            // Check if required DOM elements exist
-            const signInScreen = document.getElementById('signInScreen');
-            const app = document.getElementById('app');
-            const userName = document.getElementById('userName');
-            const userAvatar = document.getElementById('userAvatar');
-            
-            console.log('DOM elements check:');
-            console.log('- signInScreen:', !!signInScreen);
-            console.log('- app:', !!app);
-            console.log('- userName:', !!userName);
-            console.log('- userAvatar:', !!userAvatar);
-            
-            if (!signInScreen || !app || !userName || !userAvatar) {
-                console.error('❌ Required DOM elements not found! Authentication cannot proceed.');
-                return;
-            }
-            
-            // Update UI with user data
-            console.log('📝 Updating UI with user data...');
-            userName.textContent = userData.name;
-            userAvatar.src = userData.image;
-            
-            // Hide sign-in screen and show app
-            console.log('🔄 Switching from sign-in screen to app...');
-            signInScreen.style.display = 'none';
-            app.style.display = 'block';
-            
-            console.log('✅ UI updated successfully');
-            
-            // Initialize Claude API
-            console.log('🔧 Initializing Claude API...');
-            initializeClaudeAPI(userData.email);
-            
-            // Initialize the assistant
-            console.log('🤖 Initializing assistant with user data:', userData);
-            if (typeof IntelligentAssistant !== 'undefined') {
-                IntelligentAssistant.init(userData);
-                console.log('✅ Assistant initialized');
-            } else {
-                console.warn('⚠️ IntelligentAssistant not available yet, will retry...');
-                // Retry after a short delay
-                setTimeout(() => {
-                    if (typeof IntelligentAssistant !== 'undefined') {
-                        IntelligentAssistant.init(userData);
-                        console.log('✅ Assistant initialized (retry)');
-                    } else {
-                        console.error('❌ IntelligentAssistant still not available');
-                    }
-                }, 1000);
-            }
-            
-            console.log('🎉 Authentication completed successfully!');
-        }
-
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 DOM Content Loaded - Starting initialization...');
-            console.log('🔍 Checking integrations...');
-            console.log('- IntelligentAssistant class:', typeof window.IntelligentAssistant);
-            console.log('- ClaudeAPI class:', typeof window.ClaudeAPI);
-            
-            // Hide loading screen
-            console.log('🔄 Hiding loading screen...');
-            const loadingScreen = document.getElementById('loadingScreen');
-            if (loadingScreen) {
-                loadingScreen.style.display = 'none';
-                console.log('✅ Loading screen hidden');
-            } else {
-                console.warn('⚠️ Loading screen element not found');
-            }
-            
-            // First, check if user data was passed from main website
-            console.log('🔍 Step 1: Checking for passed user data from main website...');
-            if (checkForPassedUserData()) {
-                console.log('✅ User authenticated from main website - skipping remaining checks');
-                return;
-            }
-            
-            console.log('🔍 Step 2: Checking for existing localStorage session...');
-            // Check for existing Google Sign-In session
-            const storedUserData = localStorage.getItem('userData');
-            if (storedUserData) {
-                try {
-                    const user = JSON.parse(storedUserData);
-                    console.log('✅ Found existing user session:', user.email);
-                    
-                    // Authenticate with existing session
-                    console.log('🔄 Authenticating with existing session...');
-                    authenticateUser(user);
-                } catch (e) {
-                    console.error('❌ Error parsing stored user data:', e);
-                    // Show sign-in screen
-                    console.log('🔄 Showing sign-in screen due to localStorage error...');
+                // Fallback
+                const auth2 = gapi.auth2.getAuthInstance();
+                auth2.signOut().then(function () {
+                    console.log('User signed out.');
+                    localStorage.removeItem('userData');
                     document.getElementById('signInScreen').style.display = 'block';
-                }
-            } else {
-                // No existing session, show sign-in screen
-                console.log('ℹ️ No existing user session found');
-                console.log('🔄 Showing sign-in screen...');
-                const signInScreen = document.getElementById('signInScreen');
-                if (signInScreen) {
-                    signInScreen.style.display = 'block';
-                    console.log('✅ Sign-in screen displayed');
+                    document.getElementById('app').style.display = 'none';
+                });
+            }
+        }
+        
+        // Demo mode function
+        function enableDemoMode() {
+            localStorage.setItem('useDemoMode', 'true');
+            console.log('Demo mode enabled, reloading...');
+            window.location.reload();
+        }
+
+        // Initialize the modular system when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing modular JavaScript system...');
+            
+            // Wait for modules to be available, then initialize
+            function initializeApp() {
+                if (typeof window.MainApp !== 'undefined') {
+                    window.mainApp = new MainApp();
+                    console.log('✅ Main app initialized');
                 } else {
-                    console.error('❌ Sign-in screen element not found!');
+                    console.log('⏳ Waiting for modules to load...');
+                    setTimeout(initializeApp, 100);
                 }
             }
             
-            // Check if Claude API is properly integrated
-            setTimeout(() => {
-                if (window.assistant) {
-                    console.log('Assistant initialized:', window.assistant);
-                    console.log('Claude API available:', !!window.assistant.claudeAPI);
-                    console.log('Assistant methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(window.assistant)));
-                } else {
-                    console.error('Assistant not initialized');
-                }
-            }, 1000);
+            initializeApp();
         });
     </script>
 </body>

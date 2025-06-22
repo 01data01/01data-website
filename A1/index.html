@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1 Assistant - 01data</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Modular CSS Imports -->
+    <link rel="stylesheet" href="css/modules/base.css">
+    <link rel="stylesheet" href="css/modules/auth.css">
+    <link rel="stylesheet" href="css/modules/layout.css">
+    <link rel="stylesheet" href="css/modules/ai-chat.css">
+    <link rel="stylesheet" href="css/modules/voice-chat.css">
+    <link rel="stylesheet" href="css/modules/voice-auth.css">
+    <link rel="stylesheet" href="css/modules/components.css">
+    <link rel="stylesheet" href="a1-styles.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMKY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com">
+    
+    <!-- Modular JavaScript Imports -->
+    <script src="config.js"></script>
+    <script src="js/modules/core/utils.js?v=1.1"></script>
+    <script src="js/modules/core/auth.js"></script>
+    <script src="js/modules/ai/ai-service.js"></script>
+    <script src="js/modules/features/voice-auth.js"></script>
+    <script src="js/modules/features/voice-chat.js"></script>
+    <script src="js/modules/features/ai-chat.js"></script>
+    <script src="js/modules/core/main.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-brain">
+                <div class="loading-neural-paths">
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                </div>
+            </div>
+            <h2 class="loading-title">A1 Assistant</h2>
+            <p class="loading-subtitle">Connecting to AI Assistant...</p>
+        </div>
+    </div>
+
+
+    <!-- Main Application -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-container">
+                    <h1>A1 Assistant</h1>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <img src="" alt="User Avatar" class="user-avatar">
+                    <span class="user-name">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- AI Chat View -->
+            <div id="ai-chat-view" class="view active">
+                <div class="ai-chat-container">
+                <!-- Chat Sidebar -->
+                <div class="chat-sidebar">
+                    <div class="sidebar-header">
+                        <button id="newChatBtn" class="new-chat-btn">
+                            <span class="btn-icon">+</span>
+                            New Chat
+                        </button>
+                    </div>
+                    
+                    <div class="chat-history">
+                        <div class="history-header">
+                            <h3>Chat History</h3>
+                        </div>
+                        <div id="chatHistoryList" class="history-list">
+                            <!-- Chat history items will be populated here -->
+                        </div>
+                        <div class="history-empty" style="display: none;">
+                            <p>No chat history yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Chat Area -->
+                <div class="chat-main">
+                    <!-- Chat Header -->
+                    <div class="chat-header">
+                        <div class="chat-title">
+                            <h2>A1 Assistant</h2>
+                            <p>Your AI-powered business assistant</p>
+                        </div>
+                        
+                        <!-- Agent Selection -->
+                        <div class="agent-selection">
+                            <button id="agentSmartBtn" class="agent-btn active" data-agent="primary">
+                                SMART
+                            </button>
+                            <button id="agentElaBtn" class="agent-btn" data-agent="secondary">
+                                ELA
+                            </button>
+                        </div>
+                        
+                        <!-- Voice Controls -->
+                        <div class="voice-controls">
+                            <button id="voiceChatToggle" class="voice-toggle-btn" title="Toggle Voice Chat">
+                                <span class="voice-icon">🎤</span>
+                                <span class="voice-status">Voice</span>
+                            </button>
+                            
+                            <div class="voice-activity">
+                                <div class="voice-indicator"></div>
+                                <div class="voice-indicator"></div>
+                                <div class="voice-indicator"></div>
+                            </div>
+                            
+                            <div id="connectionStatus" class="connection-status">
+                                <span class="status-text">Ready</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="welcome-message">
+                            <div class="assistant-avatar">
+                                <div class="avatar-icon">🤖</div>
+                            </div>
+                            <div class="message-content">
+                                <h3>Welcome to A1 Assistant!</h3>
+                                <p>I'm here to help you with information about A1 Plastic Company and assist with your business needs. You can:</p>
+                                <ul>
+                                    <li>Ask questions about our products and services</li>
+                                    <li>Get assistance with business operations</li>
+                                    <li>Use voice mode for hands-free interaction</li>
+                                    <li>Access real-time AI-powered insights</li>
+                                </ul>
+                                <p>How can I assist you today?</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input-container">
+                        <div class="input-wrapper">
+                            <textarea id="chatInput" 
+                                      class="chat-input" 
+                                      placeholder="Ask me anything about A1 Plastic Company..."
+                                      rows="1"></textarea>
+                            <button id="sendChatBtn" class="send-btn" disabled>
+                                <span class="send-icon">→</span>
+                            </button>
+                        </div>
+                        
+                        <div class="input-suggestions">
+                            <button class="suggestion-btn">Tell me about A1 Plastic Company</button>
+                            <button class="suggestion-btn">What products do you offer?</button>
+                            <button class="suggestion-btn">Company history and background</button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
