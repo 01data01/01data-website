@@ -22,7 +22,7 @@ class VoiceChat {
             audioFormat: 'pcm_16000'
         };
         
-        this.selectedAgent = 'primary'; // Default to primary agent (SMART - uses ELEVENLABS_AGENT_ID_3)
+        this.selectedAgent = 'primary'; // Default to primary agent (SMART - uses ELEVENLABS_AGENT_ID_4)
 
         this.callbacks = {
             onConnectionChange: null,
@@ -127,7 +127,7 @@ class VoiceChat {
     async connectWebSocket() {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log('Getting signed URL from server...');
+                console.log('A1: Getting signed URL from server...');
                 
                 // Build URL with agent selection for A1 Assistant
                 let url = '/.netlify/functions/elevenlabs-signed-url';
@@ -143,22 +143,35 @@ class VoiceChat {
                     console.log('A1: Using primary agent (ELEVENLABS_AGENT_ID_4 default with fallback)');
                 }
                 
+                console.log('A1: Fetching signed URL from:', url);
+                
                 // Get signed URL from Netlify function
                 const response = await fetch(url);
+                console.log('A1: Signed URL response status:', response.status);
+                console.log('A1: Signed URL response headers:', Object.fromEntries(response.headers.entries()));
+                
                 if (!response.ok) {
-                    throw new Error(`Failed to get signed URL: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error('A1: Signed URL error response:', errorText);
+                    throw new Error(`Failed to get signed URL: ${response.status} - ${errorText}`);
                 }
                 
                 const data = await response.json();
+                console.log('A1: Signed URL response data:', data);
+                
                 const signedUrl = data.signed_url;
                 
                 if (!signedUrl) {
+                    console.error('A1: No signed URL in response data:', data);
                     throw new Error('No signed URL received from server');
                 }
                 
                 console.log('A1: Connecting with signed URL:', signedUrl);
                 console.log('A1: Using agent ID:', data.agent_id);
+                console.log('A1: Creating WebSocket connection...');
+                
                 this.websocket = new WebSocket(signedUrl);
+                console.log('A1: WebSocket created, readyState:', this.websocket.readyState);
 
                 this.websocket.onopen = () => {
                 console.log('A1: WebSocket connected successfully');
@@ -221,6 +234,8 @@ class VoiceChat {
                 console.log('A1: WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
                 console.log('A1: Was clean:', event.wasClean);
                 console.log('A1: Agent ID being used:', data.agent_id);
+                console.log('A1: URL that was used:', signedUrl);
+                console.log('A1: Selected agent type:', this.selectedAgent);
                 
                 // Common WebSocket close codes
                 const closeCodes = {
@@ -231,11 +246,22 @@ class VoiceChat {
                     1006: 'Abnormal Closure',
                     1007: 'Invalid frame payload data',
                     1008: 'Policy Violation',
+                    1009: 'Message Too Big',
+                    1010: 'Mandatory Extension',
                     1011: 'Internal Error',
+                    1012: 'Service Restart',
+                    1013: 'Try Again Later',
+                    1014: 'Bad Gateway',
                     1015: 'TLS Handshake'
                 };
                 
                 console.log('A1: Close code meaning:', closeCodes[event.code] || 'Unknown');
+                
+                // Log additional debugging info for ReadyState 2 (CLOSING)
+                if (this.websocket?.readyState === 2) {
+                    console.log('A1: WebSocket was in CLOSING state');
+                    console.log('A1: This usually indicates authentication failure or server rejection');
+                }
                 
                 this.isConnected = false;
                 this.cleanup();
@@ -245,6 +271,9 @@ class VoiceChat {
             this.websocket.onerror = (error) => {
                 console.error('A1: WebSocket error:', error);
                 console.log('A1: WebSocket readyState:', this.websocket?.readyState);
+                console.log('A1: WebSocket readyState meanings: CONNECTING=0, OPEN=1, CLOSING=2, CLOSED=3');
+                console.log('A1: Error occurred with agent:', data.agent_id);
+                console.log('A1: Error occurred with URL:', signedUrl);
                 this.isConnected = false;
                 this.cleanup();
                 reject(error);

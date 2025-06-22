@@ -24,7 +24,9 @@ class Utils {
      */
     getElementById(id) {
         const element = document.getElementById(id);
-        if (!element) {
+        // Suppress warnings for A1-specific optional elements
+        const optionalA1Elements = ['mobileMenuBtn', 'signOutBtn', 'profile-dropdown', 'user-profile-btn'];
+        if (!element && !optionalA1Elements.includes(id)) {
             console.warn(`Element with ID '${id}' not found`);
         }
         return element;
