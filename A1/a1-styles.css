@@ -381,6 +381,161 @@
     min-height: 0;
 }
 
+/* A1 PVC Animated Welcome Message */
+.animated-welcome-message {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 
+        0 8px 32px rgba(34, 197, 94, 0.15),
+        0 2px 8px rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    margin-bottom: 1.5rem;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.animated-welcome-message::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
+    animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% { 
+        opacity: 0.7;
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+    }
+    50% { 
+        opacity: 1;
+        box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+    }
+}
+
+.animated-welcome-message::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(34, 197, 94, 0.05), transparent);
+    animation: shimmer-calm 6s linear infinite;
+}
+
+@keyframes shimmer-calm {
+    0% { transform: translate(-100%, -100%) rotate(45deg); }
+    100% { transform: translate(100%, 100%) rotate(45deg); }
+}
+
+/* Animated Avatar with Sound Wave */
+.animated-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #15803d 0%, #22c55e 50%, #4ade80 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 
+        0 6px 20px rgba(21, 128, 61, 0.4),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    animation: gentle-pulse 4s ease-in-out infinite;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 
+            0 6px 20px rgba(21, 128, 61, 0.4),
+            inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 
+            0 8px 30px rgba(21, 128, 61, 0.6),
+            inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    }
+}
+
+/* Sound Wave Animation */
+.sound-wave {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.wave-bar {
+    width: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 2px;
+    animation: wave-calm 2s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.wave-bar:nth-child(1) { 
+    height: 10px; 
+    animation-delay: 0s; 
+}
+.wave-bar:nth-child(2) { 
+    height: 16px; 
+    animation-delay: 0.15s; 
+}
+.wave-bar:nth-child(3) { 
+    height: 22px; 
+    animation-delay: 0.3s; 
+}
+.wave-bar:nth-child(4) { 
+    height: 16px; 
+    animation-delay: 0.45s; 
+}
+.wave-bar:nth-child(5) { 
+    height: 10px; 
+    animation-delay: 0.6s; 
+}
+
+@keyframes wave-calm {
+    0%, 100% { 
+        transform: scaleY(0.3);
+        opacity: 0.6;
+        background: rgba(255, 255, 255, 0.7);
+    }
+    50% { 
+        transform: scaleY(1);
+        opacity: 1;
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    }
+}
+
+/* Welcome Text */
+.welcome-content {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.welcome-text {
+    color: #15803d;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin: 0;
+}
+
 .welcome-message {
     background: var(--a1-light);
     border-left: 4px solid var(--a1-accent);
@@ -762,6 +917,33 @@
 }
 
 /* Responsive design - Mobile first */
+/* Responsive Design for Animated Welcome */
+@media (max-width: 768px) {
+    .animated-welcome-message {
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .animated-avatar {
+        width: 50px;
+        height: 50px;
+    }
+
+    .welcome-text {
+        font-size: 16px;
+    }
+
+    .wave-bar {
+        width: 3px;
+    }
+
+    .wave-bar:nth-child(1) { height: 8px; }
+    .wave-bar:nth-child(2) { height: 12px; }
+    .wave-bar:nth-child(3) { height: 16px; }
+    .wave-bar:nth-child(4) { height: 12px; }
+    .wave-bar:nth-child(5) { height: 8px; }
+}
+
 @media (max-width: 768px) {
     .app-header {
         padding: 1rem;
