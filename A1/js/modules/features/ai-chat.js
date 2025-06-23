@@ -435,9 +435,9 @@ class AIChatModule {
             const isTurkish = document.documentElement.lang === 'tr' || window.location.pathname.includes('index-tr');
             
             if (isTurkish) {
-                // Turkish animated welcome message
+                // Turkish animated welcome message with voice activation
                 messagesContainer.innerHTML = `
-                    <div class="animated-welcome-message">
+                    <div class="animated-welcome-message" id="clickableWelcomeMessage" style="cursor: pointer;" title="Sesli sohbeti başlatmak için tıklayın">
                         <div class="animated-avatar">
                             <div class="sound-wave">
                                 <div class="wave-bar"></div>
@@ -449,13 +449,14 @@ class AIChatModule {
                         </div>
                         <div class="welcome-content">
                             <p class="welcome-text">Hoş Geldiniz! Size nasıl yardımcı olabilirim?</p>
+                            <p class="voice-hint" style="font-size: 14px; opacity: 0.8; margin-top: 8px;">💬 Sesli sohbet için tıklayın</p>
                         </div>
                     </div>
                 `;
             } else {
-                // English animated welcome message
+                // English animated welcome message with voice activation
                 messagesContainer.innerHTML = `
-                    <div class="animated-welcome-message">
+                    <div class="animated-welcome-message" id="clickableWelcomeMessage" style="cursor: pointer;" title="Click to start voice chat">
                         <div class="animated-avatar">
                             <div class="sound-wave">
                                 <div class="wave-bar"></div>
@@ -467,10 +468,22 @@ class AIChatModule {
                         </div>
                         <div class="welcome-content">
                             <p class="welcome-text">Welcome! How can I help you?</p>
+                            <p class="voice-hint" style="font-size: 14px; opacity: 0.8; margin-top: 8px;">💬 Click for voice chat</p>
                         </div>
                     </div>
                 `;
             }
+            
+            // Add click event listener to the welcome message for voice activation
+            setTimeout(() => {
+                const welcomeMessage = document.getElementById('clickableWelcomeMessage');
+                if (welcomeMessage) {
+                    welcomeMessage.addEventListener('click', () => {
+                        console.log('A1: Welcome message clicked - starting voice chat');
+                        this.toggleVoiceMode();
+                    });
+                }
+            }, 100);
         }
 
         // Add welcome message to current messages
