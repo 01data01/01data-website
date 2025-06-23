@@ -435,26 +435,38 @@ class AIChatModule {
             const isTurkish = document.documentElement.lang === 'tr' || window.location.pathname.includes('index-tr');
             
             if (isTurkish) {
-                // Turkish welcome message
+                // Turkish animated welcome message
                 messagesContainer.innerHTML = `
-                    <div class="welcome-message">
-                        <div class="assistant-avatar">
-                            <img src="logo.png" alt="A1 PVC Logosu" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
+                    <div class="animated-welcome-message">
+                        <div class="animated-avatar">
+                            <div class="sound-wave">
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                            </div>
                         </div>
-                        <div class="message-content">
-                            <h3>Hoş Geldiniz! Size nasıl yardımcı olabilirim?</h3>
+                        <div class="welcome-content">
+                            <p class="welcome-text">Hoş Geldiniz! Size nasıl yardımcı olabilirim?</p>
                         </div>
                     </div>
                 `;
             } else {
-                // English welcome message
+                // English animated welcome message
                 messagesContainer.innerHTML = `
-                    <div class="welcome-message">
-                        <div class="assistant-avatar">
-                            <img src="logo.png" alt="A1 PVC Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
+                    <div class="animated-welcome-message">
+                        <div class="animated-avatar">
+                            <div class="sound-wave">
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                            </div>
                         </div>
-                        <div class="message-content">
-                            <h3>Welcome! How can I help you?</h3>
+                        <div class="welcome-content">
+                            <p class="welcome-text">Welcome! How can I help you?</p>
                         </div>
                     </div>
                 `;
