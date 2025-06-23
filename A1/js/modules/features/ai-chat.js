@@ -194,11 +194,6 @@ class AIChatModule {
         const messageElement = document.createElement('div');
         messageElement.className = `message ${role}-message`;
         
-        const timestamp = new Date().toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit' 
-        });
-
         // Create modern avatar based on role
         let avatarHTML;
         if (role === 'user') {
@@ -223,7 +218,6 @@ class AIChatModule {
             <div class="message-avatar">${avatarHTML}</div>
             <div class="message-content">
                 <div class="message-text">${this.formatMessage(content)}</div>
-                <div class="message-timestamp">${timestamp}</div>
             </div>
         `;
 
@@ -506,11 +500,6 @@ class AIChatModule {
 
         const messageElement = document.createElement('div');
         messageElement.className = 'message assistant-message streaming';
-        
-        const timestamp = new Date().toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit' 
-        });
 
         messageElement.innerHTML = `
             <div class="message-avatar">
@@ -526,7 +515,6 @@ class AIChatModule {
             </div>
             <div class="message-content">
                 <div class="message-text"></div>
-                <div class="message-timestamp">${timestamp}</div>
             </div>
         `;
 
@@ -744,16 +732,10 @@ class AIChatModule {
                         </div>
                     `;
                 }
-                const timestamp = new Date(message.timestamp).toLocaleTimeString('en-US', { 
-                    hour: 'numeric', 
-                    minute: '2-digit' 
-                });
-
                 messageElement.innerHTML = `
                     <div class="message-avatar">${avatarHTML}</div>
                     <div class="message-content">
                         <div class="message-text">${this.formatMessage(message.content)}</div>
-                        <div class="message-timestamp">${timestamp}</div>
                     </div>
                 `;
 
