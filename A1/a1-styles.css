@@ -190,7 +190,7 @@
     border-radius: 1rem;
     box-shadow: 0 4px 20px var(--a1-shadow);
     overflow: hidden;
-    margin: 0 2rem;
+    margin: 0;
     display: grid;
     grid-template-columns: 300px 1fr;
     height: calc(100vh - 140px);
@@ -579,9 +579,9 @@
 
 .input-wrapper {
     background: white;
-    border: 2px solid transparent;
+    border: none;
     border-radius: 20px;
-    box-shadow: 0 4px 12px var(--a1-shadow);
+    box-shadow: none;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
