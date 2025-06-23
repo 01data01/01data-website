@@ -536,57 +536,7 @@
     margin: 0;
 }
 
-.welcome-message {
-    background: var(--a1-light);
-    border-left: 4px solid var(--a1-accent);
-    padding: 1.5rem;
-    border-radius: 0.8rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px var(--a1-shadow);
-    animation: fadeIn 0.5s ease-in;
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-}
-
-.welcome-message h3 {
-    color: var(--a1-dark);
-    font-weight: 600;
-    font-size: 1rem;
-    margin: 0 0 1rem 0;
-}
-
-.welcome-message p {
-    color: var(--a1-text-dark);
-    line-height: 1.6;
-    margin: 0 0 1rem 0;
-}
-
-.welcome-message ul {
-    color: var(--a1-text-dark);
-    padding-left: 1.5rem;
-    margin: 1rem 0;
-}
-
-.welcome-message li {
-    margin-bottom: 0.5rem;
-    line-height: 1.5;
-}
-
-.welcome-message strong {
-    color: var(--a1-dark);
-    font-weight: 600;
-}
-
-.welcome-message a {
-    color: var(--a1-accent);
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.welcome-message a:hover {
-    text-decoration: underline;
-}
+/* Old welcome message styles removed - now using animated-welcome-message */
 
 .assistant-avatar img {
     width: 60px;
@@ -985,11 +935,7 @@
         padding: 1rem;
     }
     
-    .welcome-message {
-        padding: 1rem;
-        flex-direction: column;
-        text-align: center;
-    }
+    /* Old welcome-message responsive styles removed */
     
     .assistant-avatar img {
         width: 50px;
