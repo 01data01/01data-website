@@ -15,6 +15,7 @@ class AIChatModule {
         this.voiceChat = null;
         this.isVoiceMode = false;
         this.selectedAgent = 'primary'; // Default to primary agent (SMART - uses ELEVENLABS_AGENT_ID_3)
+        this.sidebarVisible = true;
     }
 
     /**
@@ -31,6 +32,7 @@ class AIChatModule {
             this.updateConnectionStatus();
             this.loadChatHistory();
             this.createNewChat(); // Start with a new chat
+            this.initializeSidebarState(); // Initialize sidebar visibility
             
             this.initialized = true;
             console.log('A1: AI Chat Module initialized successfully');
@@ -93,6 +95,14 @@ class AIChatModule {
             newChatBtn.addEventListener('click', () => {
                 this.saveCurrentChat();
                 this.createNewChat();
+            });
+        }
+
+        // Sidebar toggle button
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => {
+                this.toggleSidebar();
             });
         }
 
@@ -459,6 +469,44 @@ class AIChatModule {
         });
 
         this.updateHistoryDisplay();
+    }
+
+    /**
+     * Toggle sidebar visibility
+     */
+    toggleSidebar() {
+        const sidebar = document.getElementById('chatSidebar');
+        const toggleBtn = document.getElementById('sidebarToggle');
+        
+        if (!sidebar || !toggleBtn) return;
+        
+        this.sidebarVisible = !this.sidebarVisible;
+        
+        if (this.sidebarVisible) {
+            sidebar.classList.remove('hidden');
+            toggleBtn.innerHTML = '←';
+            toggleBtn.classList.remove('sidebar-hidden');
+        } else {
+            sidebar.classList.add('hidden');
+            toggleBtn.innerHTML = '→';
+            toggleBtn.classList.add('sidebar-hidden');
+        }
+        
+        // Save preference to localStorage
+        localStorage.setItem('sidebarVisible', this.sidebarVisible);
+    }
+
+    /**
+     * Initialize sidebar state from localStorage
+     */
+    initializeSidebarState() {
+        const savedState = localStorage.getItem('sidebarVisible');
+        if (savedState !== null) {
+            this.sidebarVisible = savedState === 'true';
+            if (!this.sidebarVisible) {
+                setTimeout(() => this.toggleSidebar(), 100);
+            }
+        }
     }
 
     /**

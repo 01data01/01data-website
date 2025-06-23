@@ -21,7 +21,7 @@
     box-shadow: 0 16px 48px rgba(44, 95, 93, 0.15);
 }
 
-/* Chat Sidebar - Claude-inspired clean design */
+/* Chat Sidebar - Claude-inspired clean design with toggle */
 .chat-sidebar {
     width: 260px;
     background: #f8f9fa;
@@ -29,6 +29,73 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    transition: transform 0.3s ease, width 0.3s ease;
+    position: relative;
+}
+
+.chat-sidebar.hidden {
+    transform: translateX(-100%);
+    width: 0;
+    min-width: 0;
+    border-right: none;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+    position: absolute;
+    top: 16px;
+    right: -40px;
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    z-index: 10;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.sidebar-toggle:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+.sidebar-toggle.sidebar-hidden {
+    right: 8px;
+    background: #f8f9fa;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .chat-sidebar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        z-index: 20;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    }
+    
+    .chat-sidebar.hidden {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar-toggle {
+        display: block;
+    }
+    
+    .sidebar-toggle.sidebar-hidden {
+        right: 8px;
+        position: fixed;
+        top: 80px;
+        z-index: 21;
+    }
 }
 
 .sidebar-header {
