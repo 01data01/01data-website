@@ -201,6 +201,9 @@ class AIChatModule {
             return;
         }
 
+        // Check if this is the first message being added to preserve welcome message
+        const existingWelcome = messagesContainer.querySelector('.animated-welcome-message');
+        
         const messageElement = document.createElement('div');
         messageElement.className = `message ${role}-message`;
         
@@ -231,7 +234,13 @@ class AIChatModule {
             </div>
         `;
 
-        messagesContainer.appendChild(messageElement);
+        // If welcome message exists, append after it, otherwise just append
+        if (existingWelcome) {
+            existingWelcome.insertAdjacentElement('afterend', messageElement);
+        } else {
+            messagesContainer.appendChild(messageElement);
+        }
+        
         this.scrollToBottom();
 
         // Add message to current conversation
@@ -1001,7 +1010,11 @@ class AIChatModule {
                 this.voiceChat.stopConversation();
                 this.isVoiceMode = false;
                 this.updateVoiceModeUI(false);
-                this.addMessageToChat('system', 'Voice mode disabled');
+                
+                // Detect language for system messages
+                const isTurkish = document.documentElement.lang === 'tr' || window.location.pathname.includes('index-tr');
+                const disabledMessage = isTurkish ? 'Sesli mod devre dışı bırakıldı' : 'Voice mode disabled';
+                this.addMessageToChat('system', disabledMessage);
             } else {
                 console.log('A1: Starting voice mode - checking authentication...');
                 
@@ -1017,7 +1030,17 @@ class AIChatModule {
                 }
 
                 console.log('A1: Voice access granted - starting conversation...');
-                this.addMessageToChat('system', 'Starting voice mode... Please allow microphone access when prompted.');
+                
+                // Detect language for system messages
+                const isTurkish = document.documentElement.lang === 'tr' || window.location.pathname.includes('index-tr');
+                const startingMessage = isTurkish ? 
+                    'Sesli mod başlatılıyor... Mikrofon erişimine izin verin.' : 
+                    'Starting voice mode... Please allow microphone access when prompted.';
+                const enabledMessage = isTurkish ? 
+                    'Sesli mod etkinleştirildi - Artık AI ile konuşabilirsiniz' : 
+                    'Voice mode enabled - You can now speak to the AI';
+                
+                this.addMessageToChat('system', startingMessage);
 
                 // Start voice conversation - this should trigger microphone permission
                 console.log('A1: Calling voiceChat.startConversation()...');
@@ -1026,7 +1049,7 @@ class AIChatModule {
                 console.log('A1: Voice conversation started successfully');
                 this.isVoiceMode = true;
                 this.updateVoiceModeUI(true);
-                this.addMessageToChat('system', 'Voice mode enabled - You can now speak to the AI');
+                this.addMessageToChat('system', enabledMessage);
             }
         } catch (error) {
             console.error('A1: Error toggling voice mode:', error);
