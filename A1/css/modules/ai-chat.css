@@ -40,36 +40,46 @@
     border-right: none;
 }
 
-/* Sidebar toggle button */
+/* Sidebar toggle button - Enhanced for CEO usability */
 .sidebar-toggle {
     position: fixed;
     top: 80px;
     left: 268px;
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    z-index: 100;
-    color: #6b7280;
-    font-size: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 1000;
+    color: #374151;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    user-select: none;
 }
 
 .sidebar-toggle:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
-    color: #374151;
+    background: #f3f4f6;
+    border-color: #6b7280;
+    color: #111827;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+}
+
+.sidebar-toggle:active {
+    transform: scale(0.95);
+    transition: all 0.1s ease;
 }
 
 .sidebar-toggle.sidebar-hidden {
-    left: 8px;
-    background: #f8f9fa;
+    left: 12px;
+    background: #f8fafc;
+    border-color: #94a3b8;
 }
 
 /* Mobile responsive */
@@ -91,10 +101,13 @@
         display: block;
         top: 70px;
         left: 268px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
     }
     
     .sidebar-toggle.sidebar-hidden {
-        left: 8px;
+        left: 12px;
         top: 70px;
     }
 }
