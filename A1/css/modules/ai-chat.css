@@ -394,6 +394,7 @@
     position: relative;
     line-height: 1.6;
     color: var(--primary-color);
+    font-size: 0.95rem;
 }
 
 .message.user-message .message-content {
@@ -427,10 +428,18 @@
 .message-content p {
     margin: 0 0 12px 0;
     color: inherit;
+    font-size: 0.95rem;
 }
 
 .message-content p:last-child {
     margin-bottom: 0;
+}
+
+.message-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    color: inherit;
 }
 
 .message-content ul,
