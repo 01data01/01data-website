@@ -450,16 +450,7 @@ class AIChatModule {
                             <img src="logo.png" alt="A1 PVC Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
                         </div>
                         <div class="message-content">
-                            <h3>Welcome to A1 PVC Assistant!</h3>
-                            <p>I'm your AI assistant for <strong>Özemek Plastik (A1 PVC)</strong> - serving the industry since 1970s with 50+ years of expertise. I can help you with:</p>
-                            <ul>
-                                <li><strong>PVC Products:</strong> Edge Banding, Profiles, Window & Door Systems</li>
-                                <li><strong>Technical Information:</strong> Product specifications and applications</li>
-                                <li><strong>Company Services:</strong> Export capabilities to 50+ countries</li>
-                                <li><strong>Voice Mode:</strong> Hands-free interaction for convenient communication</li>
-                            </ul>
-                            <p><strong>📞 Contact:</strong> 0850 888 22 47 | <strong>🌐 Website:</strong> <a href="https://a1pvcmarket.com/" target="_blank">a1pvcmarket.com</a></p>
-                            <p>How can I assist you with A1 PVC products and services today?</p>
+                            <h3>Welcome! How can I help you?</h3>
                         </div>
                     </div>
                 `;
