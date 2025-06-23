@@ -438,16 +438,7 @@ class AIChatModule {
                             <img src="logo.png" alt="A1 PVC Logosu" style="width: 60px; height: 60px; border-radius: 50%; object-fit: contain; background: white; padding: 5px;">
                         </div>
                         <div class="message-content">
-                            <h3>A1 PVC Asistanına Hoş Geldiniz!</h3>
-                            <p><strong>Özemek Plastik (A1 PVC)</strong> için AI asistanınızım - 1970'lerden beri 50+ yıllık deneyimle sektöre hizmet vermekteyiz. Size şu konularda yardımcı olabilirim:</p>
-                            <ul>
-                                <li><strong>PVC Ürünleri:</strong> Kenar Bandı, Profiller, Pencere & Kapı Sistemleri</li>
-                                <li><strong>Teknik Bilgiler:</strong> Ürün özellikleri ve uygulamaları</li>
-                                <li><strong>Şirket Hizmetleri:</strong> 50+ ülkeye ihracat kapasitesi</li>
-                                <li><strong>Sesli Mod:</strong> Rahat iletişim için eller serbest etkileşim</li>
-                            </ul>
-                            <p><strong>📞 İletişim:</strong> 0850 888 22 47 | <strong>🌐 Website:</strong> <a href="https://a1pvcmarket.com/" target="_blank">a1pvcmarket.com</a></p>
-                            <p>Bugün A1 PVC ürünleri ve hizmetleri konusunda size nasıl yardımcı olabilirim?</p>
+                            <h3>Hoş Geldiniz! Size nasıl yardımcı olabilirim?</h3>
                         </div>
                     </div>
                 `;
