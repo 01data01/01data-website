@@ -42,9 +42,9 @@
 
 /* Sidebar toggle button */
 .sidebar-toggle {
-    position: absolute;
-    top: 16px;
-    right: -40px;
+    position: fixed;
+    top: 80px;
+    left: 268px;
     width: 32px;
     height: 32px;
     background: #fff;
@@ -54,10 +54,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s ease;
-    z-index: 10;
+    transition: all 0.3s ease;
+    z-index: 100;
     color: #6b7280;
     font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .sidebar-toggle:hover {
@@ -67,7 +68,7 @@
 }
 
 .sidebar-toggle.sidebar-hidden {
-    right: 8px;
+    left: 8px;
     background: #f8f9fa;
 }
 
@@ -88,13 +89,13 @@
     
     .sidebar-toggle {
         display: block;
+        top: 70px;
+        left: 268px;
     }
     
     .sidebar-toggle.sidebar-hidden {
-        right: 8px;
-        position: fixed;
-        top: 80px;
-        z-index: 21;
+        left: 8px;
+        top: 70px;
     }
 }
 
