@@ -652,7 +652,8 @@
 }
 
 /* AI Message with Sound Wave Avatar */
-.ai-message .message-avatar {
+.ai-message .message-avatar,
+.assistant-message .message-avatar {
     display: flex;
     align-items: center;
     background: none;
@@ -665,16 +666,7 @@
     background: none !important;
 }
 
-.ai-message .message-content {
-    background: var(--a1-light);
-    border-left: 4px solid var(--a1-primary);
-    padding: 1.2rem;
-    border-radius: 0.8rem;
-    color: var(--a1-dark);
-    box-shadow: 0 2px 8px var(--a1-shadow);
-    flex: 1;
-    margin-left: 15px;
-}
+/* Old AI message content styling - replaced with beautiful animated design below */
 
 /* Message styling */
 .message {
@@ -691,7 +683,8 @@
     box-shadow: 0 2px 8px var(--a1-shadow);
 }
 
-.ai-message {
+.ai-message,
+.assistant-message {
     background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
     border-radius: 20px;
     padding: 28px;
@@ -709,7 +702,8 @@
     animation: fadeIn 0.5s ease-in;
 }
 
-.ai-message .message-content {
+.ai-message .message-content,
+.assistant-message .message-content {
     color: #15803d;
     font-size: 18px;
     font-weight: 600;
@@ -721,7 +715,8 @@
     box-shadow: none;
 }
 
-.ai-message::before {
+.ai-message::before,
+.assistant-message::before {
     content: '';
     position: absolute;
     top: 0;
@@ -732,7 +727,8 @@
     animation: glow-pulse 3s ease-in-out infinite;
 }
 
-.ai-message::after {
+.ai-message::after,
+.assistant-message::after {
     content: '';
     position: absolute;
     top: -50%;
@@ -743,7 +739,8 @@
     animation: shimmer-calm 6s linear infinite;
 }
 
-.ai-message:hover {
+.ai-message:hover,
+.assistant-message:hover {
     transform: translateY(-2px);
     box-shadow: 
         0 12px 40px rgba(34, 197, 94, 0.2),
@@ -972,12 +969,14 @@
     .wave-bar:nth-child(4) { height: 12px; }
     .wave-bar:nth-child(5) { height: 8px; }
     
-    .ai-message {
+    .ai-message,
+    .assistant-message {
         padding: 20px;
         gap: 15px;
     }
     
-    .ai-message .message-content {
+    .ai-message .message-content,
+    .assistant-message .message-content {
         font-size: 16px;
     }
 }
