@@ -570,7 +570,7 @@
 /* Chat input container - Streamlit style */
 .chat-input-container {
     background: white;
-    border-top: 1px solid #e0e0e0;
+    border-top: none;
     padding: 1.5rem 4rem;
     flex: 0 0 auto;
     display: flex;
