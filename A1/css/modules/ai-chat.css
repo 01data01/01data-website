@@ -38,6 +38,11 @@
     width: 0;
     min-width: 0;
     border-right: none;
+    overflow: hidden;
+}
+
+.chat-sidebar.hidden * {
+    visibility: hidden;
 }
 
 /* Sidebar toggle button - Enhanced for CEO usability */
