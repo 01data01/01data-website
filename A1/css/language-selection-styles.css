@@ -125,7 +125,7 @@
         }
         
         .logo-container {
-            margin: 2rem 0 1rem 0;
+            margin: 3rem 0 2rem 0;
             text-align: center;
             z-index: 10;
             position: relative;
@@ -133,9 +133,9 @@
         }
         
         .logo-container img {
-            height: 80px;
+            height: 120px;
             margin-bottom: 0;
-            filter: drop-shadow(0 5px 15px rgba(135, 206, 235, 0.3));
+            filter: drop-shadow(0 8px 25px rgba(135, 206, 235, 0.3));
             transition: all 0.3s ease;
         }
         
