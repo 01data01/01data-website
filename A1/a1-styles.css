@@ -746,10 +746,10 @@
 .message-bubble {
     position: relative;
     border-radius: 20px;
-    padding: 20px 24px;
+    padding: 16px 20px;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    line-height: 1.6;
+    line-height: 1.5;
     transition: all 0.3s ease;
 }
 
@@ -955,7 +955,7 @@
 }
 
 .welcome-hint {
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.8;
     margin-top: 8px;
     display: flex;
@@ -965,7 +965,7 @@
 
 /* Message Text Formatting */
 .message-text {
-    font-size: 15px;
+    font-size: 13px;
     position: relative;
     z-index: 1;
 }
@@ -980,7 +980,7 @@
 
 .message-text h3 {
     color: inherit;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     margin: 16px 0 8px 0;
 }
@@ -1098,16 +1098,16 @@
     .wave-bar:nth-child(5) { height: 8px; }
     
     .message-bubble {
-        padding: 16px 20px;
-        font-size: 14px;
+        padding: 14px 16px;
+        font-size: 12px;
     }
     
     .message-text {
-        font-size: 14px;
+        font-size: 12px;
     }
     
     .welcome-hint {
-        font-size: 13px;
+        font-size: 11px;
     }
 }
 
@@ -1117,7 +1117,12 @@
     }
     
     .message-bubble {
-        padding: 14px 16px;
+        padding: 12px 14px;
+        font-size: 11px;
+    }
+    
+    .message-text {
+        font-size: 11px;
     }
 }
 

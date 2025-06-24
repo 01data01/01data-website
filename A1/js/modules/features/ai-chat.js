@@ -218,6 +218,7 @@ class AIChatModule {
         this.selectedAgent = 'primary'; // Default to primary agent (SMART - uses ELEVENLABS_AGENT_ID_3)
         this.sidebarVisible = true;
         this.messageUI = null; // Add MessageUI instance
+        this.firstMessageSent = false; // Track if first message has been sent
     }
 
     /**
@@ -410,12 +411,38 @@ class AIChatModule {
         const userInitial = 'U'; // Could be made dynamic based on user
         this.messageUI.createMessage(role, content, { userInitial });
 
+        // Hide suggestions after first user message
+        if (role === 'user' && !this.firstMessageSent) {
+            this.hideSuggestions();
+            this.firstMessageSent = true;
+        }
+
         // Still save to currentMessages for history
         this.currentMessages.push({
             role: role,
             content: content,
             timestamp: new Date().toISOString()
         });
+    }
+
+    /**
+     * Hide suggestion buttons after first message
+     */
+    hideSuggestions() {
+        const suggestionsContainer = document.querySelector('.input-suggestions');
+        if (suggestionsContainer) {
+            suggestionsContainer.style.display = 'none';
+        }
+    }
+
+    /**
+     * Show suggestion buttons (for new chat)
+     */
+    showSuggestions() {
+        const suggestionsContainer = document.querySelector('.input-suggestions');
+        if (suggestionsContainer) {
+            suggestionsContainer.style.display = 'grid';
+        }
     }
 
 
@@ -563,10 +590,14 @@ class AIChatModule {
         // Generate new chat ID
         this.currentChatId = this.generateChatId();
         this.currentMessages = [];
+        this.firstMessageSent = false; // Reset for new chat
 
         if (this.messageUI) {
             // Clear the container first
             this.messageUI.clear();
+            
+            // Show suggestions again for new chat
+            this.showSuggestions();
             
             // Detect language from page
             const isTurkish = document.documentElement.lang === 'tr' || window.location.pathname.includes('index-tr');
@@ -868,9 +899,20 @@ class AIChatModule {
         this.currentChatId = chatId;
         this.currentMessages = [...chat.messages];
 
+        // Check if this chat has user messages to determine if suggestions should be hidden
+        const hasUserMessages = chat.messages.some(msg => msg.role === 'user');
+        this.firstMessageSent = hasUserMessages;
+
         // Display messages using MessageUI
         if (this.messageUI) {
             this.messageUI.clear();
+            
+            // Show/hide suggestions based on chat history
+            if (hasUserMessages) {
+                this.hideSuggestions();
+            } else {
+                this.showSuggestions();
+            }
             
             chat.messages.forEach(message => {
                 this.messageUI.createMessage(message.role, message.content, { userInitial: 'U' });
