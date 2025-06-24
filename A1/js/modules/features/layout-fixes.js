@@ -15,9 +15,8 @@ function fixChatLayout() {
         // Force flex layout
         chatContainer.style.display = 'flex';
         chatContainer.style.flexDirection = 'row';
-        // Remove fixed height constraints to allow flexible sizing
-        chatContainer.style.height = 'auto';
-        chatContainer.style.minHeight = '600px';
+        chatContainer.style.height = 'calc(100vh - 180px)';
+        chatContainer.style.minHeight = 'calc(100vh - 180px)';
         chatContainer.style.maxHeight = 'calc(100vh - 180px)';
         chatContainer.style.overflow = 'hidden';
         console.log('A1: Chat container layout fixed');
@@ -84,10 +83,10 @@ function forceScrollToBottom() {
 function handleResize() {
     const chatContainer = document.querySelector('.ai-chat-container');
     if (chatContainer) {
-        // Use flexible height instead of fixed viewport height
-        chatContainer.style.height = 'auto';
-        chatContainer.style.minHeight = '600px';
-        chatContainer.style.maxHeight = 'calc(100vh - 180px)';
+        const newHeight = `calc(100vh - 180px)`;
+        chatContainer.style.height = newHeight;
+        chatContainer.style.minHeight = newHeight;
+        chatContainer.style.maxHeight = newHeight;
     }
 }
 
