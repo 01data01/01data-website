@@ -1,4 +1,8 @@
-    <style>
+        :root {
+            --a1-border: rgba(135, 206, 235, 0.3);
+            --a1-text-dark: #2c5f5d;
+        }
+        
         body {
             margin: 0;
             padding: 0;
