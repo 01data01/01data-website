@@ -191,10 +191,11 @@
     box-shadow: 0 4px 20px var(--a1-shadow);
     overflow: hidden;
     margin: 0;
-    display: flex; /* Change from grid to flex for better control */
-    min-height: calc(100vh - 180px) !important; /* More space for header */
-    max-height: calc(100vh - 180px) !important;
-    height: calc(100vh - 180px) !important; /* Fixed height */
+    display: flex;
+    /* REMOVE fixed heights - use flexible layout instead */
+    min-height: calc(100vh - 180px);
+    /* Remove max-height and height constraints */
+    flex-direction: row; /* Ensure horizontal layout */
 }
 
 .chat-sidebar {
@@ -338,10 +339,13 @@
 .chat-main {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    flex: 1; /* Take remaining space */
-    min-width: 0; /* Allow shrinking */
-    overflow: hidden; /* Prevent overflow */
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    /* Use flexible height that adapts to content */
+    min-height: 0;
+    height: fit-content;
+    max-height: calc(100vh - 180px);
 }
 
 
@@ -385,18 +389,21 @@
 /* Chat messages - Streamlit inspired styling */
 .chat-messages {
     padding: 32px !important;
-    flex: 1 !important; /* Take available space */
-    overflow-y: auto !important; /* Enable scrolling */
+    flex: 1 !important;
+    overflow-y: auto !important;
     background: #ffffff;
     max-width: 1000px !important;
     margin: 0 auto !important;
     width: 100% !important;
     scrollbar-width: thin;
     scrollbar-color: var(--a1-secondary) #f1f1f1;
-    /* Remove any height constraints */
-    min-height: 0 !important;
-    max-height: none !important;
+    /* Dynamic height based on content */
+    min-height: 200px !important; /* Minimum reasonable height */
     height: auto !important;
+    /* Remove max-height constraint */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Align content to top */
 }
 
 /* A1 PVC Animated Welcome Message */
@@ -1131,15 +1138,16 @@
     background: white !important;
     border-top: 1px solid #e9ecef !important;
     padding: 24px 32px !important;
-    flex: 0 0 auto !important; /* Fixed height, don't grow/shrink */
+    flex: 0 0 auto !important; /* Fixed size, don't grow */
     display: flex !important;
     flex-direction: column !important;
     max-width: 800px !important;
     margin: 0 auto !important;
     width: 100% !important;
-    /* Ensure it's always visible */
     position: relative !important;
     z-index: 10 !important;
+    /* Ensure it sticks to bottom without excess space */
+    margin-top: auto !important;
 }
 
 .input-wrapper {
@@ -1491,12 +1499,23 @@
     }
     
     .ai-chat-container {
-        margin: 0 1rem;
-        border-radius: 0.5rem;
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
         min-height: calc(100vh - 120px);
         max-height: calc(100vh - 120px);
+        margin: 0 1rem;
+        border-radius: 0.5rem;
+    }
+    
+    .chat-main {
+        max-height: calc(100vh - 120px);
+    }
+    
+    .chat-messages {
+        padding: 1rem !important;
+        min-height: 150px !important;
+    }
+    
+    .chat-input-container {
+        padding: 1rem !important;
     }
     
     .chat-sidebar {
@@ -1821,4 +1840,36 @@
     .chat-input::placeholder {
         color: #888;
     }
+}
+
+/* =================================================
+   ADDITIONAL LAYOUT FIXES FOR BOTTOM SPACE ISSUE
+   ================================================= */
+
+/* Ensure proper flex behavior */
+.chat-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+/* Remove excess bottom space */
+.chat-messages > *:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Sidebar width fix - ensure sidebar doesn't affect main content height */
+.chat-sidebar {
+    background: var(--a1-sidebar-bg);
+    border-right: 1px solid #e0e0e0;
+    padding: 1.5rem;
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    /* Remove height: 100% to prevent layout issues */
+    display: flex;
+    flex-direction: column;
 }
