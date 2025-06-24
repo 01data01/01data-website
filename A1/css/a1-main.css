@@ -4,13 +4,8 @@
 /* Import CSS Variables and Theme Configuration */
 @import url('./modules/a1-variables.css');
 
-/* Import Core Base Styles (if not conflicting with existing base.css) */
-/* Uncomment if you want to use A1-specific base styles */
-/* @import url('./modules/base.css'); */
-
-/* Import Layout Styles (if not conflicting with existing layout.css) */
-/* Uncomment if you want to use A1-specific layout styles */
-/* @import url('./modules/layout.css'); */
+/* Base and Layout styles are imported from root CSS modules */
+/* No need to duplicate - using ../css/modules/ imports in HTML */
 
 /* Import A1 Specific Components */
 @import url('./modules/a1-header.css');
@@ -20,9 +15,8 @@
 /* Import Animations */
 @import url('./modules/a1-animations.css');
 
-/* Import Voice Components (if not conflicting with existing voice-chat.css) */
-/* Note: Check for conflicts with existing voice-chat.css */
-/* @import url('./modules/voice-chat.css'); */
+/* Voice Components are imported from root CSS modules */
+/* No duplication needed - using ../css/modules/ imports in HTML */
 
 /* Import Responsive Design - Load Last for Proper Cascade */
 @import url('./modules/a1-responsive.css');
