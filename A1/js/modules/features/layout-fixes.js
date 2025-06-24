@@ -1,9 +1,9 @@
 /**
- * Layout Fix Script for A1 Chat Interface - Laptop Version
- * Add this to fix height/scrolling issues
+ * Enhanced Layout Fix Script for A1 Chat Interface
+ * Fixes bottom empty space issue
  */
 
-console.log('A1: Layout Fix Script Loaded');
+console.log('A1: Enhanced Layout Fix Script Loaded');
 
 // Fix layout issues on page load
 function fixChatLayout() {
@@ -12,12 +12,10 @@ function fixChatLayout() {
     // Fix chat container layout
     const chatContainer = document.querySelector('.ai-chat-container');
     if (chatContainer) {
-        // Force flex layout
         chatContainer.style.display = 'flex';
         chatContainer.style.flexDirection = 'row';
         chatContainer.style.height = 'calc(100vh - 180px)';
-        chatContainer.style.minHeight = 'calc(100vh - 180px)';
-        chatContainer.style.maxHeight = 'calc(100vh - 180px)';
+        chatContainer.style.minHeight = 'auto'; // Remove minimum height
         chatContainer.style.overflow = 'hidden';
         console.log('A1: Chat container layout fixed');
     }
@@ -31,208 +29,131 @@ function fixChatLayout() {
         chatMain.style.flex = '1';
         chatMain.style.minWidth = '0';
         chatMain.style.overflow = 'hidden';
+        chatMain.style.minHeight = '0'; // Allow shrinking
         console.log('A1: Chat main area fixed');
     }
     
     // Fix messages container
     const messagesContainer = document.querySelector('.chat-messages');
     if (messagesContainer) {
-        messagesContainer.style.flex = '1';
+        messagesContainer.style.flex = '1 1 auto'; // Grow and shrink as needed
         messagesContainer.style.overflowY = 'auto';
-        messagesContainer.style.height = 'auto';
-        messagesContainer.style.minHeight = '0';
-        messagesContainer.style.maxHeight = 'none';
+        messagesContainer.style.minHeight = '0'; // Remove minimum height
+        messagesContainer.style.paddingBottom = '20px';
+        messagesContainer.style.display = 'flex';
+        messagesContainer.style.flexDirection = 'column';
+        messagesContainer.style.justifyContent = 'flex-start';
+        
+        // Check if only welcome message exists
+        const messages = messagesContainer.querySelectorAll('.message, .animated-welcome-message');
+        if (messages.length <= 1) {
+            messagesContainer.style.flex = '0 0 auto';
+            messagesContainer.style.marginBottom = 'auto';
+        }
+        
         console.log('A1: Messages container fixed');
     }
     
-    // Ensure input container is visible
+    // Fix input container
     const inputContainer = document.querySelector('.chat-input-container');
     if (inputContainer) {
         inputContainer.style.flex = '0 0 auto';
+        inputContainer.style.marginTop = '0'; // Remove auto margin
+        inputContainer.style.marginBottom = '0';
         inputContainer.style.position = 'relative';
         inputContainer.style.zIndex = '10';
         inputContainer.style.borderTop = '1px solid #e9ecef';
-        console.log('A1: Input container visibility ensured');
+        inputContainer.style.padding = '20px 32px';
+        console.log('A1: Input container fixed');
     }
     
-    // Fix sidebar
+    // Fix sidebar if present
     const sidebar = document.querySelector('.chat-sidebar');
     if (sidebar) {
         sidebar.style.width = '300px';
         sidebar.style.minWidth = '300px';
         sidebar.style.maxWidth = '300px';
         sidebar.style.flexShrink = '0';
+        sidebar.style.height = '100%';
         console.log('A1: Sidebar dimensions fixed');
     }
 }
 
-// Force scroll to bottom function
-function forceScrollToBottom() {
+// Monitor for new messages and adjust layout
+function setupMessageObserver() {
     const messagesContainer = document.querySelector('.chat-messages');
-    if (messagesContainer) {
-        setTimeout(() => {
-            messagesContainer.scrollTo({
-                top: messagesContainer.scrollHeight,
-                behavior: 'smooth'
-            });
-        }, 100);
-    }
+    if (!messagesContainer) return;
+    
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                // Check message count and adjust flex
+                const messages = messagesContainer.querySelectorAll('.message, .animated-welcome-message');
+                if (messages.length > 1) {
+                    messagesContainer.style.flex = '1 1 auto';
+                    messagesContainer.style.marginBottom = '0';
+                } else {
+                    messagesContainer.style.flex = '0 0 auto';
+                    messagesContainer.style.marginBottom = 'auto';
+                }
+                
+                // Scroll to bottom for new messages
+                setTimeout(() => {
+                    messagesContainer.scrollTo({
+                        top: messagesContainer.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            }
+        });
+    });
+    
+    observer.observe(messagesContainer, { childList: true });
+    console.log('A1: Message observer set up');
 }
 
 // Resize handler to maintain layout
 function handleResize() {
     const chatContainer = document.querySelector('.ai-chat-container');
     if (chatContainer) {
-        const newHeight = `calc(100vh - 180px)`;
+        const isMobile = window.innerWidth <= 768;
+        const newHeight = `calc(100vh - ${isMobile ? '120px' : '180px'})`;
         chatContainer.style.height = newHeight;
-        chatContainer.style.minHeight = newHeight;
-        chatContainer.style.maxHeight = newHeight;
-    }
-}
-
-// Enhanced input area visibility check
-function ensureInputVisibility() {
-    const inputContainer = document.querySelector('.chat-input-container');
-    const chatContainer = document.querySelector('.ai-chat-container');
-    
-    if (inputContainer && chatContainer) {
-        const containerRect = chatContainer.getBoundingClientRect();
-        const inputRect = inputContainer.getBoundingClientRect();
-        
-        // Check if input is outside visible area
-        if (inputRect.bottom > containerRect.bottom) {
-            console.log('A1: Input area was outside visible area, fixing...');
-            fixChatLayout();
-        }
+        chatContainer.style.minHeight = 'auto';
     }
 }
 
 // Initialize layout fixes
 function initializeLayoutFixes() {
-    console.log('A1: Initializing layout fixes...');
+    console.log('A1: Initializing enhanced layout fixes...');
     
     // Apply fixes immediately
     fixChatLayout();
     
-    // Ensure input visibility
-    setTimeout(ensureInputVisibility, 500);
+    // Set up message observer
+    setupMessageObserver();
     
     // Add resize listener
     window.addEventListener('resize', handleResize);
     
-    // Add scroll helper to new messages
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === Node.ELEMENT_NODE && 
-                        (node.classList.contains('message') || 
-                         node.classList.contains('ai-message') || 
-                         node.classList.contains('assistant-message'))) {
-                        forceScrollToBottom();
-                    }
-                });
-            }
-        });
-    });
-    
-    const messagesContainer = document.querySelector('.chat-messages');
-    if (messagesContainer) {
-        observer.observe(messagesContainer, { childList: true });
-    }
+    // Re-apply fixes after a short delay to ensure all elements are loaded
+    setTimeout(fixChatLayout, 500);
     
     console.log('A1: Layout fixes initialized successfully');
-}
-
-// Enhanced textarea auto-resize that doesn't break layout
-function setupImprovedAutoResize() {
-    const textarea = document.getElementById('chatInput');
-    if (!textarea) return;
-    
-    function autoResize() {
-        // Reset height to auto to get the correct scrollHeight
-        textarea.style.height = 'auto';
-        
-        // Calculate new height (max 120px)
-        const newHeight = Math.min(textarea.scrollHeight, 120);
-        textarea.style.height = newHeight + 'px';
-        
-        // Ensure input container stays visible
-        const inputContainer = document.querySelector('.chat-input-container');
-        if (inputContainer) {
-            inputContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
-        }
-    }
-    
-    textarea.addEventListener('input', autoResize);
-    textarea.addEventListener('paste', () => setTimeout(autoResize, 10));
-    
-    // Initial resize
-    autoResize();
-}
-
-// Debug function to log layout info
-function debugLayout() {
-    const chatContainer = document.querySelector('.ai-chat-container');
-    const messagesContainer = document.querySelector('.chat-messages');
-    const inputContainer = document.querySelector('.chat-input-container');
-    
-    console.log('A1: Layout Debug Info:');
-    console.log('Chat Container:', chatContainer?.getBoundingClientRect());
-    console.log('Messages Container:', messagesContainer?.getBoundingClientRect());
-    console.log('Input Container:', inputContainer?.getBoundingClientRect());
-    console.log('Window Height:', window.innerHeight);
 }
 
 // Initialize everything when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         setTimeout(initializeLayoutFixes, 100);
-        setTimeout(setupImprovedAutoResize, 200);
-        setTimeout(debugLayout, 1000); // Debug after everything loads
     });
 } else {
     setTimeout(initializeLayoutFixes, 100);
-    setTimeout(setupImprovedAutoResize, 200);
-    setTimeout(debugLayout, 1000);
 }
 
-// Export functions for manual calling
+// Export functions for manual calling if needed
 window.A1LayoutFixes = {
     fixChatLayout,
-    forceScrollToBottom,
-    ensureInputVisibility,
-    debugLayout
+    handleResize,
+    initializeLayoutFixes
 };
-
-// Add manual fix button (temporary for testing)
-setTimeout(() => {
-    const fixButton = document.createElement('button');
-    fixButton.textContent = 'Fix Layout';
-    fixButton.style.position = 'fixed';
-    fixButton.style.top = '10px';
-    fixButton.style.right = '10px';
-    fixButton.style.zIndex = '9999';
-    fixButton.style.padding = '10px';
-    fixButton.style.background = '#ff4444';
-    fixButton.style.color = 'white';
-    fixButton.style.border = 'none';
-    fixButton.style.borderRadius = '5px';
-    fixButton.style.cursor = 'pointer';
-    
-    fixButton.addEventListener('click', () => {
-        console.log('A1: Manual layout fix triggered');
-        fixChatLayout();
-        ensureInputVisibility();
-        debugLayout();
-    });
-    
-    document.body.appendChild(fixButton);
-    
-    // Remove button after 10 seconds
-    setTimeout(() => {
-        if (fixButton.parentNode) {
-            fixButton.parentNode.removeChild(fixButton);
-        }
-    }, 10000);
-}, 2000);
