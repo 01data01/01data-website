@@ -1,0 +1,62 @@
+/* A1 Assistant - Main CSS Import File */
+/* Optimized and Modular CSS Structure for Better Performance */
+
+/* Import CSS Variables and Theme Configuration */
+@import url('./modules/a1-variables.css');
+
+/* Import Core Base Styles (if not conflicting with existing base.css) */
+/* Uncomment if you want to use A1-specific base styles */
+/* @import url('./modules/base.css'); */
+
+/* Import Layout Styles (if not conflicting with existing layout.css) */
+/* Uncomment if you want to use A1-specific layout styles */
+/* @import url('./modules/layout.css'); */
+
+/* Import A1 Specific Components */
+@import url('./modules/a1-header.css');
+@import url('./modules/a1-chat-interface.css');
+@import url('./modules/a1-messages.css');
+
+/* Import Animations */
+@import url('./modules/a1-animations.css');
+
+/* Import Voice Components (if not conflicting with existing voice-chat.css) */
+/* Note: Check for conflicts with existing voice-chat.css */
+/* @import url('./modules/voice-chat.css'); */
+
+/* Import Responsive Design - Load Last for Proper Cascade */
+@import url('./modules/a1-responsive.css');
+
+/* Additional A1 Specific Overrides */
+/* Ensuring proper integration with existing modular system */
+
+/* Override existing styles if needed */
+.main-content {
+    background: transparent;
+}
+
+/* Remove excess bottom space */
+.chat-messages > *:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Sidebar width fix - ensure sidebar doesn't affect main content height */
+.chat-sidebar {
+    background: var(--a1-sidebar-bg);
+    border-right: 1px solid #e0e0e0;
+    padding: 1.5rem;
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Smooth transitions for better UX */
+* {
+    transition-property: transform, box-shadow, background-color, border-color, opacity;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+}
