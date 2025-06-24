@@ -37,14 +37,8 @@ class MessageUI {
             </div>
         `;
 
-        // Check if this is the first message being added to preserve welcome message
-        const existingWelcome = this.container.querySelector('.message.welcome');
-        
-        if (existingWelcome && !options.isWelcome) {
-            existingWelcome.insertAdjacentElement('afterend', messageElement);
-        } else {
-            this.container.appendChild(messageElement);
-        }
+        // Always append messages to the end for proper chronological order
+        this.container.appendChild(messageElement);
         
         // Smooth scroll to bottom
         this.scrollToBottom();
@@ -424,15 +418,6 @@ class AIChatModule {
         });
     }
 
-    /**
-     * Format message content
-     */
-    formatMessage(content) {
-        return content
-            .replace(/\n/g, '<br>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>');
-    }
 
     /**
      * Show typing indicator
