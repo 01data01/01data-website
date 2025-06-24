@@ -192,9 +192,9 @@
     overflow: hidden;
     margin: 0;
     display: flex; /* Change from grid to flex for better control */
-    min-height: calc(100vh - 180px) !important; /* More space for header */
-    max-height: calc(100vh - 180px) !important;
-    height: calc(100vh - 180px) !important; /* Fixed height */
+    min-height: 600px; /* Reasonable minimum height */
+    max-height: calc(100vh - 180px); /* Maximum height constraint */
+    /* Remove fixed height to allow flexible sizing */
 }
 
 .chat-sidebar {
@@ -1495,7 +1495,7 @@
         border-radius: 0.5rem;
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr;
-        min-height: calc(100vh - 120px);
+        min-height: 500px; /* Reasonable minimum for mobile */
         max-height: calc(100vh - 120px);
     }
     
