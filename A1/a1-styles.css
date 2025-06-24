@@ -383,7 +383,7 @@
 /* Chat Messages */
 .chat-messages {
     padding: 32px !important;
-    flex: 1;
+    flex: 1 1 auto !important;
     overflow-y: auto;
     background: #ffffff;
     max-width: 1000px !important;
@@ -391,7 +391,10 @@
     width: 100% !important;
     scrollbar-width: thin;
     scrollbar-color: var(--a1-secondary) #f1f1f1;
-    min-height: 0; /* Important for flexbox shrinking */
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Add this */
 }
 
 /* A1 PVC Animated Welcome Message */
@@ -1224,7 +1227,6 @@
 /* Hidden state for suggestions after first message */
 .input-suggestions.hidden {
     display: none !important;
-}
 }
 
 .suggestion-btn {
