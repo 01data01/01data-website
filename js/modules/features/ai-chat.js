@@ -874,7 +874,17 @@ class AIChatModule {
         const voiceStatus = document.querySelector('.voice-status');
         if (voiceStatus) {
             voiceStatus.className = `voice-status ${connected ? 'connected' : 'disconnected'}`;
-            voiceStatus.textContent = connected ? 'Voice Connected' : 'Voice Disconnected';
+            
+            // Check if current page is Turkish
+            const isTurkish = window.location.pathname.includes('index-tr.html') || 
+                            document.documentElement.lang === 'tr' ||
+                            document.querySelector('html[lang="tr"]');
+            
+            if (isTurkish) {
+                voiceStatus.textContent = connected ? 'SES BAĞLANDI' : 'SES BAĞLANTISI YOK';
+            } else {
+                voiceStatus.textContent = connected ? 'Voice Connected' : 'Voice Disconnected';
+            }
         }
     }
 
