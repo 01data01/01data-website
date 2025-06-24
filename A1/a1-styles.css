@@ -385,7 +385,7 @@
 /* Chat Messages */
 .chat-messages {
     padding: 32px !important;
-    flex: 1 1 auto !important;
+    flex: 1 1 auto;
     overflow-y: auto;
     background: #ffffff;
     max-width: 1000px !important;
@@ -396,7 +396,16 @@
     min-height: 0;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Add this */
+    justify-content: flex-start;
+    /* Add this to prevent expansion when content is minimal */
+    align-content: flex-start;
+}
+
+/* Add this new rule to handle empty space */
+.chat-messages::after {
+    content: '';
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 /* A1 PVC Animated Welcome Message */
