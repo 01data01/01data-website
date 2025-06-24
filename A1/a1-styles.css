@@ -192,22 +192,19 @@
     overflow: hidden;
     margin: 0;
     display: flex;
-    /* REMOVE fixed heights - use flexible layout instead */
-    min-height: calc(100vh - 180px);
-    /* Remove max-height and height constraints */
-    flex-direction: row; /* Ensure horizontal layout */
+    height: calc(100vh - 180px); /* Fixed height, not min-height */
+    flex-direction: row;
 }
 
 .chat-sidebar {
     background: var(--a1-sidebar-bg);
     border-right: 1px solid #e0e0e0;
     padding: 1.5rem;
-    width: 300px; /* Fixed width instead of flex */
+    width: 300px;
     min-width: 300px;
     max-width: 300px;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
     overflow-y: auto;
-    height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -342,10 +339,7 @@
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    /* Use flexible height that adapts to content */
-    min-height: 0;
-    height: fit-content;
-    max-height: calc(100vh - 180px);
+    height: 100%; /* Full height of container */
 }
 
 
@@ -386,24 +380,18 @@
     100% { box-shadow: 0 4px 12px rgba(16, 172, 132, 0.3); }
 }
 
-/* Chat messages - Streamlit inspired styling */
+/* Chat Messages */
 .chat-messages {
     padding: 32px !important;
-    flex: 1 !important;
-    overflow-y: auto !important;
+    flex: 1;
+    overflow-y: auto;
     background: #ffffff;
     max-width: 1000px !important;
     margin: 0 auto !important;
     width: 100% !important;
     scrollbar-width: thin;
     scrollbar-color: var(--a1-secondary) #f1f1f1;
-    /* Dynamic height based on content */
-    min-height: 200px !important; /* Minimum reasonable height */
-    height: auto !important;
-    /* Remove max-height constraint */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Align content to top */
+    min-height: 0; /* Important for flexbox shrinking */
 }
 
 /* A1 PVC Animated Welcome Message */
@@ -1138,16 +1126,12 @@
     background: white !important;
     border-top: 1px solid #e9ecef !important;
     padding: 24px 32px !important;
-    flex: 0 0 auto !important; /* Fixed size, don't grow */
+    flex-shrink: 0; /* Don't shrink */
     display: flex !important;
     flex-direction: column !important;
     max-width: 800px !important;
     margin: 0 auto !important;
     width: 100% !important;
-    position: relative !important;
-    z-index: 10 !important;
-    /* Ensure it sticks to bottom without excess space */
-    margin-top: auto !important;
 }
 
 .input-wrapper {
@@ -1499,19 +1483,17 @@
     }
     
     .ai-chat-container {
-        min-height: calc(100vh - 120px);
-        max-height: calc(100vh - 120px);
+        height: calc(100vh - 120px); /* Adjusted for mobile header */
         margin: 0 1rem;
         border-radius: 0.5rem;
     }
     
     .chat-main {
-        max-height: calc(100vh - 120px);
+        height: 100%;
     }
     
     .chat-messages {
         padding: 1rem !important;
-        min-height: 150px !important;
     }
     
     .chat-input-container {
@@ -1874,85 +1856,3 @@
     flex-direction: column;
 }
 
-/* =================================================
-   FIX FOR BOTTOM EMPTY SPACE ISSUE
-   ================================================= */
-
-/* Remove fixed minimum height from chat container */
-.ai-chat-container {
-    min-height: auto !important;
-    height: calc(100vh - 180px) !important; /* Keep max height but not min */
-    display: flex !important;
-    flex-direction: row !important;
-}
-
-/* Fix chat main area to properly fill available space */
-.chat-main {
-    display: flex !important;
-    flex-direction: column !important;
-    height: 100% !important;
-    min-height: 0 !important; /* Allow it to shrink */
-}
-
-/* Fix messages container to grow with content, not force minimum height */
-.chat-messages {
-    flex: 1 1 auto !important; /* Grow and shrink as needed */
-    min-height: 0 !important; /* Remove the 200px minimum */
-    height: auto !important;
-    overflow-y: auto !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important; /* Keep messages at top */
-    padding-bottom: 20px !important; /* Just a small padding at bottom */
-}
-
-/* Fix input container - remove auto margin that pushes it down */
-.chat-input-container {
-    flex: 0 0 auto !important; /* Don't grow or shrink */
-    margin-top: 0 !important; /* Remove auto margin */
-    margin-bottom: 0 !important;
-    position: relative !important;
-    background: white !important;
-    border-top: 1px solid #e9ecef !important;
-    padding: 20px 32px !important; /* Slightly reduced padding */
-}
-
-/* Ensure suggestions and input wrapper maintain proper order */
-.input-suggestions {
-    margin-bottom: 16px !important; /* Reduced margin */
-    order: 1 !important;
-}
-
-.input-wrapper {
-    order: 2 !important;
-    margin-bottom: 0 !important;
-}
-
-/* Additional fix for when there are few messages */
-.chat-messages:has(.animated-welcome-message:only-child) {
-    flex: 0 0 auto !important; /* Don't force full height when only welcome message */
-    margin-bottom: auto !important; /* Push remaining space below */
-}
-
-/* Mobile responsive adjustments */
-@media (max-width: 768px) {
-    .ai-chat-container {
-        height: calc(100vh - 120px) !important;
-        min-height: auto !important;
-    }
-    
-    .chat-messages {
-        padding: 16px !important;
-        padding-bottom: 16px !important;
-    }
-    
-    .chat-input-container {
-        padding: 16px !important;
-    }
-}
-
-/* Ensure proper layout when sidebar is hidden */
-.chat-sidebar.hidden + .chat-main {
-    width: 100% !important;
-    max-width: 100% !important;
-}
