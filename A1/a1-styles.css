@@ -192,8 +192,9 @@
     overflow: hidden;
     margin: 0;
     display: flex;
-    height: calc(100vh - 180px); /* Fixed height, not min-height */
+    height: calc(100vh - 180px);
     flex-direction: row;
+    position: relative; /* Add this */
 }
 
 .chat-sidebar {
@@ -339,7 +340,8 @@
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    height: 100%; /* Full height of container */
+    height: 100%;
+    position: relative; /* Add this */
 }
 
 
