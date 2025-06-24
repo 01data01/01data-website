@@ -192,10 +192,9 @@
     overflow: hidden;
     margin: 0;
     display: flex;
-    min-height: calc(100vh - 180px); /* Changed from height to min-height */
-    max-height: calc(100vh - 180px); /* Add max-height to constrain it */
+    height: calc(100vh - 180px);
     flex-direction: row;
-    position: relative;
+    position: relative; /* Add this */
 }
 
 .chat-sidebar {
@@ -341,9 +340,8 @@
     flex: 1;
     min-width: 0;
     overflow: hidden;
-    /* Remove or comment out the height: 100% */
-    /* height: 100%; */
-    position: relative;
+    height: 100%;
+    position: relative; /* Add this */
 }
 
 
