@@ -12,11 +12,13 @@
     border-radius: 1rem;
     box-shadow: var(--shadow-medium);
     overflow: hidden;
-    margin: 0;
+    margin: 0 auto;
     display: flex;
-    height: calc(100vh - 180px);
+    height: calc(100vh - 120px);
     flex-direction: row;
     position: relative;
+    width: 100%;
+    max-width: 100%;
 }
 
 .chat-sidebar {
@@ -168,12 +170,10 @@
 
 /* Chat Messages */
 .chat-messages {
-    padding: 32px !important;
-    flex: 1 1 auto;
+    padding: 24px !important;
+    flex: 1;
     overflow-y: auto;
     background: #ffffff;
-    max-width: 1000px !important;
-    margin: 0 auto !important;
     width: 100% !important;
     scrollbar-width: thin;
     scrollbar-color: var(--a1-secondary) #f1f1f1;
@@ -181,13 +181,6 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-content: flex-start;
-}
-
-.chat-messages::after {
-    content: '';
-    flex: 1 1 auto;
-    min-height: 0;
 }
 
 /* A1 PVC Animated Welcome Message */
@@ -399,12 +392,10 @@
 .chat-input-container {
     background: white !important;
     border-top: 1px solid #e9ecef !important;
-    padding: 24px 32px !important;
+    padding: 20px 24px !important;
     flex-shrink: 0;
     display: flex !important;
     flex-direction: column !important;
-    max-width: 800px !important;
-    margin: 0 auto !important;
     width: 100% !important;
 }
 

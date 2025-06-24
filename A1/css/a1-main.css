@@ -30,9 +30,21 @@
 /* Additional A1 Specific Overrides */
 /* Ensuring proper integration with existing modular system */
 
-/* Override existing styles if needed */
+/* Fix layout spacing issues */
+.app-container {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
 .main-content {
     background: transparent;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 /* Remove excess bottom space */
@@ -40,18 +52,12 @@
     margin-bottom: 0 !important;
 }
 
-/* Sidebar width fix - ensure sidebar doesn't affect main content height */
-.chat-sidebar {
-    background: var(--a1-sidebar-bg);
-    border-right: 1px solid #e0e0e0;
-    padding: 1.5rem;
-    width: 300px;
-    min-width: 300px;
-    max-width: 300px;
-    flex-shrink: 0;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
+/* Ensure full width utilization */
+.ai-chat-container {
+    margin: 0 !important;
+    width: 100% !important;
+    height: calc(100vh - 90px) !important;
+    border-radius: 0 !important;
 }
 
 /* Smooth transitions for better UX */
