@@ -5,12 +5,12 @@ The A1 Assistant is a self-contained AI chat application with working voice capa
 
 ## Git Version Information 📋
 
-### 🖥️ **Latest DESKTOP VERSION**: `835ba84` (CURRENT)
-- **Commit**: "Fix height constraints and implement comprehensive mobile responsive design"
-- **Features**: Desktop-optimized with enhanced UI/UX design and flexible layout system
-- **Layout**: Professional interface with optimized spacing, centered containers, and flexible height management
+### 🖥️ **Latest DESKTOP VERSION**: `d1d08d9` (CURRENT)
+- **Commit**: "Revert height changes - restore original layout constraints"
+- **Features**: Desktop-optimized with enhanced UI/UX design, suggestion buttons fix, and stable layout system
+- **Layout**: Professional interface with optimized spacing, centered containers, and fixed viewport height management
 - **Perfect for**: Desktop/laptop demonstrations and professional presentations
-- **Status**: ✅ Currently active version with comprehensive responsive design
+- **Status**: ✅ Currently active version with suggestion buttons auto-hide functionality
 
 ### 📱 **Latest MOBILE VERSION**: `835ba84` (UNIFIED)
 - **Commit**: "Fix height constraints and implement comprehensive mobile responsive design" 
@@ -21,15 +21,16 @@ The A1 Assistant is a self-contained AI chat application with working voice capa
 
 ### 🔄 **Version Switching Commands**:
 ```bash
-# Current latest version (unified desktop/mobile)
-git checkout 835ba84
+# Current latest version (with suggestion buttons fix)
+git checkout d1d08d9
 
 # Return to latest main branch
 git checkout main
 
 # Previous versions (for reference)
+# git checkout 140c5ee  # Initial suggestion buttons fix
+# git checkout 835ba84  # Height constraints and responsive design
 # git checkout 56c6238  # UI/UX improvements
-# git checkout 4417368  # AI message design fixes
 ```
 
 ## Current Status: ✅ FULLY WORKING (Modern Message UI System)
@@ -44,10 +45,23 @@ git checkout main
 - **Enhanced Layout**: ✅ Flexible height system, optimized spacing, and professional visual hierarchy
 - **Mobile Optimization**: ✅ Touch-friendly interface with slide-out sidebar and performance optimizations
 - **Modern Message UI**: ✅ Beautiful bubble-based design with sound wave avatars and animations
-- **Auto-Hide Suggestions**: ✅ Suggestion buttons disappear after first message for cleaner interface
+- **Auto-Hide Suggestions**: ✅ Fixed suggestion buttons to properly hide after first message
 - **Compact Text Design**: ✅ Optimized text sizes for better content density
 
-## Latest Modern Message UI System Integration (June 2025)
+## Latest Suggestion Buttons Fix (June 2025)
+
+### Auto-Hide Suggestions Fix ✅ RESOLVED
+- **Problem Identified**: Suggestion buttons ("PVC Profil ürünleri hakkında bilgi", "Kenar bandı çeşitleri nelerdir?", "İhracat ülkeleri ve referanslar", "Teknik özellikler ve kalite") were not hiding after first message
+- **Root Cause**: CSS `display: grid !important` in `a1-styles.css` was overriding JavaScript `display: none` style setting
+- **Solution Applied**: 
+  - Added CSS class rule `.input-suggestions.hidden { display: none !important; }` to override existing `!important` declaration
+  - Updated `hideSuggestions()` and `showSuggestions()` methods in `ai-chat.js` to use CSS classes instead of inline styles
+- **Result**: Suggestion buttons now properly disappear after first user message for cleaner interface
+- **Files Modified**: 
+  - `A1/a1-styles.css` - Added hidden state CSS class
+  - `A1/js/modules/features/ai-chat.js` - Updated JavaScript to use CSS classes
+
+## Previous Modern Message UI System Integration (June 2025)
 
 ### Beautiful MessageUI System Implementation ✨
 - **Comprehensive MessageUI Class**: 200+ lines of programmatic message creation and management
