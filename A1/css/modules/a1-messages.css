@@ -22,7 +22,7 @@
 .message-content-wrapper {
     display: flex;
     gap: 12px;
-    max-width: var(--msg-max-width);
+    width: 100%;
     align-items: flex-start;
 }
 
@@ -35,6 +35,8 @@
     overflow-wrap: break-word;
     line-height: 1.5;
     transition: var(--transition-smooth);
+    flex: 1;
+    max-width: none;
 }
 
 /* AI Message Styling */
