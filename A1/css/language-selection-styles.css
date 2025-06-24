@@ -10,9 +10,9 @@
             background: linear-gradient(135deg, #f8fffe 0%, #e8f8f5 25%, #f0f9ff 50%, #f8fffe 75%, #e8f8f5 100%);
             background-size: 400% 400%;
             animation: gradientFlow 15s ease-in-out infinite;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr;
             align-items: center;
             justify-content: center;
             position: relative;
@@ -125,7 +125,7 @@
         }
         
         .logo-container {
-            margin-bottom: 4rem;
+            margin: 2rem 0 1rem 0;
             text-align: center;
             z-index: 10;
             position: relative;
@@ -133,9 +133,9 @@
         }
         
         .logo-container img {
-            height: 120px;
+            height: 80px;
             margin-bottom: 0;
-            filter: drop-shadow(0 10px 30px rgba(135, 206, 235, 0.3));
+            filter: drop-shadow(0 5px 15px rgba(135, 206, 235, 0.3));
             transition: all 0.3s ease;
         }
         
@@ -151,39 +151,43 @@
         
         .language-selection {
             text-align: center;
-            max-width: 600px;
+            max-width: 500px;
             width: 90%;
             z-index: 10;
             position: relative;
+            margin: 0 auto;
         }
         
         .language-buttons {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             justify-content: center;
+            align-items: center;
         }
         
         .language-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 2rem 3rem;
-            border: 3px solid var(--a1-border);
-            border-radius: 15px;
+            padding: 1.5rem 2.5rem;
+            border: 2px solid rgba(135, 206, 235, 0.4);
+            border-radius: 12px;
             text-decoration: none;
             color: var(--a1-text-dark);
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
             transition: all 0.3s ease;
-            background: white;
-            min-width: 150px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            min-width: 140px;
+            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.1);
         }
         
         .language-btn:hover {
-            background: rgba(255, 255, 255, 0.95);
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(135, 206, 235, 0.3);
-            border-color: rgba(135, 206, 235, 0.8);
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(135, 206, 235, 0.25);
+            border-color: rgba(135, 206, 235, 0.6);
         }
         
         .language-btn {
@@ -208,19 +212,20 @@
         }
         
         .language-btn .flag {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
         }
         
         .language-btn .label {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
+            margin-bottom: 0.3rem;
         }
         
         .language-btn .desc {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #666;
-            margin-top: 0.5rem;
+            margin-top: 0.2rem;
         }
         
         @media (max-width: 768px) {
