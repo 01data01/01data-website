@@ -5,6 +5,213 @@
 
 console.log('A1: ai-chat.js script loaded');
 
+// Message UI Controller
+class MessageUI {
+    constructor(containerId) {
+        this.container = document.getElementById(containerId);
+        this.messages = [];
+    }
+
+    // Create a new message
+    createMessage(role, content, options = {}) {
+        const messageId = this.generateId();
+        const messageElement = document.createElement('div');
+        messageElement.className = `message ${role}`;
+        messageElement.id = messageId;
+        
+        if (options.isWelcome) {
+            messageElement.classList.add('welcome');
+        }
+        
+        if (options.isStreaming) {
+            messageElement.classList.add('streaming');
+        }
+
+        const avatar = this.createAvatar(role, options.userInitial);
+        const bubble = this.createBubble(content, options);
+
+        messageElement.innerHTML = `
+            <div class="message-content-wrapper">
+                ${avatar}
+                ${bubble}
+            </div>
+        `;
+
+        // Check if this is the first message being added to preserve welcome message
+        const existingWelcome = this.container.querySelector('.message.welcome');
+        
+        if (existingWelcome && !options.isWelcome) {
+            existingWelcome.insertAdjacentElement('afterend', messageElement);
+        } else {
+            this.container.appendChild(messageElement);
+        }
+        
+        // Smooth scroll to bottom
+        this.scrollToBottom();
+
+        const messageData = {
+            id: messageId,
+            role,
+            content,
+            timestamp: new Date(),
+            element: messageElement
+        };
+
+        this.messages.push(messageData);
+        return messageData;
+    }
+
+    // Create avatar based on role
+    createAvatar(role, userInitial = 'U') {
+        if (role === 'user') {
+            return `
+                <div class="avatar-container">
+                    <div class="user-avatar">${userInitial}</div>
+                </div>
+            `;
+        } else if (role === 'ai' || role === 'assistant') {
+            return `
+                <div class="avatar-container">
+                    <div class="sound-wave-avatar">
+                        <div class="wave-bars">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        return '';
+    }
+
+    // Create message bubble
+    createBubble(content, options = {}) {
+        let formattedContent = this.formatContent(content);
+        
+        if (options.isWelcome && options.hint) {
+            formattedContent += `<div class="welcome-hint">${options.hint}</div>`;
+        }
+
+        return `
+            <div class="message-bubble">
+                <div class="message-text">${formattedContent}</div>
+            </div>
+        `;
+    }
+
+    // Format message content
+    formatContent(content) {
+        // Convert line breaks
+        content = content.replace(/\n/g, '<br>');
+        
+        // Convert markdown-style formatting
+        content = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        content = content.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        content = content.replace(/`(.*?)`/g, '<code>$1</code>');
+        
+        return content;
+    }
+
+    // Show typing indicator
+    showTyping() {
+        const typingId = 'typing-indicator';
+        
+        // Remove existing typing indicator
+        this.hideTyping();
+        
+        const typingElement = document.createElement('div');
+        typingElement.className = 'message ai typing-indicator';
+        typingElement.id = typingId;
+        
+        typingElement.innerHTML = `
+            <div class="message-content-wrapper">
+                ${this.createAvatar('ai')}
+                <div class="message-bubble">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        this.container.appendChild(typingElement);
+        this.scrollToBottom();
+        
+        return typingId;
+    }
+
+    // Hide typing indicator
+    hideTyping() {
+        const typing = document.getElementById('typing-indicator');
+        if (typing) {
+            typing.remove();
+        }
+    }
+
+    // Create streaming message
+    createStreamingMessage(role = 'ai') {
+        const message = this.createMessage(role, '', { isStreaming: true });
+        return message;
+    }
+
+    // Update streaming message content
+    updateStreamingMessage(messageId, content) {
+        const message = this.messages.find(m => m.id === messageId);
+        if (message) {
+            const textElement = message.element.querySelector('.message-text');
+            if (textElement) {
+                textElement.innerHTML = this.formatContent(content);
+                message.content = content;
+                this.scrollToBottom();
+            }
+        }
+    }
+
+    // Finish streaming
+    finishStreaming(messageId) {
+        const message = this.messages.find(m => m.id === messageId);
+        if (message) {
+            message.element.classList.remove('streaming');
+        }
+    }
+
+    // Scroll to bottom
+    scrollToBottom() {
+        const chatMessages = this.container.closest('.chat-messages');
+        if (chatMessages) {
+            chatMessages.scrollTo({
+                top: chatMessages.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    // Generate unique ID
+    generateId() {
+        return `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+
+    // Clear all messages
+    clear() {
+        this.container.innerHTML = '';
+        this.messages = [];
+    }
+
+    // Remove specific message
+    removeMessage(messageId) {
+        const index = this.messages.findIndex(m => m.id === messageId);
+        if (index > -1) {
+            this.messages[index].element.remove();
+            this.messages.splice(index, 1);
+        }
+    }
+}
+
 class AIChatModule {
     constructor() {
         this.initialized = false;
@@ -16,6 +223,7 @@ class AIChatModule {
         this.isVoiceMode = false;
         this.selectedAgent = 'primary'; // Default to primary agent (SMART - uses ELEVENLABS_AGENT_ID_3)
         this.sidebarVisible = true;
+        this.messageUI = null; // Add MessageUI instance
     }
 
     /**
@@ -26,6 +234,10 @@ class AIChatModule {
         
         try {
             console.log('A1: Initializing AI Chat Module...');
+            
+            // Initialize MessageUI
+            this.messageUI = new MessageUI('chatMessages');
+            console.log('A1: MessageUI initialized');
             
             this.setupEventListeners();
             this.initializeVoiceChat();
@@ -195,55 +407,16 @@ class AIChatModule {
      * Add message to chat
      */
     addMessageToChat(role, content) {
-        const messagesContainer = document.getElementById('chatMessages');
-        if (!messagesContainer) {
-            console.error('Chat messages container not found');
+        if (!this.messageUI) {
+            console.error('MessageUI not initialized');
             return;
         }
 
-        // Check if this is the first message being added to preserve welcome message
-        const existingWelcome = messagesContainer.querySelector('.animated-welcome-message');
-        
-        const messageElement = document.createElement('div');
-        messageElement.className = `message ${role}-message`;
-        
-        // Create modern avatar based on role
-        let avatarHTML;
-        if (role === 'user') {
-            avatarHTML = '<div class="user-avatar">👤</div>';
-        } else if (role === 'assistant' || role === 'ai') {
-            avatarHTML = `
-                <div class="ai-avatar-soundwave">
-                    <div class="soundwave-container">
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                    </div>
-                </div>
-            `;
-        } else {
-            avatarHTML = '<div class="system-avatar">⚙️</div>';
-        }
+        // Use the new MessageUI instead of manual DOM manipulation
+        const userInitial = 'U'; // Could be made dynamic based on user
+        this.messageUI.createMessage(role, content, { userInitial });
 
-        messageElement.innerHTML = `
-            <div class="message-avatar">${avatarHTML}</div>
-            <div class="message-content">
-                <div class="message-text">${this.formatMessage(content)}</div>
-            </div>
-        `;
-
-        // If welcome message exists, append after it, otherwise just append
-        if (existingWelcome) {
-            existingWelcome.insertAdjacentElement('afterend', messageElement);
-        } else {
-            messagesContainer.appendChild(messageElement);
-        }
-        
-        this.scrollToBottom();
-
-        // Add message to current conversation
+        // Still save to currentMessages for history
         this.currentMessages.push({
             role: role,
             content: content,
@@ -265,48 +438,16 @@ class AIChatModule {
      * Show typing indicator
      */
     showTypingIndicator() {
-        const messagesContainer = document.getElementById('chatMessages');
-        if (!messagesContainer) return;
-
-        // Remove existing typing indicator
-        this.hideTypingIndicator();
-
-        const typingElement = document.createElement('div');
-        typingElement.className = 'message ai-message typing-indicator';
-        typingElement.id = 'typingIndicator';
-        typingElement.innerHTML = `
-            <div class="message-avatar">
-                <div class="ai-avatar-soundwave">
-                    <div class="soundwave-container">
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="message-content">
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        `;
-
-        messagesContainer.appendChild(typingElement);
-        this.scrollToBottom();
+        if (!this.messageUI) return;
+        return this.messageUI.showTyping();
     }
 
     /**
      * Hide typing indicator
      */
     hideTypingIndicator() {
-        const typingIndicator = document.getElementById('typingIndicator');
-        if (typingIndicator) {
-            typingIndicator.remove();
-        }
+        if (!this.messageUI) return;
+        this.messageUI.hideTyping();
     }
 
     /**
@@ -386,7 +527,7 @@ class AIChatModule {
                 this.hideTypingIndicator();
                 
                 // Get the final content and add to current messages
-                const finalContent = streamingMessage.querySelector('.message-text').textContent;
+                const finalContent = streamingMessage.content;
                 this.currentMessages.push({
                     role: 'assistant',
                     content: finalContent,
@@ -438,59 +579,39 @@ class AIChatModule {
         this.currentChatId = this.generateChatId();
         this.currentMessages = [];
 
-        const messagesContainer = document.getElementById('chatMessages');
-        if (messagesContainer) {
+        if (this.messageUI) {
+            // Clear the container first
+            this.messageUI.clear();
+            
             // Detect language from page
             const isTurkish = document.documentElement.lang === 'tr' || window.location.pathname.includes('index-tr');
             
-            if (isTurkish) {
-                // Turkish animated welcome message with voice activation
-                messagesContainer.innerHTML = `
-                    <div class="animated-welcome-message" id="clickableWelcomeMessage" style="cursor: pointer;" title="Sesli sohbeti başlatmak için tıklayın">
-                        <div class="animated-avatar">
-                            <div class="sound-wave">
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                            </div>
-                        </div>
-                        <div class="welcome-content">
-                            <p class="welcome-text">Hoş Geldiniz! Size nasıl yardımcı olabilirim?</p>
-                            <p class="voice-hint" style="font-size: 14px; opacity: 0.8; margin-top: 8px;">💬 Sesli sohbet için tıklayın</p>
-                        </div>
-                    </div>
-                `;
-            } else {
-                // English animated welcome message with voice activation
-                messagesContainer.innerHTML = `
-                    <div class="animated-welcome-message" id="clickableWelcomeMessage" style="cursor: pointer;" title="Click to start voice chat">
-                        <div class="animated-avatar">
-                            <div class="sound-wave">
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                            </div>
-                        </div>
-                        <div class="welcome-content">
-                            <p class="welcome-text">Welcome! How can I help you?</p>
-                            <p class="voice-hint" style="font-size: 14px; opacity: 0.8; margin-top: 8px;">💬 Click for voice chat</p>
-                        </div>
-                    </div>
-                `;
-            }
+            const welcomeText = isTurkish ? 
+                'Hoş Geldiniz! Size nasıl yardımcı olabilirim?' : 
+                'Welcome! How can I help you?';
+            const hintText = isTurkish ? 
+                '💬 Sesli sohbet için tıklayın' : 
+                '💬 Click for voice chat';
+            
+            // Create welcome message using MessageUI
+            const welcomeMessage = this.messageUI.createMessage('ai', welcomeText, {
+                isWelcome: true,
+                hint: hintText
+            });
             
             // Add click event listener to the welcome message for voice activation
             setTimeout(() => {
-                const welcomeMessage = document.getElementById('clickableWelcomeMessage');
-                if (welcomeMessage) {
-                    welcomeMessage.addEventListener('click', () => {
-                        console.log('A1: Welcome message clicked - starting voice chat');
-                        this.toggleVoiceMode();
-                    });
+                const welcomeElement = document.getElementById(welcomeMessage.id);
+                if (welcomeElement) {
+                    const bubble = welcomeElement.querySelector('.message-bubble');
+                    if (bubble) {
+                        bubble.style.cursor = 'pointer';
+                        bubble.title = isTurkish ? 'Sesli sohbeti başlatmak için tıklayın' : 'Click to start voice chat';
+                        bubble.addEventListener('click', () => {
+                            console.log('A1: Welcome message clicked - starting voice chat');
+                            this.toggleVoiceMode();
+                        });
+                    }
                 }
             }, 100);
         }
@@ -571,63 +692,36 @@ class AIChatModule {
      */
     createStreamingMessage() {
         console.log('Creating streaming message element');
-        const messagesContainer = document.getElementById('chatMessages');
-        if (!messagesContainer) {
-            console.error('Chat messages container not found');
+        
+        if (!this.messageUI) {
+            console.error('MessageUI not initialized');
             return null;
         }
 
         // Hide typing indicator
         this.hideTypingIndicator();
 
-        const messageElement = document.createElement('div');
-        messageElement.className = 'message assistant-message streaming';
-
-        messageElement.innerHTML = `
-            <div class="message-avatar">
-                <div class="ai-avatar-soundwave">
-                    <div class="soundwave-container">
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                        <div class="soundwave-bar"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="message-content">
-                <div class="message-text"></div>
-            </div>
-        `;
-
-        messagesContainer.appendChild(messageElement);
-        this.scrollToBottom();
-        
+        const message = this.messageUI.createStreamingMessage('assistant');
         console.log('Streaming message element created successfully');
-        return messageElement;
+        return message;
     }
 
     /**
      * Update streaming message content
      */
-    updateStreamingMessage(messageElement, chunk, fullContent) {
-        if (!messageElement) return;
+    updateStreamingMessage(messageData, chunk, fullContent) {
+        if (!messageData || !this.messageUI) return;
         
-        const messageText = messageElement.querySelector('.message-text');
-        if (messageText) {
-            messageText.innerHTML = this.formatMessage(fullContent);
-            this.scrollToBottom();
-        }
+        this.messageUI.updateStreamingMessage(messageData.id, fullContent);
     }
 
     /**
      * Finish streaming message
      */
-    finishStreamingMessage(messageElement) {
-        if (!messageElement) return;
+    finishStreamingMessage(messageData) {
+        if (!messageData || !this.messageUI) return;
         
-        // Remove streaming class to stop the pulse animation
-        messageElement.classList.remove('streaming');
+        this.messageUI.finishStreaming(messageData.id);
     }
 
     /**
@@ -789,42 +883,13 @@ class AIChatModule {
         this.currentChatId = chatId;
         this.currentMessages = [...chat.messages];
 
-        // Display messages
-        const messagesContainer = document.getElementById('chatMessages');
-        if (messagesContainer) {
-            messagesContainer.innerHTML = '';
+        // Display messages using MessageUI
+        if (this.messageUI) {
+            this.messageUI.clear();
             
             chat.messages.forEach(message => {
-                const messageElement = document.createElement('div');
-                messageElement.className = `message ${message.role}-message`;
-                
-                let avatarHTML;
-                if (message.role === 'user') {
-                    avatarHTML = '👤';
-                } else {
-                    avatarHTML = `
-                        <div class="ai-avatar-soundwave">
-                            <div class="soundwave-container">
-                                <div class="soundwave-bar"></div>
-                                <div class="soundwave-bar"></div>
-                                <div class="soundwave-bar"></div>
-                                <div class="soundwave-bar"></div>
-                                <div class="soundwave-bar"></div>
-                            </div>
-                        </div>
-                    `;
-                }
-                messageElement.innerHTML = `
-                    <div class="message-avatar">${avatarHTML}</div>
-                    <div class="message-content">
-                        <div class="message-text">${this.formatMessage(message.content)}</div>
-                    </div>
-                `;
-
-                messagesContainer.appendChild(messageElement);
+                this.messageUI.createMessage(message.role, message.content, { userInitial: 'U' });
             });
-
-            this.scrollToBottom();
         }
 
         this.updateHistoryDisplay();
