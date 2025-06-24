@@ -431,7 +431,7 @@ class AIChatModule {
     hideSuggestions() {
         const suggestionsContainer = document.querySelector('.input-suggestions');
         if (suggestionsContainer) {
-            suggestionsContainer.style.display = 'none';
+            suggestionsContainer.classList.add('hidden');
         }
     }
 
@@ -441,7 +441,7 @@ class AIChatModule {
     showSuggestions() {
         const suggestionsContainer = document.querySelector('.input-suggestions');
         if (suggestionsContainer) {
-            suggestionsContainer.style.display = 'grid';
+            suggestionsContainer.classList.remove('hidden');
         }
     }
 

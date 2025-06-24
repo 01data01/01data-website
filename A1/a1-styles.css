@@ -1229,6 +1229,12 @@
     order: 1;
 }
 
+/* Hidden state for suggestions after first message */
+.input-suggestions.hidden {
+    display: none !important;
+}
+}
+
 .suggestion-btn {
     background: white;
     color: var(--a1-dark);
