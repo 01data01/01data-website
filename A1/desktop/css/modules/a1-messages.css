@@ -1,0 +1,351 @@
+/* A1 Assistant Message Components and Styling */
+
+/* Base Message Structure */
+.message {
+    display: flex;
+    gap: 16px;
+    animation: messageSlideIn 0.5s ease-out;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* Message Alignment */
+.message.user {
+    justify-content: flex-end;
+}
+
+.message.user .message-content-wrapper {
+    flex-direction: row-reverse;
+}
+
+/* Message Content Wrapper */
+.message-content-wrapper {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+/* Message Bubble */
+.message-bubble {
+    position: relative;
+    border-radius: 20px;
+    padding: 16px 20px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    transition: var(--transition-smooth);
+    flex: 1;
+    max-width: none;
+}
+
+/* AI Message Styling */
+.message.ai .message-bubble,
+.message.assistant .message-bubble {
+    background: linear-gradient(135deg, var(--msg-ai-gradient-1) 0%, var(--msg-ai-gradient-2) 50%, var(--msg-ai-gradient-3) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    color: var(--msg-ai-text);
+    box-shadow: 
+        0 8px 32px rgba(34, 197, 94, 0.15),
+        0 2px 8px rgba(34, 197, 94, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Glowing Border Animation */
+.message.ai .message-bubble::before,
+.message.assistant .message-bubble::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(135deg, var(--msg-ai-accent-2) 0%, var(--msg-ai-accent-3) 100%);
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
+/* Shimmer Effect */
+.message.ai .message-bubble::after,
+.message.assistant .message-bubble::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(34, 197, 94, 0.05), transparent);
+    animation: shimmerSweep 6s linear infinite;
+    pointer-events: none;
+}
+
+/* User Message Styling */
+.message.user .message-bubble {
+    background: var(--msg-user-bg);
+    border-left: 4px solid var(--msg-user-border);
+    color: var(--msg-user-text);
+    box-shadow: 0 2px 8px rgba(33, 150, 243, 0.1);
+}
+
+/* System Message Styling */
+.message.system {
+    justify-content: center;
+}
+
+.message.system .message-bubble {
+    background: var(--msg-system-bg);
+    color: var(--msg-system-text);
+    font-size: 0.9rem;
+    padding: 12px 20px;
+    text-align: center;
+    max-width: 500px;
+    border: 1px solid rgba(156, 163, 175, 0.2);
+}
+
+/* Sound Wave Avatar */
+.avatar-container {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.sound-wave-avatar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--msg-ai-accent-1) 0%, var(--msg-ai-accent-2) 50%, var(--msg-ai-accent-3) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+        0 6px 20px rgba(21, 128, 61, 0.4),
+        inset 0 2px 4px rgba(255, 255, 255, 0.2);
+    animation: avatarPulse 4s ease-in-out infinite;
+}
+
+/* Wave Bars */
+.wave-bars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 24px;
+}
+
+.wave-bar {
+    width: 4px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 2px;
+    animation: waveAnimation 2s ease-in-out infinite;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+.wave-bar:nth-child(1) { 
+    height: 10px; 
+    animation-delay: 0s; 
+}
+.wave-bar:nth-child(2) { 
+    height: 16px; 
+    animation-delay: 0.15s; 
+}
+.wave-bar:nth-child(3) { 
+    height: 22px; 
+    animation-delay: 0.3s; 
+}
+.wave-bar:nth-child(4) { 
+    height: 16px; 
+    animation-delay: 0.45s; 
+}
+.wave-bar:nth-child(5) { 
+    height: 10px; 
+    animation-delay: 0.6s; 
+}
+
+/* User Avatar */
+.user-avatar {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+/* Welcome Message Special Styling */
+.message.welcome .message-bubble {
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.message.welcome .message-bubble:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px rgba(34, 197, 94, 0.2),
+        0 4px 12px rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.message.welcome .message-bubble:active {
+    transform: translateY(0px);
+}
+
+.welcome-hint {
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Message Text Formatting */
+.message-text {
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+}
+
+.message-text p {
+    margin: 0 0 12px 0;
+}
+
+.message-text p:last-child {
+    margin-bottom: 0;
+}
+
+.message-text h3 {
+    color: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 16px 0 8px 0;
+}
+
+.message-text h3:first-child {
+    margin-top: 0;
+}
+
+.message-text ol,
+.message-text ul {
+    margin: 12px 0;
+    padding-left: 20px;
+}
+
+.message-text li {
+    margin-bottom: 6px;
+}
+
+.message-text code {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+}
+
+.message-text pre {
+    background: rgba(0, 0, 0, 0.05);
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 12px 0;
+}
+
+/* Enhanced List Styling for AI Responses */
+.ai-message ol,
+.assistant-message ol {
+    margin: 16px 0;
+    padding-left: 0;
+    list-style: none;
+    counter-reset: item;
+}
+
+.ai-message ol > li,
+.assistant-message ol > li {
+    counter-increment: item;
+    margin-bottom: 16px;
+    position: relative;
+    padding-left: 24px;
+}
+
+.ai-message ol > li::before,
+.assistant-message ol > li::before {
+    content: counter(item) ".";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: #15803d;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Sub-list improvements */
+.ai-message ul,
+.assistant-message ul {
+    margin: 8px 0 0 0;
+    padding-left: 16px;
+    list-style: none;
+}
+
+.ai-message ul li,
+.assistant-message ul li {
+    position: relative;
+    margin-bottom: 8px;
+    padding-left: 16px;
+    color: #166534;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.ai-message ul li::before,
+.assistant-message ul li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: #22c55e;
+    font-weight: 500;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+}
+
+.typing-dots {
+    display: flex;
+    gap: 4px;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--msg-ai-accent-2);
+    border-radius: 50%;
+    animation: typingBounce 1.4s ease-in-out infinite both;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(3) { animation-delay: 0s; }
+
+/* Streaming Message Effect */
+.message.streaming .message-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    width: 8px;
+    height: 8px;
+    background: var(--msg-ai-accent-2);
+    border-radius: 50%;
+    animation: streamingPulse 2s infinite;
+    z-index: 2;
+}

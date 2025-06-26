@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A1 Smart Assistant - Özemek Plastik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Optimized A1 CSS Imports -->
+    <link rel="stylesheet" href="../css/modules/base.css">
+    <link rel="stylesheet" href="../css/modules/auth.css">
+    <link rel="stylesheet" href="../css/modules/layout.css">
+    <link rel="stylesheet" href="css/modules/ai-chat.css">
+    <link rel="stylesheet" href="../css/modules/voice-chat.css">
+    <link rel="stylesheet" href="../css/modules/voice-auth.css">
+    <link rel="stylesheet" href="../css/modules/components.css">
+    <!-- A1 Optimized and Modular CSS -->
+    <link rel="stylesheet" href="css/a1-main.css?v=3.0">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMKY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="336524755075-i029li7vjliiekjhheadd7ilr03aj73o.apps.googleusercontent.com">
+    
+    <!-- Modular JavaScript Imports -->
+    <script src="config.js"></script>
+    <script src="js/modules/core/utils.js?v=20250622-force-reload-v2"></script>
+    <script src="js/modules/core/auth.js?v=20250622-force-reload-v2"></script>
+    <script src="js/modules/ai/ai-service.js?v=20250622-force-reload-v2"></script>
+    <script src="js/modules/features/voice-auth.js?v=20250622-force-reload-v2"></script>
+    <script src="js/modules/features/voice-chat.js?v=20250622-official-docs-fix"></script>
+    <script src="js/modules/features/faq-loader.js?v=20250622-force-reload-v2"></script>
+    <script src="js/modules/features/ux-enhancements.js?v=20250624-ux-improvements"></script>
+    <script src="js/modules/features/ai-chat.js?v=20250622-force-reload-v2"></script>
+    <script src="js/modules/core/main.js?v=20250622-force-reload-v2"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-brain">
+                <div class="loading-neural-paths">
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                    <div class="loading-neural-line"></div>
+                </div>
+            </div>
+            <h2 class="loading-title">A1 Smart Assistant</h2>
+            <p class="loading-subtitle">Özemek Plastik AI Assistant Loading...</p>
+        </div>
+    </div>
+
+
+    <!-- Main Application -->
+    <div id="app" class="app-container" style="display: none;">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <div class="logo-container">
+                    <img src="logo_2.png" alt="Company Logo" style="height: 40px; margin-right: 15px; vertical-align: middle;">
+                    <h1>A1 Smart Assistant</h1>
+                </div>
+            </div>
+            <div class="header-right">
+                <!-- Language Switching -->
+                <div class="language-switch">
+                    <a href="index-tr.html" class="lang-btn">TR</a>
+                    <a href="index-en.html" class="lang-btn active">EN</a>
+                </div>
+                
+                <!-- Voice Controls in Header -->
+                <div class="header-voice-controls">
+                    <button id="voiceToggleBtn" class="header-voice-btn" title="Toggle Voice Chat">
+                        <span class="voice-icon">🎤</span>
+                        <span class="voice-status">VOICE DISCONNECTED</span>
+                    </button>
+                    
+                    <div class="voice-activity">
+                        <div class="voice-indicator"></div>
+                        <div class="voice-indicator"></div>
+                        <div class="voice-indicator"></div>
+                    </div>
+                    
+                </div>
+                
+                <div class="user-info">
+                    <img src="" alt="User Avatar" class="user-avatar">
+                    <span class="user-name">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- AI Chat View -->
+            <div id="ai-chat-view" class="view active">
+                <div class="ai-chat-container">
+                <!-- Sidebar Toggle Button (Outside sidebar for better functionality) -->
+                <button class="sidebar-toggle" id="sidebarToggle" title="Toggle sidebar">
+                    ←
+                </button>
+                
+                <!-- Chat Sidebar -->
+                <div class="chat-sidebar" id="chatSidebar">
+                    <div class="sidebar-header">
+                        <button id="newChatBtn" class="new-chat-btn">
+                            <span class="btn-icon">+</span>
+                            New Chat
+                        </button>
+                    </div>
+                    
+                    <div class="chat-history">
+                        <h3>Chat History</h3>
+                        <div id="chatHistoryList" class="history-list">
+                            <!-- Chat history will be loaded dynamically -->
+                        </div>
+                        <div class="history-empty" style="display: none;">
+                            <p>No chat history yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Chat Area -->
+                <div class="chat-main">
+
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="chat-messages">
+                        <!-- Welcome message will be created by MessageUI -->
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input-container">
+                        <div class="input-suggestions">
+                            <button class="suggestion-btn">PVC Profile product information</button>
+                            <button class="suggestion-btn">What are the edge banding varieties?</button>
+                            <button class="suggestion-btn">Export countries and references</button>
+                            <button class="suggestion-btn">Technical specifications and quality</button>
+                        </div>
+                        
+                        <div class="input-wrapper">
+                            <textarea id="chatInput" 
+                                      class="chat-input" 
+                                      placeholder="Ask questions about A1 PVC products and services..."
+                                      rows="2"></textarea>
+                            <button id="sendChatBtn" class="send-btn" disabled>
+                                <span class="send-icon">→</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+/* Mobile Gesture Support */
+
+/* Swipe Gestures */
+.swipe-enabled {
+    touch-action: pan-y;
+}
+
+.swipe-sidebar {
+    touch-action: pan-x;
+}
+
+/* Pull to Refresh */
+.pull-refresh-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.pull-refresh-indicator {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #4CAF50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.pull-refresh-indicator.show {
+    opacity: 1;
+    top: 20px;
+}
+
+/* Long Press Gestures */
+.long-press-enabled {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.long-press-active {
+    background-color: rgba(0,0,0,0.1);
+    transform: scale(0.98);
+}
+
+/* Pinch Zoom Prevention */
+.no-zoom {
+    touch-action: manipulation;
+}
+
+/* Haptic Feedback Classes */
+.haptic-light {
+    transition: transform 0.1s ease;
+}
+
+.haptic-light:active {
+    transform: scale(0.95);
+}
+
+.haptic-medium {
+    transition: transform 0.15s ease;
+}
+
+.haptic-medium:active {
+    transform: scale(0.92);
+}
+
+/* Smooth Scrolling */
+.smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Touch Feedback */
+.touch-feedback {
+    position: relative;
+    overflow: hidden;
+}
+
+.touch-feedback::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255,255,255,0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+}
+
+.touch-feedback:active::after {
+    width: 200px;
+    height: 200px;
+}

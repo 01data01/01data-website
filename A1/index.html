@@ -1,45 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A1 Akıllı Asistanı - Language Selection</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- A1 Language Selection Styles -->
-    <link rel="stylesheet" href="css/language-selection-styles.css">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMGY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
-<body>
-    <!-- Animated Background Elements -->
-    <div class="wave-background"></div>
-    <div class="floating-elements">
-        <div class="floating-particle"></div>
-        <div class="floating-particle"></div>
-        <div class="floating-particle"></div>
-        <div class="floating-particle"></div>
-        <div class="floating-particle"></div>
-    </div>
-    
-    <!-- Main Content -->
-    <div class="logo-container">
-        <img src="logo_2.png" alt="A1 Akıllı Asistanı Logo">
-    </div>
-    
-    <div class="language-selection">
-        <div class="language-buttons">
-            <a href="index-tr.html" class="language-btn">
-                <div class="flag">🇹🇷</div>
-                <div class="label">TÜRKÇE</div>
-                <div class="desc">Turkish Interface</div>
-            </a>
+    <title>A1 Akıllı Asistanı</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+        }
+        .loading-container {
+            text-align: center;
+            padding: 20px;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .loading-subtext {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+    </style>
+    <script>
+        // Device detection and routing
+        (function() {
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            const screenWidth = window.innerWidth;
+            const isTablet = screenWidth >= 768 && screenWidth <= 1024;
             
-            <a href="index-en.html" class="language-btn">
-                <div class="flag">🇺🇸</div>
-                <div class="label">ENGLISH</div>
-                <div class="desc">English Interface</div>
-            </a>
-        </div>
+            // Show loading for better UX
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    // For tablets, let user choose or default to desktop
+                    if (isMobile && !isTablet && screenWidth < 768) {
+                        window.location.replace('/A1/mobile/index.html');
+                    } else {
+                        window.location.replace('/A1/desktop/index.html');
+                    }
+                }, 1000); // 1 second delay for smooth transition
+            });
+        })();
+    </script>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">A1 Akıllı Asistanı</div>
+        <div class="loading-subtext">Cihaz algılanıyor...</div>
     </div>
 </body>
 </html>

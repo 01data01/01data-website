@@ -1,0 +1,90 @@
+/* Mobile Language Selection Styles */
+.mobile-language-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.mobile-logo {
+    margin-bottom: 40px;
+}
+
+.mobile-logo img {
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+}
+
+.mobile-language-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.mobile-lang-btn {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: white;
+    border-radius: 16px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    min-height: 60px;
+}
+
+.mobile-lang-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.flag-icon {
+    font-size: 32px;
+    margin-right: 16px;
+}
+
+.lang-text {
+    flex: 1;
+}
+
+.lang-primary {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.lang-secondary {
+    font-size: 14px;
+    color: #666;
+}
+
+@media (max-width: 480px) {
+    .mobile-language-buttons {
+        max-width: 280px;
+    }
+    
+    .mobile-lang-btn {
+        padding: 16px;
+        min-height: 56px;
+    }
+    
+    .flag-icon {
+        font-size: 28px;
+        margin-right: 12px;
+    }
+    
+    .lang-primary {
+        font-size: 16px;
+    }
+    
+    .lang-secondary {
+        font-size: 13px;
+    }
+}
