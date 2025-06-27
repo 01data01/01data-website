@@ -1,0 +1,206 @@
+/* A1 Assistant Header, Navigation and Language Components */
+
+/* Language Switch Buttons */
+.language-switch {
+    display: flex;
+    gap: 0.5rem;
+    margin-right: 1rem;
+}
+
+.lang-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid var(--a1-border);
+    border-radius: 8px;
+    background: white;
+    color: var(--a1-text-dark);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 50px;
+}
+
+.lang-btn:hover {
+    background: var(--a1-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.lang-btn.active {
+    background: var(--a1-accent);
+    color: white;
+    border-color: var(--a1-accent);
+}
+
+/* Beautiful gradient header - Streamlit style */
+.app-header {
+    background: var(--a1-gradient);
+    padding: 1.8rem 2rem;
+    color: white;
+    border-radius: 0 0 1rem 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-medium);
+    position: relative;
+    overflow: hidden;
+}
+
+.app-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 3s infinite;
+}
+
+.app-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
+}
+
+.logo-container img {
+    transition: var(--transition-smooth);
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+}
+
+.logo-container h1 {
+    color: white;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    margin: 0;
+}
+
+.user-info {
+    background: rgba(255, 255, 255, 0.15);
+    padding: 8px 16px;
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition-smooth);
+}
+
+.user-name {
+    color: white;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+/* Header Voice Controls */
+.header-voice-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 20px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 25px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-voice-btn {
+    background: linear-gradient(135deg, #8B0000 0%, #A52A2A 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-voice-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139, 0, 0, 0.4);
+}
+
+.header-voice-btn.active {
+    background: linear-gradient(135deg, #10ac84 0%, #00d2d3 100%);
+    animation: voice-pulse 2s infinite;
+}
+
+.header-voice-btn.active .voice-status {
+    color: white;
+}
+
+.header-connection-status {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 15px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: white;
+    display: inline-block;
+}
+
+/* Header Responsive Design */
+@media (max-width: 768px) {
+    .app-header {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .header-right {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: flex-end;
+    }
+    
+    .language-switch {
+        order: 1;
+        margin-right: 0.5rem;
+    }
+    
+    .header-voice-controls {
+        order: 2;
+        margin-right: 0.5rem;
+        padding: 8px 12px;
+        gap: 10px;
+    }
+    
+    .header-voice-btn {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .user-info {
+        order: 3;
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .logo-container h1 {
+        font-size: 1.3rem;
+    }
+    
+    .logo-container img {
+        height: 30px;
+        margin-right: 10px;
+    }
+}

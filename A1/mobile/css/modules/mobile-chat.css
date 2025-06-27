@@ -1,0 +1,329 @@
+/* Mobile Chat Interface Styles */
+
+.mobile-chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--mobile-bg);
+    position: relative;
+}
+
+/* Messages Container */
+.mobile-messages {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--mobile-spacing-md);
+    padding-bottom: var(--mobile-spacing-xl);
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+}
+
+/* Hide scrollbar but keep functionality */
+.mobile-messages::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-messages {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Input Area */
+.mobile-input-area {
+    background: var(--mobile-bg-elevated);
+    border-top: 1px solid var(--mobile-border);
+    padding: var(--mobile-spacing);
+    padding-bottom: calc(var(--mobile-spacing) + var(--safe-area-inset-bottom));
+    flex-shrink: 0;
+}
+
+/* Suggestions */
+.mobile-suggestions {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: var(--mobile-spacing-sm);
+    overflow-x: auto;
+    margin-bottom: var(--mobile-spacing);
+    padding-bottom: var(--mobile-spacing-xs);
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+}
+
+.mobile-suggestions::-webkit-scrollbar {
+    height: 0;
+}
+
+.mobile-suggestions.hidden {
+    display: none;
+}
+
+.mobile-suggestion {
+    flex: 0 0 auto;
+    padding: var(--mobile-spacing-sm) var(--mobile-spacing-md);
+    background: var(--mobile-bg);
+    border: 1px solid var(--mobile-border);
+    border-radius: var(--mobile-radius-full);
+    font-size: var(--mobile-font-sm);
+    color: var(--mobile-text);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all var(--mobile-transition);
+    scroll-snap-align: start;
+}
+
+.mobile-suggestion:active {
+    background: var(--mobile-primary);
+    color: white;
+    border-color: var(--mobile-primary);
+    transform: scale(0.95);
+}
+
+/* Input Bar */
+.mobile-input-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--mobile-spacing-sm);
+}
+
+/* Attach Button */
+.mobile-attach-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--mobile-text-secondary);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--mobile-transition);
+}
+
+.mobile-attach-btn:active {
+    color: var(--mobile-primary);
+    transform: scale(0.9);
+}
+
+/* Input Wrapper */
+.mobile-input-wrapper {
+    flex: 1;
+    position: relative;
+    background: var(--mobile-bg-secondary);
+    border-radius: var(--mobile-radius-lg);
+    border: 1px solid var(--mobile-border);
+    transition: all var(--mobile-transition);
+}
+
+.mobile-input-wrapper:focus-within {
+    border-color: var(--mobile-primary);
+    box-shadow: var(--mobile-focus-ring);
+}
+
+/* Text Input */
+.mobile-input {
+    width: 100%;
+    min-height: 40px;
+    max-height: 120px;
+    padding: var(--mobile-spacing) var(--mobile-spacing-md);
+    background: transparent;
+    border: none;
+    font-size: var(--mobile-font);
+    color: var(--mobile-text);
+    resize: none;
+    line-height: 1.5;
+}
+
+.mobile-input::placeholder {
+    color: var(--mobile-text-tertiary);
+}
+
+/* Voice Button */
+.mobile-voice-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mobile-primary);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--mobile-transition);
+}
+
+.mobile-voice-btn:active {
+    transform: scale(0.9);
+    background: var(--mobile-primary-dark);
+}
+
+.mobile-voice-btn.recording {
+    background: var(--mobile-error);
+    animation: recording-pulse 1.5s ease-in-out infinite;
+}
+
+/* Send Button */
+.mobile-send-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mobile-primary);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all var(--mobile-transition);
+}
+
+.mobile-send-btn:active {
+    transform: scale(0.9);
+    background: var(--mobile-primary-dark);
+}
+
+.mobile-send-btn:disabled {
+    background: var(--mobile-bg-tertiary);
+    color: var(--mobile-text-tertiary);
+    cursor: not-allowed;
+}
+
+/* Voice Recording Overlay */
+.mobile-voice-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--mobile-z-modal);
+    backdrop-filter: blur(10px);
+}
+
+.mobile-voice-content {
+    text-align: center;
+    padding: var(--mobile-spacing-xl);
+}
+
+.mobile-voice-animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--mobile-spacing-xs);
+    margin-bottom: var(--mobile-spacing-xl);
+}
+
+.voice-wave {
+    width: 4px;
+    background: white;
+    border-radius: 2px;
+    animation: voice-wave 1s ease-in-out infinite;
+}
+
+.voice-wave:nth-child(1) {
+    height: 20px;
+    animation-delay: 0s;
+}
+
+.voice-wave:nth-child(2) {
+    height: 30px;
+    animation-delay: 0.15s;
+}
+
+.voice-wave:nth-child(3) {
+    height: 40px;
+    animation-delay: 0.3s;
+}
+
+.voice-wave:nth-child(4) {
+    height: 30px;
+    animation-delay: 0.45s;
+}
+
+.voice-wave:nth-child(5) {
+    height: 20px;
+    animation-delay: 0.6s;
+}
+
+.mobile-voice-text {
+    color: white;
+    font-size: var(--mobile-font-lg);
+    margin-bottom: var(--mobile-spacing-xl);
+}
+
+.mobile-voice-cancel {
+    padding: var(--mobile-spacing) var(--mobile-spacing-xl);
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--mobile-radius-full);
+    color: white;
+    font-size: var(--mobile-font);
+    cursor: pointer;
+    transition: all var(--mobile-transition);
+}
+
+.mobile-voice-cancel:active {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Bottom Sheet */
+.mobile-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--mobile-bg-elevated);
+    border-top-left-radius: var(--mobile-radius-xl);
+    border-top-right-radius: var(--mobile-radius-xl);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(100%);
+    transition: transform var(--mobile-transition-slow);
+    z-index: var(--mobile-z-modal);
+}
+
+.mobile-bottom-sheet.active {
+    transform: translateY(0);
+}
+
+.mobile-sheet-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--mobile-border);
+    border-radius: 2px;
+    margin: var(--mobile-spacing) auto;
+}
+
+.mobile-sheet-content {
+    padding: var(--mobile-spacing-lg);
+    padding-bottom: calc(var(--mobile-spacing-lg) + var(--safe-area-inset-bottom));
+}
+
+/* Animations */
+@keyframes recording-pulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+}
+
+@keyframes voice-wave {
+    0%, 100% {
+        transform: scaleY(0.5);
+        opacity: 0.5;
+    }
+    50% {
+        transform: scaleY(1);
+        opacity: 1;
+    }
+}

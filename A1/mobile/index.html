@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#2c5f5d">
+    <title>A1 Akıllı Asistanı - Language Selection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/mobile-language-selection.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMNY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="mobile-background">
+        <div class="wave wave1"></div>
+        <div class="wave wave2"></div>
+        <div class="wave wave3"></div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="mobile-language-container">
+        <div class="mobile-logo-section">
+            <img src="../shared/assets/logo_2.png" alt="A1 Akıllı Asistanı" class="mobile-logo">
+            <h1 class="mobile-title">A1 Akıllı Asistanı</h1>
+            <p class="mobile-subtitle">Özemek Plastik AI Assistant</p>
+        </div>
+        
+        <div class="mobile-language-buttons">
+            <a href="index-tr.html" class="mobile-lang-btn" data-lang="tr">
+                <div class="lang-btn-content">
+                    <div class="flag-icon">🇹🇷</div>
+                    <div class="lang-text">
+                        <div class="lang-primary">TÜRKÇE</div>
+                        <div class="lang-secondary">Turkish Interface</div>
+                    </div>
+                    <div class="arrow-icon">›</div>
+                </div>
+            </a>
+            
+            <a href="index-en.html" class="mobile-lang-btn" data-lang="en">
+                <div class="lang-btn-content">
+                    <div class="flag-icon">🇺🇸</div>
+                    <div class="lang-text">
+                        <div class="lang-primary">ENGLISH</div>
+                        <div class="lang-secondary">English Interface</div>
+                    </div>
+                    <div class="arrow-icon">›</div>
+                </div>
+            </a>
+        </div>
+        
+        <div class="mobile-footer">
+            <p class="mobile-footer-text">50+ Years of Excellence in PVC Solutions</p>
+        </div>
+    </div>
+    
+    <script>
+        // Add touch feedback
+        document.querySelectorAll('.mobile-lang-btn').forEach(btn => {
+            btn.addEventListener('touchstart', function() {
+                this.classList.add('touched');
+            });
+            
+            btn.addEventListener('touchend', function() {
+                setTimeout(() => {
+                    this.classList.remove('touched');
+                }, 150);
+            });
+        });
+        
+        // Preload next page resources
+        const preloadLink = document.createElement('link');
+        preloadLink.rel = 'preload';
+        preloadLink.as = 'document';
+        preloadLink.href = navigator.language.startsWith('tr') ? 'index-tr.html' : 'index-en.html';
+        document.head.appendChild(preloadLink);
+    </script>
+</body>
+</html>
