@@ -324,7 +324,7 @@
         <section class="chat-container">
             <div class="chat-body">
                 <div class="elevenlabs-container">
-                    <elevenlabs-convai agent-id="DpUHUaJeMXPge91Sev0l"></elevenlabs-convai>
+                    <elevenlabs-convai id="elevenlabs-widget"></elevenlabs-convai>
                     <div class="loading-state" id="loadingState">
                         <div class="loading-spinner"></div>
                         <div class="loading-text" id="loadingText">Loading Assistant...</div>
@@ -404,8 +404,29 @@
             document.documentElement.lang = lang;
         }
 
+        // Initialize ElevenLabs widget with agent ID from environment
+        async function initializeWidget() {
+            try {
+                // Fetch agent ID from server-side function
+                const response = await fetch('/.netlify/functions/get-agent-id');
+                const data = await response.json();
+                
+                if (data.agentId) {
+                    const widget = document.getElementById('elevenlabs-widget');
+                    widget.setAttribute('agent-id', data.agentId);
+                } else {
+                    console.error('Failed to load agent ID');
+                }
+            } catch (error) {
+                console.error('Error initializing widget:', error);
+            }
+        }
+
         // Hide loading state when widget loads
         window.addEventListener('load', () => {
+            // Initialize widget with agent ID
+            initializeWidget();
+            
             setTimeout(() => {
                 const loadingState = document.getElementById('loadingState');
                 if (loadingState) {
