@@ -356,7 +356,7 @@ exports.handler = async (event, context) => {
             },
             tr: {
                 welcomeTitle: "Akıllı Sesli Müşteri Desteği",
-                welcomeSubtitle: "Konuşmak için dokunun veya sorularınızı yazın",
+                welcomeSubtitle: "Konuşmak için buraya tıklayabilirsiniz",
                 statusText: "AI Asistan Çevrimiçi",
                 loadingText: "Asistan Yükleniyor...",
                 footerText: "1975'ten beri",
