@@ -5,6 +5,11 @@
   SECRETS_SCAN_OMIT_PATHS = "netlify/functions/elevenlabs-signed-url.js"
 
 [[redirects]]
+  from = "/A1/mobile"
+  to = "/.netlify/functions/mobile-a1"
+  status = 200
+
+[[redirects]]
   from = "/A1"
   to = "/A1/index.html"
   status = 200

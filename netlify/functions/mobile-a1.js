@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+exports.handler = async (event, context) => {
+  const agentId = process.env.ELEVENLABS_AGENT_ID || 'DpUHUaJeMXPge91Sev0l';
+  
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -301,7 +304,7 @@
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <img src="logo.png" alt="A1 PVC Logo" class="logo-img">
+                <img src="/A1/logo.png" alt="A1 PVC Logo" class="logo-img">
             </div>
             <div class="lang-switcher">
                 <button class="lang-btn active" onclick="switchLanguage('tr')" id="trBtn">TR</button>
@@ -324,7 +327,7 @@
         <section class="chat-container">
             <div class="chat-body">
                 <div class="elevenlabs-container">
-                    <elevenlabs-convai agent-id="DpUHUaJeMXPge91Sev0l"></elevenlabs-convai>
+                    <elevenlabs-convai agent-id="${agentId}"></elevenlabs-convai>
                     <div class="loading-state" id="loadingState">
                         <div class="loading-spinner"></div>
                         <div class="loading-text" id="loadingText">Loading Assistant...</div>
@@ -418,4 +421,13 @@
         switchLanguage('en');
     </script>
 </body>
-</html>
+</html>`;
+
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'text/html',
+    },
+    body: html,
+  };
+};
