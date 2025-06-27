@@ -5,6 +5,8 @@ data/api-keys.json
 .env.production
 
 # Note: config.js is included in repo for deployment
+# Local development mobile version (hardcoded agent ID)
+A1/mobile.html
 
 # Dependencies
 node_modules/
