@@ -357,7 +357,7 @@ exports.handler = async (event, context) => {
             tr: {
                 welcomeTitle: "Akıllı Sesli Müşteri Desteği",
                 welcomeSubtitle: "Konuşmak için buraya tıklayabilirsiniz",
-                statusText: "AI Asistan Çevrimiçi",
+                statusText: "A1 Asistanı şu anda çevrimiçi",
                 loadingText: "Asistan Yükleniyor...",
                 footerText: "1975'ten beri",
                 footerLink: "a1pvcmarket.com"
