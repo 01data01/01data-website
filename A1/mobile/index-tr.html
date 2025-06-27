@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#2c5f5d">
+    <title>A1 Akıllı Asistanı - Özemek Plastik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Mobile CSS -->
+    <link rel="stylesheet" href="css/mobile-main.css">
+    
+    <!-- Shared JavaScript -->
+    <script src="../shared/config.js"></script>
+    <script src="../shared/js/modules/core/utils.js"></script>
+    <script src="../shared/js/modules/core/auth.js"></script>
+    <script src="../shared/js/modules/ai/ai-service.js"></script>
+    <script src="../shared/js/modules/features/voice-auth.js"></script>
+    <script src="../shared/js/modules/features/voice-chat.js"></script>
+    <script src="../shared/js/modules/features/faq-loader.js"></script>
+    
+    <!-- Mobile JavaScript -->
+    <script src="js/modules/features/mobile-chat-ui.js"></script>
+    <script src="js/modules/features/mobile-gestures.js"></script>
+    <script src="js/modules/features/mobile-ux.js"></script>
+    <script src="js/modules/core/mobile-main.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="mobile-loading-screen">
+        <div class="mobile-loading-content">
+            <div class="mobile-loading-logo">
+                <img src="../shared/assets/logo_2.png" alt="A1 Logo">
+            </div>
+            <div class="mobile-loading-spinner"></div>
+            <p class="mobile-loading-text">A1 Asistanı Yükleniyor...</p>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="mobile-app" style="display: none;">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            
+            <div class="mobile-header-title">
+                <img src="../shared/assets/logo.png" alt="A1" class="mobile-header-logo">
+                <span>A1 Asistanı</span>
+            </div>
+            
+            <div class="mobile-header-actions">
+                <a href="index-en.html" class="mobile-lang-switch">EN</a>
+                <button class="mobile-voice-status" id="mobileVoiceStatus">
+                    <span class="voice-icon">🎤</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mobile Sidebar -->
+        <nav class="mobile-sidebar" id="mobileSidebar">
+            <div class="mobile-sidebar-header">
+                <h3>Sohbet Geçmişi</h3>
+                <button class="mobile-new-chat" id="mobileNewChat">
+                    <span>+</span>
+                    Yeni Sohbet
+                </button>
+            </div>
+            
+            <div class="mobile-chat-history" id="mobileChatHistory">
+                <div class="mobile-empty-history">
+                    <p>Henüz sohbet yok</p>
+                    <span>Konuşmaya başlayın</span>
+                </div>
+            </div>
+            
+            <div class="mobile-sidebar-footer">
+                <div class="mobile-user-info">
+                    <img src="" alt="User" class="mobile-user-avatar">
+                    <span class="mobile-user-name">A1 CEO</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Chat Container -->
+        <main class="mobile-chat-container">
+            <!-- Chat Messages -->
+            <div class="mobile-messages" id="mobileMessages">
+                <!-- Messages will be added here -->
+            </div>
+
+            <!-- Mobile Input Area -->
+            <div class="mobile-input-area" id="mobileInputArea">
+                <!-- Suggestions -->
+                <div class="mobile-suggestions" id="mobileSuggestions">
+                    <button class="mobile-suggestion">PVC Profil ürünleri hakkında bilgi</button>
+                    <button class="mobile-suggestion">Kenar bandı çeşitleri nelerdir?</button>
+                    <button class="mobile-suggestion">İhracat ülkeleri ve referanslar</button>
+                    <button class="mobile-suggestion">Teknik özellikler ve kalite</button>
+                </div>
+                
+                <!-- Input Bar -->
+                <div class="mobile-input-bar">
+                    <button class="mobile-attach-btn" id="mobileAttachBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="mobile-input-wrapper">
+                        <textarea 
+                            id="mobileInput" 
+                            class="mobile-input"
+                            placeholder="Mesajınızı yazın..."
+                            rows="1"></textarea>
+                    </div>
+                    
+                    <button class="mobile-voice-btn" id="mobileVoiceBtn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+                            <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                    </button>
+                    
+                    <button class="mobile-send-btn" id="mobileSendBtn" style="display: none;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Voice Recording Overlay -->
+        <div class="mobile-voice-overlay" id="mobileVoiceOverlay" style="display: none;">
+            <div class="mobile-voice-content">
+                <div class="mobile-voice-animation">
+                    <div class="voice-wave"></div>
+                    <div class="voice-wave"></div>
+                    <div class="voice-wave"></div>
+                    <div class="voice-wave"></div>
+                    <div class="voice-wave"></div>
+                </div>
+                <p class="mobile-voice-text">Dinleniyor...</p>
+                <button class="mobile-voice-cancel" id="mobileVoiceCancel">İptal</button>
+            </div>
+        </div>
+
+        <!-- Bottom Sheet (for expanded input) -->
+        <div class="mobile-bottom-sheet" id="mobileBottomSheet" style="display: none;">
+            <div class="mobile-sheet-handle"></div>
+            <div class="mobile-sheet-content">
+                <!-- Expanded input area -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Touch Feedback -->
+    <div class="mobile-touch-feedback" id="mobileTouchFeedback"></div>
+</body>
+</html>

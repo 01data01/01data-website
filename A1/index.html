@@ -3,43 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A1 Akıllı Asistanı - Language Selection</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- A1 Language Selection Styles -->
-    <link rel="stylesheet" href="css/language-selection-styles.css">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzJjNWY1ZCIvPgo8cGF0aCBkPSJNOCAxMkw4IDE2TDEyIDE2TDEyIDEyWiIgZmlsbD0iIzRkYjZhYyIvPgo8cGF0aCBkPSJNMTQgMTBMMTQgMThMMTggMThMMTggMTBaIiBmaWxsPSIjNGRiNmFjIi8+CjxwYXRoIGQ9Ik0yMCA4TDIwIDIwTDI0IDIwTDI0IDhaIiBmaWxsPSIjNGRiNmFjIi8+CjxjaXJjbGUgY3g9IjEwIiBjeT0iOCIgcj0iMSIgZmlsbD0iIzRkYjZhYyIvPgo8Y2lyY2xlIGN4PSIxNiIgY3k9IjYiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPGNPCMGY9IngyMiIgY3k9IjQiIHI9IjEiIGZpbGw9IiM0ZGI2YWMiLz4KPHN2Zz4K">
+    <title>A1 Akıllı Asistanı</title>
+    <style>
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            background: linear-gradient(135deg, #2c5f5d, #4db6ac);
+            color: white;
+        }
+        .container { 
+            text-align: center; 
+            background: rgba(255,255,255,0.1);
+            padding: 2rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #2c5f5d;
+            font-weight: bold;
+        }
+        .loading { 
+            font-size: 1.2rem; 
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
 <body>
-    <!-- Animated Background Elements -->
-    <div class="wave-background"></div>
-    <div class="floating-elements">
-        <div class="floating-particle"></div>
-        <div class="floating-particle"></div>
-        <div class="floating-particle"></div>
-        <div class="floating-particle"></div>
-        <div class="floating-particle"></div>
+    <div class="container">
+        <div class="logo">A1</div>
+        <div class="loading">Cihaz algılanıyor...</div>
+        <div class="spinner"></div>
+        <p>Detecting device...</p>
+        <p class="subtitle">Özemek Plastik AI Assistant</p>
     </div>
-    
-    <!-- Main Content -->
-    <div class="logo-container">
-        <img src="logo_2.png" alt="A1 Akıllı Asistanı Logo">
-    </div>
-    
-    <div class="language-selection">
-        <div class="language-buttons">
-            <a href="index-tr.html" class="language-btn">
-                <div class="flag">🇹🇷</div>
-                <div class="label">TÜRKÇE</div>
-                <div class="desc">Turkish Interface</div>
-            </a>
+
+    <script>
+        function detectDevice() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
+            const isTablet = /ipad|android(?!.*mobile)/i.test(userAgent);
             
-            <a href="index-en.html" class="language-btn">
-                <div class="flag">🇺🇸</div>
-                <div class="label">ENGLISH</div>
-                <div class="desc">English Interface</div>
-            </a>
-        </div>
-    </div>
+            // Check screen size as additional mobile indicator
+            const screenWidth = window.innerWidth;
+            const isMobileScreen = screenWidth <= 768;
+            
+            // More sophisticated detection
+            const touchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            console.log('Device Detection:', {
+                userAgent: userAgent,
+                isMobile: isMobile,
+                isTablet: isTablet,
+                screenWidth: screenWidth,
+                isMobileScreen: isMobileScreen,
+                touchDevice: touchDevice
+            });
+            
+            if ((isMobile || (isMobileScreen && touchDevice)) && !isTablet) {
+                // Redirect to mobile version
+                console.log('Redirecting to mobile version');
+                window.location.replace('./mobile/index.html');
+            } else {
+                // Redirect to desktop version
+                console.log('Redirecting to desktop version');
+                window.location.replace('./desktop/index.html');
+            }
+        }
+        
+        // Detect device after a short delay for better UX
+        setTimeout(detectDevice, 1000);
+        
+        // Handle manual override via URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const forceMode = urlParams.get('mode');
+        
+        if (forceMode === 'mobile') {
+            setTimeout(() => window.location.replace('./mobile/index.html'), 500);
+        } else if (forceMode === 'desktop') {
+            setTimeout(() => window.location.replace('./desktop/index.html'), 500);
+        }
+        
+        // Fallback redirect after 3 seconds
+        setTimeout(() => {
+            console.log('Fallback redirect to desktop');
+            window.location.replace('./desktop/index.html');
+        }, 3000);
+    </script>
 </body>
 </html>
