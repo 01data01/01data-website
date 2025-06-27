@@ -11,6 +11,12 @@
 
 [[redirects]]
   from = "/A1"
+  to = "/.netlify/functions/mobile-a1"
+  status = 200
+  conditions = {header = {user-agent = ["*Mobile*", "*Android*", "*iPhone*", "*iPad*", "*iPod*"]}}
+
+[[redirects]]
+  from = "/A1"
   to = "/A1/index.html"
   status = 200
 
