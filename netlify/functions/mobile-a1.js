@@ -385,7 +385,7 @@ exports.handler = async (event, context) => {
             }
         }
 
-        let currentLanguage = 'en';
+        let currentLanguage = 'tr';
 
         function switchLanguage(lang) {
             currentLanguage = lang;
@@ -417,8 +417,8 @@ exports.handler = async (event, context) => {
             }, 3000);
         });
 
-        // Initialize with English
-        switchLanguage('en');
+        // Initialize with Turkish
+        switchLanguage('tr');
     </script>
 </body>
 </html>`;
