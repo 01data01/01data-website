@@ -1,0 +1,129 @@
+/* Mobile CSS Variables */
+
+:root {
+    /* Colors - A1 PVC Brand */
+    --mobile-primary: #2c5f5d;
+    --mobile-primary-light: #4db6ac;
+    --mobile-primary-dark: #1a3b3a;
+    --mobile-secondary: #87CEEB;
+    --mobile-accent: #4CAF50;
+    --mobile-success: #22c55e;
+    --mobile-warning: #f59e0b;
+    --mobile-error: #ef4444;
+    
+    /* Background Colors */
+    --mobile-bg: #ffffff;
+    --mobile-bg-secondary: #f8f9fa;
+    --mobile-bg-tertiary: #f3f4f6;
+    --mobile-bg-elevated: #ffffff;
+    
+    /* Text Colors */
+    --mobile-text: #1f2937;
+    --mobile-text-secondary: #6b7280;
+    --mobile-text-tertiary: #9ca3af;
+    --mobile-text-inverse: #ffffff;
+    
+    /* Border Colors */
+    --mobile-border: #e5e7eb;
+    --mobile-border-light: #f3f4f6;
+    --mobile-border-dark: #d1d5db;
+    
+    /* Message Colors */
+    --mobile-msg-user-bg: #e3f2fd;
+    --mobile-msg-user-text: #1565c0;
+    --mobile-msg-ai-bg: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%);
+    --mobile-msg-ai-text: #15803d;
+    --mobile-msg-system-bg: #f3f4f6;
+    --mobile-msg-system-text: #6b7280;
+    
+    /* Shadows */
+    --mobile-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --mobile-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --mobile-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --mobile-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --mobile-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    
+    /* Border Radius */
+    --mobile-radius-sm: 8px;
+    --mobile-radius: 12px;
+    --mobile-radius-lg: 16px;
+    --mobile-radius-xl: 20px;
+    --mobile-radius-full: 9999px;
+    
+    /* Spacing */
+    --mobile-spacing-xs: 4px;
+    --mobile-spacing-sm: 8px;
+    --mobile-spacing: 12px;
+    --mobile-spacing-md: 16px;
+    --mobile-spacing-lg: 20px;
+    --mobile-spacing-xl: 24px;
+    
+    /* Typography */
+    --mobile-font-xs: 11px;
+    --mobile-font-sm: 12px;
+    --mobile-font: 14px;
+    --mobile-font-md: 16px;
+    --mobile-font-lg: 18px;
+    --mobile-font-xl: 20px;
+    
+    /* Z-Index */
+    --mobile-z-base: 1;
+    --mobile-z-dropdown: 10;
+    --mobile-z-sticky: 20;
+    --mobile-z-fixed: 30;
+    --mobile-z-modal-backdrop: 40;
+    --mobile-z-modal: 50;
+    --mobile-z-popover: 60;
+    --mobile-z-tooltip: 70;
+    
+    /* Transitions */
+    --mobile-transition-fast: 150ms ease;
+    --mobile-transition: 200ms ease;
+    --mobile-transition-slow: 300ms ease;
+    
+    /* Header Height */
+    --mobile-header-height: 56px;
+    
+    /* Input Height */
+    --mobile-input-height: 56px;
+    
+    /* Safe Areas */
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+    
+    /* Selection */
+    --mobile-selection: rgba(44, 95, 93, 0.2);
+    
+    /* Focus */
+    --mobile-focus-ring: 0 0 0 3px rgba(44, 95, 93, 0.2);
+}
+
+/* Dark Mode Variables */
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Dark mode colors */
+        --mobile-bg: #111827;
+        --mobile-bg-secondary: #1f2937;
+        --mobile-bg-tertiary: #374151;
+        --mobile-bg-elevated: #1f2937;
+        
+        --mobile-text: #f9fafb;
+        --mobile-text-secondary: #e5e7eb;
+        --mobile-text-tertiary: #9ca3af;
+        
+        --mobile-border: #374151;
+        --mobile-border-light: #4b5563;
+        --mobile-border-dark: #1f2937;
+        
+        --mobile-msg-user-bg: #1e3a5f;
+        --mobile-msg-user-text: #93c5fd;
+        --mobile-msg-ai-bg: linear-gradient(135deg, #1a2e1a 0%, #234423 50%, #2d542d 100%);
+        --mobile-msg-ai-text: #86efac;
+        --mobile-msg-system-bg: #374151;
+        --mobile-msg-system-text: #d1d5db;
+        
+        --mobile-selection: rgba(135, 206, 235, 0.3);
+    }
+}

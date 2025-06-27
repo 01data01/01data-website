@@ -1,0 +1,257 @@
+/* Mobile Gestures CSS */
+
+/* Touch feedback effects */
+.mobile-touchable {
+    position: relative;
+    overflow: hidden;
+}
+
+.mobile-touchable::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: width 0.6s, height 0.6s;
+}
+
+.mobile-touchable:active::after {
+    width: 300px;
+    height: 300px;
+}
+
+/* Touch active states */
+.touch-active {
+    transform: scale(0.98);
+    opacity: 0.8;
+}
+
+/* Swipe indicators */
+.mobile-swipe-indicator {
+    position: absolute;
+    top: 50%;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--mobile-primary);
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: all var(--mobile-transition);
+}
+
+.mobile-swipe-indicator.left {
+    left: 10px;
+}
+
+.mobile-swipe-indicator.right {
+    right: 10px;
+}
+
+.mobile-swipe-indicator.active {
+    opacity: 1;
+    transform: translateY(-50%) scale(1.2);
+}
+
+/* Pull to refresh indicator */
+.mobile-pull-indicator {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--mobile-primary);
+    transition: all var(--mobile-transition);
+}
+
+.mobile-pull-indicator.pulling {
+    top: 20px;
+    transform: translateX(-50%) rotate(180deg);
+}
+
+/* Long press selection */
+.mobile-long-press-selection {
+    background: rgba(44, 95, 93, 0.1);
+    border-radius: var(--mobile-radius);
+    animation: long-press-highlight 0.3s ease-out;
+}
+
+@keyframes long-press-highlight {
+    0% {
+        background: transparent;
+    }
+    100% {
+        background: rgba(44, 95, 93, 0.1);
+    }
+}
+
+/* Gesture feedback overlay */
+.mobile-gesture-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: var(--mobile-z-tooltip);
+}
+
+/* Swipe direction indicators */
+.mobile-swipe-hint {
+    position: absolute;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all var(--mobile-transition);
+}
+
+.mobile-swipe-hint.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Edge swipe areas */
+.mobile-edge-left,
+.mobile-edge-right {
+    position: fixed;
+    top: 0;
+    width: 20px;
+    height: 100%;
+    z-index: var(--mobile-z-base);
+    pointer-events: none;
+}
+
+.mobile-edge-left {
+    left: 0;
+}
+
+.mobile-edge-right {
+    right: 0;
+}
+
+/* Pinch zoom protection */
+.mobile-no-zoom {
+    touch-action: pan-x pan-y;
+}
+
+/* Gesture states */
+.mobile-swiping {
+    transition: none !important;
+}
+
+.mobile-dragging {
+    cursor: grabbing;
+    user-select: none;
+}
+
+/* Context menu */
+.mobile-context-menu {
+    position: fixed;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    z-index: var(--mobile-z-modal);
+    transform: scale(0.9);
+    opacity: 0;
+    animation: context-menu-appear 0.2s ease-out forwards;
+}
+
+.mobile-context-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color var(--mobile-transition);
+}
+
+.mobile-context-item:hover {
+    background: var(--mobile-bg-secondary);
+}
+
+.mobile-context-item:active {
+    background: var(--mobile-primary);
+    color: white;
+}
+
+@keyframes context-menu-appear {
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Haptic feedback indicator */
+.mobile-haptic-feedback {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    background: var(--mobile-primary);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: var(--mobile-z-tooltip);
+}
+
+.mobile-haptic-feedback.active {
+    animation: haptic-pulse 0.3s ease-out;
+}
+
+@keyframes haptic-pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(3);
+    }
+}
+
+/* Momentum scrolling for better performance */
+.mobile-momentum-scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+}
+
+/* Disable text selection during gestures */
+.mobile-gesture-active {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Visual feedback for successful gesture */
+.mobile-gesture-success {
+    animation: gesture-success 0.3s ease-out;
+}
+
+@keyframes gesture-success {
+    0% {
+        background: var(--mobile-success);
+        transform: scale(1);
+    }
+    100% {
+        background: transparent;
+        transform: scale(1.05);
+    }
+}
