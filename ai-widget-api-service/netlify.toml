@@ -1,17 +1,17 @@
 [build]
-  functions = "netlify/functions"
+  functions = "functions"
 
 [functions]
   node_bundler = "esbuild"
 
 [[headers]]
-  for = "/api/*"
+  for = "/widget-api/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Headers = "Content-Type, x-api-key"
     Access-Control-Allow-Methods = "GET, POST, OPTIONS"
 
 [[redirects]]
-  from = "/api/*"
+  from = "/widget-api/*"
   to = "/.netlify/functions/:splat"
   status = 200

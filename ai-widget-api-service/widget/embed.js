@@ -10,7 +10,7 @@
     // Widget configuration
     let widgetConfig = {
         apiKey: '',
-        endpoint: 'https://01data.org/.netlify/functions/conversation',
+        endpoint: 'https://01data.org/widget-api/conversation',
         language: 'tr',
         position: 'bottom-right',
         company: 'AI Assistant',
