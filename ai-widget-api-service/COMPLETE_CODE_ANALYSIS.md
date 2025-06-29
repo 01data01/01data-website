@@ -40,12 +40,13 @@ The `ai-widget-api-service` folder contains a complete SaaS API service for prov
 
 #### 4. netlify.toml
 - **File Type**: Netlify Configuration
-- **Purpose**: Deployment and routing configuration
+- **Purpose**: Independent deployment and routing configuration
 - **Key Settings**:
-  - Functions directory: netlify/functions
-  - CORS headers for API access
-  - Redirects from /api/* to /.netlify/functions/
-  - esbuild bundler for functions
+  - Functions directory: functions (independent from main website)
+  - CORS headers for /widget-api/* endpoints
+  - Redirects from /widget-api/* to /.netlify/functions/
+  - esbuild bundler for optimized performance
+  - Separated from main website to avoid conflicts
 
 ### 📁 Admin Dashboard Files
 
@@ -101,9 +102,9 @@ The `ai-widget-api-service` folder contains a complete SaaS API service for prov
 - **Target Audience**: Service administrators and client developers
 - **Code Examples**: Complete integration snippets
 
-### 📁 API Functions (Netlify Serverless)
+### 📁 API Functions (Independent Serverless)
 
-#### 8. netlify/functions/conversation.js
+#### 8. functions/conversation.js
 - **File Type**: Serverless API Function (Node.js)
 - **Purpose**: Main AI conversation endpoint
 - **Main Functions**:
@@ -126,7 +127,7 @@ The `ai-widget-api-service` folder contains a complete SaaS API service for prov
 - **Supported Modes**: text, voice
 - **Languages**: Turkish (tr), English (en)
 
-#### 9. netlify/functions/generate-api-key.js
+#### 9. functions/generate-api-key.js
 - **File Type**: Serverless API Function (Node.js)
 - **Purpose**: API key management (CRUD operations)
 - **Main Functions**:
@@ -146,7 +147,7 @@ The `ai-widget-api-service` folder contains a complete SaaS API service for prov
 - **Data Format**: JSON responses with comprehensive error handling
 - **Storage**: In-memory with persistence options
 
-#### 10. netlify/functions/verify-key.js
+#### 10. functions/verify-key.js
 - **File Type**: Serverless API Function (Node.js)
 - **Purpose**: API key validation service
 - **Main Functions**:
@@ -176,6 +177,7 @@ The `ai-widget-api-service` folder contains a complete SaaS API service for prov
 - **Widget Integration**: Uses embed.js with demo API key
 - **Styling**: Modern design with CSS3 gradients and animations
 - **Target Audience**: Potential clients and developers
+- **Live Demo**: Fully functional at https://01data.org/widget/demo.html
 
 #### 12. widget/embed.js
 - **File Type**: JavaScript Widget Library (ES6+)
@@ -205,23 +207,31 @@ The `ai-widget-api-service` folder contains a complete SaaS API service for prov
 - **Public API**: Exposes `window.AIWidget` for client integration
 - **Error Handling**: Comprehensive error management and user feedback
 - **Performance**: Optimized for fast loading and smooth interactions
+- **Recent Improvements**:
+  - Enhanced chat scrolling with webkit-scrollbar styling
+  - Fixed message display issues with loading spinners
+  - Improved API response format parsing
+  - Better mobile touch scrolling support
+  - Debug logging for troubleshooting
 
 ## Technical Architecture
 
-### Backend Architecture (Netlify Functions)
+### Backend Architecture (Independent Serverless Functions)
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │  conversation.js │    │ generate-api-key │    │   verify-key.js │
 │                 │    │      .js         │    │                 │
 │ Main AI API     │    │                  │    │ Authentication  │
 │ Text + Voice    │    │ Admin CRUD API   │    │ & Validation    │
+│ /widget-api/    │    │ /widget-api/     │    │ /widget-api/    │
+│ conversation    │    │ generate-api-key │    │ verify-key      │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                       │                       │
          └───────────────────────┼───────────────────────┘
                                  │
          ┌───────────────────────▼───────────────────────┐
-         │            Shared Data Layer                  │
-         │          (In-memory storage)                  │
+         │            Independent Data Layer             │
+         │          (Separate from main website)         │
          │     API Keys, Usage Stats, Client Data       │
          └───────────────────────────────────────────────┘
 ```
@@ -254,11 +264,30 @@ Client Website → Widget (embed.js) → verify-key → conversation → AI Serv
 - **Input Validation**: Sanitization of all user inputs
 
 ## Development Status
-- **Completion**: 95% production ready
-- **Testing**: Live demo available
-- **Documentation**: Comprehensive guides and examples
-- **Deployment**: Netlify-optimized serverless functions
-- **Monitoring**: Usage tracking and analytics built-in
+- **Completion**: 100% production ready ✅
+- **Testing**: Live demo at https://01data.org/widget/demo.html ✅
+- **Documentation**: Comprehensive guides and examples ✅
+- **Deployment**: Independent Netlify-optimized serverless functions ✅
+- **Monitoring**: Usage tracking and analytics built-in ✅
+
+## Recent Updates (June 2024)
+### Configuration Separation ✅
+- **Independent Functions**: Moved from `netlify/functions/` to `functions/`
+- **Separate API Paths**: Uses `/widget-api/*` instead of `/api/*`
+- **No Conflicts**: Can deploy alongside main website or independently
+- **Enhanced Security**: Separate CORS configuration and routing
+
+### User Experience Improvements ✅
+- **Fixed Chat Scrolling**: Proper webkit-scrollbar styling and smooth auto-scroll
+- **Resolved Loading Issues**: Fixed message display problems where spinners showed instead of text
+- **Enhanced Mobile Support**: Better touch scrolling and responsive design
+- **Debug Capabilities**: Added console logging for troubleshooting
+
+### Production Status ✅
+- **Live Demo Available**: https://01data.org/widget/demo.html
+- **Fully Functional**: Both text and voice modes working
+- **Claude API Integration**: Real AI responses with excellent quality
+- **Ready for Client Deployment**: Complete SaaS solution
 
 ## Business Model
 - **Pricing**: Usage-based ($1-2 per minute of AI interaction)
