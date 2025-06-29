@@ -4,6 +4,13 @@
 [build.environment]
   SECRETS_SCAN_OMIT_PATHS = "netlify/functions/elevenlabs-signed-url.js,netlify/functions/mobile-a1.js"
 
+[[headers]]
+  for = "/widget-api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, x-api-key"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+
 [[redirects]]
   from = "/A1/mobile"
   to = "/.netlify/functions/mobile-a1"
@@ -42,6 +49,11 @@
 [[redirects]]
   from = "/widget/*"
   to = "/ai-widget-api-service/widget/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/widget-api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
 
 [[redirects]]
