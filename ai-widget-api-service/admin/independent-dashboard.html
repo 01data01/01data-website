@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Widget API - Independent Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            color: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(45deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f7931e 0%, #ff6b00 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(247, 147, 30, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #f7931e;
+            box-shadow: 0 0 0 3px rgba(247, 147, 30, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #f7931e 0%, #ff6b00 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(247, 147, 30, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(247, 147, 30, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .api-keys-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .api-keys-table th,
+        .api-keys-table td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid #f1f3f4;
+        }
+
+        .api-keys-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .api-keys-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        .api-keys-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .api-key-display {
+            font-family: 'Monaco', 'Menlo', 'SF Mono', monospace;
+            background: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 1px solid #e9ecef;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left-color: #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left-color: #dc3545;
+        }
+
+        .alert-info {
+            background: #cce7ff;
+            color: #004085;
+            border-left-color: #007bff;
+        }
+
+        .api-key-result {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .api-key-result.show {
+            display: block;
+        }
+
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .integration-code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .revenue-highlight {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .revenue-highlight h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .api-keys-table {
+                font-size: 14px;
+            }
+
+            .api-keys-table th,
+            .api-keys-table td {
+                padding: 12px 8px;
+            }
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #f7931e 0%, #ff6b00 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            margin: 0 auto 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">AI</div>
+            <h1>AI Widget API Service</h1>
+            <p>Independent Admin Dashboard for API Key Management</p>
+        </div>
+
+        <!-- Stats Overview -->
+        <div class="stats-grid" id="statsSection">
+            <div class="stat-card">
+                <div class="stat-value" id="totalKeys">0</div>
+                <div class="stat-label">Total API Keys</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalRevenue">$0</div>
+                <div class="stat-label">Monthly Revenue</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="activeClients">0</div>
+                <div class="stat-label">Active Clients</div>
+            </div>
+        </div>
+
+        <!-- API Key Generator -->
+        <div class="card">
+            <h2 class="section-title">🔑 Generate New API Key</h2>
+            
+            <div class="alert alert-info">
+                <strong>Info:</strong> This is an independent dashboard that works without server connections. Perfect for generating keys locally and managing client information.
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Company Name *</label>
+                    <input type="text" id="companyName" placeholder="e.g., A1 PVC Market" value="">
+                </div>
+                <div class="form-group">
+                    <label>Monthly Usage Limit</label>
+                    <input type="number" id="usageLimit" value="5000" placeholder="5000">
+                </div>
+                <div class="form-group">
+                    <label>Price per Minute ($)</label>
+                    <input type="number" id="pricePerMinute" value="1.50" step="0.10" placeholder="1.50">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="generateApiKey()">🚀 Generate API Key</button>
+                </div>
+            </div>
+
+            <div class="api-key-result" id="apiKeyResult">
+                <h3>✅ API Key Generated Successfully!</h3>
+                <p><strong>API Key:</strong> <span id="generatedKey"></span> 
+                   <button class="copy-btn" onclick="copyApiKey()">Copy</button></p>
+                <p><strong>Company:</strong> <span id="resultCompany"></span></p>
+                <p><strong>Usage Limit:</strong> <span id="resultLimit"></span> requests/month</p>
+                <p><strong>Pricing:</strong> $<span id="resultPrice"></span>/minute</p>
+                
+                <h4>Integration Code for Client:</h4>
+                <div class="integration-code" id="integrationCode"></div>
+                <button class="copy-btn" onclick="copyIntegrationCode()">Copy Integration Code</button>
+            </div>
+        </div>
+
+        <!-- Client Management -->
+        <div class="card">
+            <h2 class="section-title">👥 Client Management</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-secondary" onclick="loadSampleData()">Load Sample Data</button>
+                <button class="btn btn-secondary" onclick="exportData()">Export All Data</button>
+                <button class="btn btn-secondary" onclick="clearAllData()">Clear All Data</button>
+            </div>
+
+            <table class="api-keys-table">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>API Key</th>
+                        <th>Usage Limit</th>
+                        <th>Price/Min</th>
+                        <th>Monthly Revenue</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsTable">
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                            No clients yet. Generate your first API key above or load sample data.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Revenue Calculator -->
+        <div class="card">
+            <h2 class="section-title">💰 Revenue Calculator</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Usage Minutes per Month</label>
+                    <input type="number" id="calcMinutes" value="100" placeholder="100">
+                </div>
+                <div class="form-group">
+                    <label>Price per Minute ($)</label>
+                    <input type="number" id="calcPrice" value="1.50" step="0.10" placeholder="1.50">
+                </div>
+                <div class="form-group">
+                    <label>Your Costs per Minute ($)</label>
+                    <input type="number" id="calcCosts" value="0.31" step="0.01" placeholder="0.31">
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="calculateRevenue()">📊 Calculate</button>
+                </div>
+            </div>
+
+            <div class="revenue-highlight" id="revenueResult" style="display: none;">
+                <h3 id="monthlyRevenue">$0</h3>
+                <p>Monthly Revenue | <span id="monthlyProfit">$0</span> Profit (<span id="profitMargin">0%</span> margin)</p>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card">
+            <h2 class="section-title">📖 How to Use</h2>
+            
+            <div style="line-height: 1.8;">
+                <h3>For A1 PVC Company:</h3>
+                <ol style="margin: 15px 0; padding-left: 20px;">
+                    <li>Enter "A1 PVC Market" as company name</li>
+                    <li>Set usage limit to 5000 requests/month</li>
+                    <li>Set price to $1.50 per minute</li>
+                    <li>Click "Generate API Key"</li>
+                    <li>Copy the integration code and send to their developer</li>
+                </ol>
+
+                <h3>Integration Steps:</h3>
+                <p>The client adds this code to their website:</p>
+                <div class="integration-code">
+&lt;script src="https://01data.org/widget/embed.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+AIWidget.init({
+  apiKey: 'their_generated_key',
+  language: 'tr',
+  company: 'A1 PVC Market'
+});
+&lt;/script&gt;</div>
+
+                <h3>Revenue Model:</h3>
+                <ul style="margin: 15px 0; padding-left: 20px;">
+                    <li><strong>Your Costs:</strong> ~$0.31/minute (ElevenLabs + Claude)</li>
+                    <li><strong>Your Price:</strong> $1.50/minute</li>
+                    <li><strong>Your Profit:</strong> ~$1.19/minute (79% margin)</li>
+                    <li><strong>Billing:</strong> Monthly based on actual usage</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Local storage for client data
+        const STORAGE_KEY = 'ai_widget_clients';
+        let clients = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+        // Generate API Key
+        function generateApiKey() {
+            const companyName = document.getElementById('companyName').value.trim();
+            const usageLimit = parseInt(document.getElementById('usageLimit').value);
+            const pricePerMinute = parseFloat(document.getElementById('pricePerMinute').value);
+
+            if (!companyName) {
+                alert('Please enter a company name');
+                return;
+            }
+
+            // Generate unique API key
+            const companySlug = companyName.toLowerCase()
+                .replace(/[^a-z0-9]/g, '')
+                .substring(0, 10);
+            const randomSuffix = Math.random().toString(36).substring(2, 8);
+            const apiKey = `sk_${companySlug}_${randomSuffix}`;
+
+            // Create client record
+            const client = {
+                id: Date.now(),
+                company: companyName,
+                apiKey: apiKey,
+                usageLimit: usageLimit,
+                pricePerMinute: pricePerMinute,
+                used: 0,
+                active: true,
+                createdAt: new Date().toISOString().split('T')[0]
+            };
+
+            // Add to storage
+            clients.push(client);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+
+            // Show result
+            showApiKeyResult(client);
+            
+            // Clear form
+            document.getElementById('companyName').value = '';
+            document.getElementById('usageLimit').value = '5000';
+            document.getElementById('pricePerMinute').value = '1.50';
+
+            // Update displays
+            updateStats();
+            updateClientsTable();
+        }
+
+        // Show API key result
+        function showApiKeyResult(client) {
+            document.getElementById('generatedKey').textContent = client.apiKey;
+            document.getElementById('resultCompany').textContent = client.company;
+            document.getElementById('resultLimit').textContent = client.usageLimit.toLocaleString();
+            document.getElementById('resultPrice').textContent = client.pricePerMinute.toFixed(2);
+
+            const integrationCode = `<script src="https://01data.org/widget/embed.js"></script>
+<script>
+AIWidget.init({
+  apiKey: '${client.apiKey}',
+  language: 'tr',
+  company: '${client.company}'
+});
+</script>`;
+
+            document.getElementById('integrationCode').textContent = integrationCode;
+            document.getElementById('apiKeyResult').classList.add('show');
+        }
+
+        // Copy functions
+        function copyApiKey() {
+            const apiKey = document.getElementById('generatedKey').textContent;
+            navigator.clipboard.writeText(apiKey).then(() => {
+                alert('API Key copied to clipboard!');
+            });
+        }
+
+        function copyIntegrationCode() {
+            const code = document.getElementById('integrationCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Integration code copied to clipboard!');
+            });
+        }
+
+        // Update statistics
+        function updateStats() {
+            const totalKeys = clients.length;
+            const activeClients = clients.filter(c => c.active).length;
+            const totalRevenue = clients.reduce((sum, client) => {
+                return sum + (client.used * client.pricePerMinute);
+            }, 0);
+
+            document.getElementById('totalKeys').textContent = totalKeys;
+            document.getElementById('activeClients').textContent = activeClients;
+            document.getElementById('totalRevenue').textContent = '$' + totalRevenue.toFixed(2);
+        }
+
+        // Update clients table
+        function updateClientsTable() {
+            const tbody = document.getElementById('clientsTable');
+            
+            if (clients.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                            No clients yet. Generate your first API key above or load sample data.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = clients.map(client => `
+                <tr>
+                    <td><strong>${client.company}</strong></td>
+                    <td><code class="api-key-display">${client.apiKey}</code></td>
+                    <td>${client.usageLimit.toLocaleString()}</td>
+                    <td>$${client.pricePerMinute.toFixed(2)}</td>
+                    <td>$${(client.used * client.pricePerMinute).toFixed(2)}</td>
+                    <td><span class="status-badge status-${client.active ? 'active' : 'inactive'}">${client.active ? 'Active' : 'Inactive'}</span></td>
+                    <td>
+                        <button class="btn btn-sm ${client.active ? 'btn-danger' : 'btn'}" 
+                                onclick="toggleClient(${client.id})">
+                            ${client.active ? 'Deactivate' : 'Activate'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Toggle client status
+        function toggleClient(clientId) {
+            const client = clients.find(c => c.id === clientId);
+            if (client) {
+                client.active = !client.active;
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+                updateStats();
+                updateClientsTable();
+            }
+        }
+
+        // Load sample data
+        function loadSampleData() {
+            const sampleClients = [
+                {
+                    id: Date.now(),
+                    company: 'A1 PVC Market',
+                    apiKey: 'sk_a1pvcmarket_demo123',
+                    usageLimit: 5000,
+                    pricePerMinute: 1.50,
+                    used: 150,
+                    active: true,
+                    createdAt: new Date().toISOString().split('T')[0]
+                },
+                {
+                    id: Date.now() + 1,
+                    company: 'Test Company Ltd',
+                    apiKey: 'sk_testcompany_demo456',
+                    usageLimit: 1000,
+                    pricePerMinute: 1.00,
+                    used: 75,
+                    active: true,
+                    createdAt: new Date().toISOString().split('T')[0]
+                }
+            ];
+
+            clients = [...clients, ...sampleClients];
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+            updateStats();
+            updateClientsTable();
+        }
+
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(clients, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'ai-widget-clients-' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all client data? This cannot be undone.')) {
+                clients = [];
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
+                updateStats();
+                updateClientsTable();
+            }
+        }
+
+        // Revenue calculator
+        function calculateRevenue() {
+            const minutes = parseInt(document.getElementById('calcMinutes').value);
+            const price = parseFloat(document.getElementById('calcPrice').value);
+            const costs = parseFloat(document.getElementById('calcCosts').value);
+
+            const revenue = minutes * price;
+            const totalCosts = minutes * costs;
+            const profit = revenue - totalCosts;
+            const margin = ((profit / revenue) * 100).toFixed(1);
+
+            document.getElementById('monthlyRevenue').textContent = '$' + revenue.toFixed(2);
+            document.getElementById('monthlyProfit').textContent = '$' + profit.toFixed(2);
+            document.getElementById('profitMargin').textContent = margin + '%';
+            document.getElementById('revenueResult').style.display = 'block';
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            updateClientsTable();
+            
+            // Auto-fill A1 PVC data
+            document.getElementById('companyName').value = 'A1 PVC Market';
+            
+            console.log('Independent AI Widget Admin Dashboard Loaded');
+            console.log('Total Clients:', clients.length);
+        });
+    </script>
+</body>
+</html>
