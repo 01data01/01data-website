@@ -213,6 +213,9 @@
             color: #1e293b;
             border-bottom: 1px solid #e2e8f0;
             backdrop-filter: blur(10px);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .header-content {
@@ -331,6 +334,9 @@
             background: #ffffff;
             border-bottom: 1px solid #f1f5f9;
             gap: 8px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .mode-btn {
