@@ -1,304 +1,380 @@
-# A1 Assistant File Contents Reference - Production Version (ac2dc8a)
+# A1 PVC Customer Assistant - Complete File Reference
 
 ## Overview
-The A1 Assistant is a self-contained AI chat application with working voice capabilities, specifically designed for A1 Plastic Company CEO demonstrations. This folder is completely isolated and can be deleted without affecting the main 01data website.
+The A1 Assistant is a professional AI-powered customer service solution for A1 Plastic Company (Özemek Plastik). It features voice chat integration, bilingual support, and comprehensive PVC product knowledge.
 
-## Production Status: ac2dc8a ✅ STABLE VERSION
+---
 
-**Current Commit**: Fix Turkish language support for voice connection status messages  
-**Status**: Production-ready, fully operational A1 Assistant application  
-**Architecture**: Streamlined modular design with separate language interfaces
+## HTML Files
 
-## Complete File Structure Analysis
-
-### **HTML Files (3 files)**
-
-#### `index.html` (Language Selection Landing Page)
-- **Purpose**: Beautiful animated landing page for language selection
-- **Features**: 
-  - Animated background with floating particles
-  - Flowing gradient background animation
-  - Turkish/English choice buttons with flags
-  - Professional A1 branding with logo
-- **Technology**: Pure HTML5 with animated CSS effects
-- **Mobile Ready**: Responsive design with proper scaling
-
-#### `index-tr.html` (Turkish Interface) 
-- **Purpose**: Complete Turkish AI assistant application
-- **Key Features**:
-  - Turkish localized interface ("A1 Akıllı Asistanı")
-  - Voice chat integration with Turkish status messages
-  - Turkish suggestion buttons and placeholders
-  - Auto-login as A1 CEO user
-  - Complete modular CSS and JavaScript loading
-- **Voice Integration**: "Sesli Sohbeti Aç/Kapat" with localized controls
-- **A1 Branding**: Company logo and professional Turkish content
-
-#### `index-en.html` (English Interface)
-- **Purpose**: Complete English AI assistant application
-- **Key Features**:
-  - English localized interface ("A1 Smart Assistant") 
-  - Identical functionality to Turkish version
-  - English suggestion buttons and placeholders
-  - Same technical architecture with language differences
-- **Voice Integration**: "Toggle Voice Chat" with English controls
-- **Professional Design**: International business communication ready
-
-### **CSS Architecture (11 files)**
-
-#### Main CSS Files
-- **`css/a1-main.css`**: Central CSS import file with modular organization
-  - Imports all module CSS files
-  - Handles layout spacing fixes
-  - Implements smooth transitions
-  - Full-width utilization and responsive design
-
-- **`css/language-selection-styles.css`**: Landing page styling (245 lines)
-  - Flowing gradient background animations
-  - Floating particle effects with staggered timing
-  - Professional language selection buttons
-  - Mobile-responsive design with smooth transitions
-
-#### Modular CSS System (`css/modules/` - 9 files)
-
-**`a1-variables.css`** (62 lines)
-- CSS custom properties and theme configuration
-- Streamlit-inspired color palette
-- AI message theme variables with green gradients
-- Dark mode support with media queries
-
-**`a1-header.css`** (206 lines)
-- Language switch buttons with hover effects
-- Beautiful gradient header with shimmer animations
-- Voice controls in header with pulse animations
-- Professional user info styling
-- Mobile responsive header layout
-
-**`a1-chat-interface.css`** (550 lines)
-- Main chat container with professional styling
-- Sidebar design with chat history management
-- Animated welcome message with sound wave avatars
-- Input suggestions grid system
-- Chat input styling with focus states
-- Scrollbar customization
-
-**`a1-messages.css`** (351 lines)
-- Message bubble system with role-based styling
-- AI message green gradient backgrounds
-- Sound wave avatar implementations
-- User message styling with blue themes
-- Enhanced list formatting for AI responses
-- Typing indicator and streaming effects
-
-**`a1-animations.css`** (263 lines)
-- Comprehensive animation keyframes
-- Welcome message glow and shimmer effects
-- Voice activity indicators
-- Typing bounce animations
-- Performance optimizations for mobile
-- Reduced motion support
-
-**`a1-responsive.css`** (371 lines)
-- Mobile-first responsive design
-- Tablet and mobile breakpoints
-- Touch-optimized interface elements
-- Mobile sidebar behavior
-- High DPI display support
-- Print styles
-
-**`ai-chat.css`** (874 lines)
-- Claude-inspired chat interface styling
-- Sidebar toggle functionality with fixed positioning
-- Chat history with clean typography
-- Modern message layout system
-- Professional color palette
-- Extensive mobile responsive design
-
-### **JavaScript Architecture (9 files)**
-
-#### Core Modules (`js/modules/core/` - 3 files)
-
-**`main.js`** (655 lines) - Application Controller
-- **Auto-login System**: A1 CEO user authentication bypass
-- **Module Initialization**: FAQ loader, AI service, voice modules
-- **Routing**: Single-page application for AI chat focus
-- **Event Management**: Keyboard shortcuts and cleanup
-- **User Management**: Session handling and interface updates
-- **Error Handling**: Comprehensive try-catch blocks
-
-**`utils.js`** (493 lines) - Utility Functions
-- **DOM Utilities**: Enhanced element selection with error handling
-- **Date/Time Functions**: Relative time, formatting, timezone handling
-- **Storage Utilities**: localStorage wrapper with error handling
-- **Animation Helpers**: CSS animation and smooth scrolling
-- **Validation**: Email, URL validation functions
-- **Performance**: Debounce and throttle implementations
-
-**`auth.js`** (567 lines) - Authentication Module
-- **Google OAuth Integration**: Complete authentication flow
-- **Session Management**: User state persistence
-- **Token Refresh**: Automatic token renewal
-- **Permission System**: User permissions and validation
-- **Profile Management**: User interface updates
-- **Security**: Session expiration and cleanup
-
-#### AI Integration (`js/modules/ai/` - 1 file)
-
-**`ai-service.js`** (250+ lines) - Claude API Integration
-- **A1 PVC System Prompts**: Company-specific knowledge integration
-- **API Key Management**: Secure key rotation and assignment
-- **Conversation Context**: Context management for chat history
-- **Streaming Support**: Real-time response streaming
-- **Error Handling**: Retry mechanisms and fallback systems
-- **FAQ Integration**: A1 PVC product knowledge injection
-
-#### Feature Modules (`js/modules/features/` - 5 files)
-
-**`ai-chat.js`** (250+ lines) - Chat Interface Controller
-- **MessageUI Class**: Programmatic message creation (207 lines)
-- **AIChatModule Class**: Main chat controller
-- **Sound Wave Avatars**: Animated avatar system
-- **Sidebar Toggle**: Collapsible sidebar with state persistence
-- **Language Detection**: Automatic Turkish/English support
-- **Suggestion System**: Auto-hide after first message
-
-**`voice-chat.js`** (150+ lines) - ElevenLabs Voice Integration
-- **WebSocket Management**: Real-time audio streaming
-- **Audio Recording**: MediaRecorder API integration
-- **Queue Management**: Audio response playback system
-- **Agent Selection**: Primary/secondary agent support
-- **Turkish Language Support**: Localized voice status messages
-- **Error Handling**: Comprehensive voice error management
-
-**`faq-loader.js`** (100+ lines) - A1 PVC Knowledge System
-- **Company Information**: Özemek Plastik details (50+ years experience)
-- **Product Categories**: 10 main product lines with applications
-- **Static FAQ Database**: Common customer questions
-- **Context Integration**: AI service knowledge injection
-- **Bilingual Support**: Turkish and English product information
-
-**`voice-auth.js`** (50+ lines) - Voice Authentication
-- **A1 Special Configuration**: Auto-grant voice access for CEO demos
-- **Security Framework**: Password protection system (when needed)
-- **Session Management**: Voice authentication state
-- **Lockout Protection**: Security attempt tracking
-
-**`ux-enhancements.js`** (50+ lines) - User Experience Improvements
-- **Message Formatting**: Enhanced AI response formatting
-- **List Processing**: Numbered and bulleted list improvements
-- **Content Enhancement**: Heading and paragraph formatting
-- **Typography**: Professional text presentation
-
-### **Configuration & Assets**
-
-#### Configuration
-**`config.js`** (121 lines) - Application Settings
-- **Claude API Keys**: Encoded key management with validation
-- **ElevenLabs Config**: Voice service configuration
-- **Security**: No hardcoded sensitive data
-- **Performance**: Caching and optimization settings
-
-#### Assets
-- **`logo.png`**: A1 PVC company logo for chat interface
-- **`logo_2.png`**: Header branding logo
-- **`ÖZEMEK A1 FAQ Database for Eleven Labs.docx`**: Company FAQ documentation
-- **`faq_database v4.xlsx`**: Product database spreadsheet
-
-## Technical Implementation Details
-
-### **Frontend Technologies**
-- **Pure HTML5/CSS3/JavaScript**: No frameworks, optimal performance
-- **CSS Grid & Flexbox**: Modern layout systems
-- **CSS Custom Properties**: Theme and variable management
-- **Inter Font Family**: Professional typography
-- **Responsive Design**: Mobile-first approach with breakpoints
-
-### **Backend Integration**
-- **Claude API**: Streaming chat responses with A1 PVC context
-- **ElevenLabs WebSocket**: Real-time voice conversation
-- **Netlify Functions**: Serverless backend processing
-- **Google OAuth**: Authentication with A1 CEO auto-login override
-
-### **Key Features Implemented**
-
-**✅ Voice Chat System**
-- WebSocket audio streaming with queue management
-- MediaRecorder API for audio capture
-- Turkish language support for status messages
-- Agent selection (primary/secondary)
-- Comprehensive error handling
-
-**✅ Professional UI/UX**
-- Streamlit-inspired design with green gradients
-- Sound wave avatars with smooth animations
-- Collapsible sidebar with state persistence
-- Responsive design for all devices
+### `index.html` - Language Selection Landing Page
+**Purpose**: Animated landing page for Turkish/English language selection
+**Features**:
+- Animated background with floating particles
 - Professional A1 PVC branding
+- Automatic mobile device detection and redirect to mobile version
+- Language selection with flag icons
 
-**✅ A1 PVC Integration** 
-- Complete company knowledge base
-- 10+ product categories with technical specifications
+### `index-tr.html` - Turkish Desktop Interface  
+**Purpose**: Complete Turkish AI assistant application
+**Features**:
+- Full Turkish localization ("A1 Akıllı Asistanı")
+- Advanced chat interface with Claude AI integration
+- Voice chat capabilities via ElevenLabs
+- Streamlit-inspired professional design
+- Auto-login as A1 CEO for demonstrations
+
+### `index-en.html` - English Desktop Interface
+**Purpose**: Complete English AI assistant application  
+**Features**:
+- English localized interface ("A1 Smart Assistant")
+- Identical functionality to Turkish version
+- Professional international business communication
+- English suggestion prompts and responses
+
+### `mobile.html` - Mobile Version (Local Development)
+**Purpose**: Mobile-optimized interface using ElevenLabs widget
+**Features**:
+- Direct ElevenLabs conversational AI integration
+- Touch-optimized interface
+- Turkish default language with English toggle
+- Simplified UI for quick voice interactions
+- **Note**: Local file only, not committed to git
+
+---
+
+## CSS Architecture
+
+### Main CSS Files
+
+#### `css/a1-main.css`
+Central CSS orchestrator that imports all modular CSS files
+
+#### `css/language-selection-styles.css`
+Sophisticated landing page styling with gradient animations and floating particles
+
+### Modular CSS System (`css/modules/`)
+
+#### `css/modules/a1-variables.css`
+- CSS custom properties and color palette
+- Streamlit-inspired design tokens
+- Dark mode support variables
+
+#### `css/modules/a1-header.css`
+- Language switching interface
+- Gradient headers with shimmer effects
+- Voice control button styling
+
+#### `css/modules/a1-chat-interface.css`
+- Main chat container layout
+- Sidebar design and animations
+- Welcome message styling
+
+#### `css/modules/a1-messages.css`
+- Message bubbles for AI and user
+- Sound wave avatars for AI responses
+- Message formatting and typography
+
+#### `css/modules/a1-animations.css`
+- Comprehensive keyframe animations
+- Voice indicator animations
+- Performance-optimized transitions
+
+#### `css/modules/a1-responsive.css`
+- Mobile-first responsive design
+- Touch optimization for mobile devices
+- Breakpoint management
+
+#### `css/modules/ai-chat.css`
+- Claude-inspired chat interface
+- Professional styling and spacing
+
+---
+
+## JavaScript Architecture
+
+### Core Modules (`js/modules/core/`)
+
+#### `js/modules/core/main.js`
+**Purpose**: Application controller and initialization
+**Key Features**:
+- Auto-login system for A1 CEO demonstrations
+- Module coordination (FAQ, AI service, voice)
+- Event management and cleanup
+- User session management
+
+#### `js/modules/core/utils.js`
+**Purpose**: Utility library for common operations
+**Key Features**:
+- DOM utilities with error handling
+- Date/time formatting functions
+- localStorage management wrapper
+- Animation helpers and performance tools
+- Validation and sanitization functions
+
+#### `js/modules/core/auth.js`
+**Purpose**: Authentication and user management
+**Key Features**:
+- Google OAuth integration
+- Session management and token refresh
+- User role validation and security
+- Profile management and cleanup
+
+### AI Integration (`js/modules/ai/`)
+
+#### `js/modules/ai/ai-service.js`
+**Purpose**: Claude AI API integration
+**Key Features**:
+- A1 PVC-specific system prompts
+- Streaming response support
+- API key management and rotation
+- Conversation context management
+- FAQ knowledge integration
+
+### Feature Modules (`js/modules/features/`)
+
+#### `js/modules/features/ai-chat.js`
+**Purpose**: Chat interface controller
+**Key Features**:
+- MessageUI class for message management
+- Voice integration toggle
+- Sidebar management with state persistence
+- Language detection and adaptation
+- Chat history with localStorage
+
+#### `js/modules/features/voice-chat.js`
+**Purpose**: ElevenLabs voice integration
+**Key Features**:
+- WebSocket audio streaming
+- MediaRecorder API integration
+- Audio processing and PCM conversion
+- Queue management for responses
+- Multiple agent support
+
+#### `js/modules/features/faq-loader.js`
+**Purpose**: A1 PVC knowledge system
+**Key Features**:
+- Complete Özemek Plastik company information
+- 10+ product categories with specifications
+- Static FAQ database with professional answers
+- AI context integration for Claude conversations
+
+#### `js/modules/features/voice-auth.js`
+**Purpose**: Voice authentication management
+**Key Features**:
+- A1 configuration with auto-grant for demos
+- Security framework with password protection
+- Voice authentication state handling
+
+#### `js/modules/features/ux-enhancements.js`
+**Purpose**: User experience improvements
+**Key Features**:
+- Enhanced AI response formatting
+- List processing for numbered/bulleted content
+- Typography enhancement and readability
+
+---
+
+## Configuration & Assets
+
+### `config.js`
+**Purpose**: Application configuration and settings
+**Contains**:
+- Encoded Claude API keys for security
+- ElevenLabs configuration settings
+- Performance optimization parameters
+- Environment-specific settings
+
+### Assets
+- `logo.png` & `logo_2.png`: Professional A1 PVC company branding
+- FAQ documentation in Excel and Word formats
+
+---
+
+## Serverless Functions
+
+### `netlify/functions/mobile-a1.js`
+**Purpose**: Secure mobile version delivery
+**Features**:
+- Server-side rendering of mobile interface
+- Environment variable injection for agent ID
+- Security compliance for Netlify deployment
+- Turkish default language with English toggle
+
+---
+
+## Key Technical Features
+
+### ✅ Advanced Voice Chat System
+- Real-time WebSocket audio streaming
+- High-quality audio capture via MediaRecorder API
+- Comprehensive error handling and recovery
+- Agent selection for different conversation types
+- Turkish language support throughout
+
+### ✅ Professional UI/UX Design
+- Streamlit-inspired design with sophisticated gradients
+- Animated sound wave avatars for AI messages
+- Fully responsive design for all devices
+- Professional A1 PVC branding integration
+- 60fps performance optimization
+
+### ✅ A1 PVC Business Integration
+- Complete company knowledge base (50+ years)
+- 10+ product categories with technical specs
 - Bilingual support (Turkish/English)
-- 50+ years company experience emphasis
 - Professional customer service guidelines
+- Industry-specific terminology and expertise
 
-**✅ Advanced Features**
-- Auto-hide suggestion buttons after first message
-- Message streaming with typing indicators
-- Chat history management
-- Language-aware empty states
-- Professional animations with 60fps performance
+### ✅ Advanced Chat Features
+- Real-time message streaming with typing indicators
+- Auto-hide suggestion buttons after interaction
+- Persistent chat history with user sessions
+- Language-aware empty states and error handling
+- Context-aware conversations with memory
 
-## Production Readiness Assessment
+---
 
-### **✅ Deployment Ready**
-- **Stable Codebase**: All features tested and working
-- **Clean Architecture**: Modular, maintainable code structure
-- **Security**: Environment variables for API keys
-- **Performance**: Optimized loading and execution
-- **Mobile Ready**: Touch-optimized responsive design
-- **CEO Demo Ready**: Professional appearance and functionality
+## Company Information Integrated
 
-### **Environment Requirements**
-- **Netlify Deployment**: Configured for Netlify Functions
-- **API Keys Required**: Claude API and ElevenLabs credentials
-- **Modern Browser Support**: Chrome, Firefox, Safari, Edge
+### A1 Plastic Company (Özemek Plastik)
+- **Established**: 1970s (50+ years experience)
+- **Products**: PVC Profiles, Edge Banding, Window/Door Systems, Construction Materials
+- **Export**: 50+ countries worldwide
+- **Capacity**: 1,000 tons monthly production
+- **Contact**: 0850 888 22 47 | info@ozemekplastik.com | a1pvcmarket.com
 
-### **Security Features**
-- **Environment Variables**: All sensitive keys stored securely
-- **Client-Side Safety**: No hardcoded credentials
-- **Auto-Authentication**: Streamlined CEO access for demonstrations
-- **Session Management**: Proper user state handling
+---
 
-## Code Quality Highlights
+## Development & Deployment
 
-### **Excellent Architecture**
-- **Modular Design**: Clean separation of concerns
-- **Error Handling**: Comprehensive try-catch blocks
-- **Memory Management**: Proper cleanup and event listener removal
-- **Performance Optimization**: Mobile considerations and smooth animations
-- **Maintainability**: Well-commented, organized code structure
+### Local Development
+- `mobile.html` available for local testing
+- All desktop versions work locally
+- No API keys required for basic functionality
 
-### **Production Standards**
-- **No Malicious Code**: Clean, professional implementation
-- **Working Voice Features**: Complete ElevenLabs integration
-- **Stable Chat System**: Claude API with streaming responses
-- **Professional UI**: Modern design matching industry standards
-- **A1 PVC Branded**: Company-specific knowledge and styling
+### Production Deployment
+- Netlify serverless functions for mobile version
+- Environment variables for secure API key management
+- Automatic mobile device detection and routing
+- CDN delivery for optimal performance
 
-## Recent Updates (Production Commit ac2dc8a)
-- **Turkish Language Support**: Fixed voice connection status messages
-- **Code Stability**: All major features tested and verified
-- **Architecture Finalization**: Modular structure optimized for production
-- **Documentation**: Comprehensive file reference completed
+### Security Features
+- No hardcoded secrets in repository
+- Environment variable injection for sensitive data
+- Netlify secrets scanning compliance
+- Secure API key rotation system
 
-## Summary
+---
 
-The A1 Assistant represents a **sophisticated, production-ready AI assistant application** specifically tailored for A1 Plastic Company CEO demonstrations. The codebase features:
+## Architecture Quality
 
-- **Modern Architecture**: Modular JavaScript and CSS with clean separation
-- **Complete Functionality**: Working voice chat, streaming text chat, and responsive design
-- **Professional Quality**: Industry-standard UI/UX with A1 PVC branding
-- **Production Ready**: Deployed and tested for CEO demonstrations worldwide
+### ✅ Production-Ready Standards
+- **Modular Architecture**: Clean separation of concerns
+- **Error Handling**: Comprehensive try-catch throughout
+- **Memory Management**: Proper cleanup and optimization
+- **Security**: Environment variables, no credentials
+- **Performance**: Mobile optimization and smooth animations
+- **Maintainability**: Well-commented, organized code
 
-The application successfully combines Claude AI for intelligent responses, ElevenLabs for voice interaction, and a beautiful responsive interface optimized for professional demonstrations across all devices.
+### ✅ Modern Development Practices
+- Pure JavaScript for optimal performance
+- CSS Grid & Flexbox for modern layouts
+- WebSocket integration for real-time features
+- REST API integration with proper security
+- Progressive enhancement with graceful fallbacks
+
+---
+
+## Usage Instructions
+
+### For Mobile Users
+1. Visit `01data.org/A1` on mobile device
+2. Automatically redirected to mobile version
+3. Default Turkish interface with voice capabilities
+4. Toggle to English if needed
+
+### For Desktop Users
+1. Visit `01data.org/A1` on desktop
+2. Choose Turkish or English language
+3. Full chat interface with advanced features
+4. Voice chat and text chat capabilities
+
+### For Developers
+1. Local testing via `A1/mobile.html`
+2. Desktop versions work directly
+3. Check `config.js` for API configurations
+4. Use `netlify/functions/` for serverless features
+
+---
+
+## File Organization Summary
+
+```
+A1/
+├── index.html (Language selection + mobile redirect)
+├── index-tr.html (Turkish desktop interface)
+├── index-en.html (English desktop interface)
+├── mobile.html (Local mobile version - gitignored)
+├── config.js (Application configuration)
+├── css/
+│   ├── a1-main.css (Main CSS orchestrator)
+│   ├── language-selection-styles.css (Landing page)
+│   └── modules/ (Modular CSS system)
+├── js/
+│   └── modules/
+│       ├── core/ (Main application logic)
+│       ├── ai/ (Claude AI integration)
+│       └── features/ (Feature implementations)
+├── logo.png & logo_2.png (Branding assets)
+└── Documentation files (FAQ, references)
+
+netlify/
+└── functions/
+    └── mobile-a1.js (Secure mobile delivery)
+```
+
+---
+
+## Stable Version Reference
+
+### **Git Version: `main@e1b2a64`** 🔒
+**Status**: **STABLE WORKING VERSION**
+
+This git commit represents a proven, stable version of the A1 Assistant that works well in both desktop and mobile versions:
+
+- ✅ **Desktop Version**: Fully functional with all features
+- ✅ **Mobile Version**: Working with proper Turkish defaults and ElevenLabs integration
+- ✅ **Deployment**: Successfully deployed and tested on production
+- ✅ **Security**: Passes Netlify security scans
+- ✅ **Performance**: Optimized and responsive
+
+### **Important Version Policy**
+> **When you provide new updates, if users are not happy, you can always publish `main@e1b2a64` git version. This is a working well version. Not perfect but working well version. This version will never be deleted.**
+
+#### How to Rollback to Stable Version:
+```bash
+# Rollback to stable version
+git checkout main@e1b2a64
+
+# Create new branch from stable version
+git checkout -b rollback-to-stable main@e1b2a64
+
+# Force push to main (use with caution)
+git checkout main
+git reset --hard e1b2a64
+git push --force-with-lease
+```
+
+#### Features Confirmed Working in `main@e1b2a64`:
+- Mobile device detection and auto-redirect
+- Turkish default language on mobile
+- ElevenLabs voice integration
+- Desktop chat interface with Claude AI
+- Bilingual support (Turkish/English)
+- All CSS animations and responsive design
+- Netlify deployment without security issues
+
+---
+
+This reference document provides a complete overview of the A1 Assistant codebase, its architecture, features, and deployment configuration.

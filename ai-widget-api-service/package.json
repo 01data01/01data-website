@@ -1,0 +1,21 @@
+{
+  "name": "ai-widget-api-service",
+  "version": "1.0.0",
+  "description": "SaaS API service for AI-powered customer support widgets",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "netlify build",
+    "test": "node tests/api.test.js"
+  },
+  "keywords": ["ai", "widget", "api", "customer-support", "elevenlabs", "claude"],
+  "author": "01data.org",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}
