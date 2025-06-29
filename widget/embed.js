@@ -753,37 +753,165 @@
         }
     }
 
-    // Voice recording functions (simplified - implement with Web Audio API)
-    function startVoiceRecording() {
-        console.log('Voice recording started...');
-        // TODO: Implement Web Audio API recording
+    // Voice recording state
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let audioStream = null;
+
+    // Voice recording functions with real microphone access
+    async function startVoiceRecording() {
+        try {
+            // Request microphone access
+            audioStream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 44100
+                } 
+            });
+            
+            // Create MediaRecorder
+            mediaRecorder = new MediaRecorder(audioStream, {
+                mimeType: 'audio/webm;codecs=opus'
+            });
+            
+            audioChunks = [];
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+            
+            mediaRecorder.onstop = () => {
+                processRecordedAudio();
+            };
+            
+            // Start recording
+            mediaRecorder.start();
+            console.log('Voice recording started successfully');
+            
+        } catch (error) {
+            console.error('Error accessing microphone:', error);
+            const status = document.getElementById('voice-status');
+            status.textContent = 'Mikrofon erişimi reddedildi';
+            
+            // Reset recording state
+            widgetState.isRecording = false;
+            const btn = document.getElementById('voice-btn');
+            const avatar = document.getElementById('voice-avatar');
+            const texts = translations[widgetConfig.language];
+            
+            btn.classList.remove('recording');
+            btn.textContent = texts.startSpeaking;
+            avatar.classList.remove('speaking');
+            
+            setTimeout(() => {
+                status.textContent = texts.voiceReady;
+            }, 3000);
+        }
     }
 
     function stopVoiceRecording() {
-        console.log('Voice recording stopped...');
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            
+            // Stop all audio tracks
+            if (audioStream) {
+                audioStream.getTracks().forEach(track => track.stop());
+            }
+        }
+    }
+
+    async function processRecordedAudio() {
         const status = document.getElementById('voice-status');
         const texts = translations[widgetConfig.language];
         
-        // Simulate API call
-        setTimeout(async () => {
-            try {
-                // TODO: Send actual audio data to API
-                const response = await callAPI('Voice message received', 'voice');
-                
+        try {
+            // Create audio blob
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+            
+            status.textContent = texts.processing;
+            
+            // Convert to base64 for API transmission
+            const base64Audio = await blobToBase64(audioBlob);
+            
+            // Send to API
+            const response = await callAPI({
+                audioData: base64Audio,
+                mimeType: 'audio/webm;codecs=opus'
+            }, 'voice');
+            
+            if (response.success) {
                 status.textContent = texts.speaking;
                 
-                // TODO: Play audio response
+                // Play audio response if available
+                if (response.audioResponse) {
+                    await playAudioResponse(response.audioResponse);
+                } else {
+                    // Fallback to text response
+                    const textResponse = response.response?.text || 'Yanıt alındı';
+                    addMessageToChat('🎤 ' + textResponse, 'ai');
+                }
+                
                 setTimeout(() => {
                     status.textContent = texts.voiceReady;
-                }, 3000);
-                
-            } catch (error) {
-                status.textContent = 'Error occurred';
+                }, 1000);
+            } else {
+                status.textContent = 'Hata oluştu';
                 setTimeout(() => {
                     status.textContent = texts.voiceReady;
                 }, 2000);
             }
-        }, 1000);
+            
+        } catch (error) {
+            console.error('Error processing audio:', error);
+            status.textContent = 'Ses işleme hatası';
+            setTimeout(() => {
+                status.textContent = texts.voiceReady;
+            }, 2000);
+        }
+    }
+
+    // Helper function to convert blob to base64
+    function blobToBase64(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    // Play audio response
+    async function playAudioResponse(audioData) {
+        try {
+            // Convert base64 to blob
+            const audioBlob = base64ToBlob(audioData, 'audio/mpeg');
+            const audioUrl = URL.createObjectURL(audioBlob);
+            
+            const audio = new Audio(audioUrl);
+            await audio.play();
+            
+            // Clean up
+            audio.onended = () => {
+                URL.revokeObjectURL(audioUrl);
+            };
+            
+        } catch (error) {
+            console.error('Error playing audio response:', error);
+        }
+    }
+
+    // Helper function to convert base64 to blob
+    function base64ToBlob(base64, mimeType) {
+        const byteCharacters = atob(base64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        return new Blob([byteArray], { type: mimeType });
     }
 
     // Add message to chat

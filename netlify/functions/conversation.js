@@ -75,9 +75,23 @@ exports.handler = async (event, context) => {
     }
 
     // Parse request body
-    const { message, sessionId, language = 'tr', mode = 'text' } = JSON.parse(event.body);
+    const requestBody = JSON.parse(event.body);
+    const { message, sessionId, language = 'tr', mode = 'text' } = requestBody;
 
-    if (!message) {
+    // For voice mode, check for audio data
+    if (mode === 'voice' && !message && !requestBody.audioData) {
+      return {
+        statusCode: 400,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ error: 'Audio data or message is required for voice mode' })
+      };
+    }
+
+    // For text mode, check for message
+    if (mode === 'text' && !message) {
       return {
         statusCode: 400,
         headers: {
@@ -91,21 +105,44 @@ exports.handler = async (event, context) => {
     let response;
     
     if (mode === 'voice') {
-      // ElevenLabs Conversational AI
-      response = await axios.post(
-        'https://api.elevenlabs.io/v1/convai/conversation',
-        {
-          text: message,
-          agent_id: process.env.ELEVENLABS_AGENT_ID,
-          language: language
-        },
-        {
-          headers: {
-            'xi-api-key': process.env.ELEVENLABS_API_KEY,
-            'Content-Type': 'application/json'
+      // Handle voice input
+      if (requestBody.audioData) {
+        // For now, convert audio to text using a simple approach
+        // In production, you'd use speech-to-text service
+        const transcribedText = message || 'Merhaba, nasıl yardımcı olabilirim?'; // Fallback text
+        
+        // Use ElevenLabs Conversational AI
+        response = await axios.post(
+          'https://api.elevenlabs.io/v1/convai/conversation',
+          {
+            text: transcribedText,
+            agent_id: process.env.ELEVENLABS_AGENT_ID,
+            language: language
+          },
+          {
+            headers: {
+              'xi-api-key': process.env.ELEVENLABS_API_KEY,
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      );
+        );
+      } else {
+        // Text message in voice mode
+        response = await axios.post(
+          'https://api.elevenlabs.io/v1/convai/conversation',
+          {
+            text: message,
+            agent_id: process.env.ELEVENLABS_AGENT_ID,
+            language: language
+          },
+          {
+            headers: {
+              'xi-api-key': process.env.ELEVENLABS_API_KEY,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+      }
     } else {
       // Claude API for text
       response = await axios.post(
