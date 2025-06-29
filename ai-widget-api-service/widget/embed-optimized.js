@@ -44,7 +44,9 @@
             processing: "Processing...",
             listening: "Listening...",
             speaking: "Speaking...",
-            online: "Online"
+            online: "Online",
+            textChatMode: "Text Chat",
+            voiceChatMode: "Voice Chat"
         },
         tr: {
             welcome: "Merhaba! Size nasıl yardımcı olabilirim?",
@@ -56,7 +58,9 @@
             processing: "İşleniyor...",
             listening: "Dinliyorum...",
             speaking: "Konuşuyorum...",
-            online: "Çevrimiçi"
+            online: "Çevrimiçi",
+            textChatMode: "Hadi Mesajlaşalım",
+            voiceChatMode: "Hadi Konuşalım"
         }
     };
 
@@ -108,13 +112,13 @@
                 </div>
 
                 <div class="mode-switcher">
-                    <button class="mode-btn active" data-mode="text">
+                    <button class="mode-btn active" data-mode="text" id="text-mode-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">${SVG_ICONS.textChat}</svg>
-                        Text Chat
+                        <span id="text-mode-label">Text Chat</span>
                     </button>
-                    <button class="mode-btn" data-mode="voice">
+                    <button class="mode-btn" data-mode="voice" id="voice-mode-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">${SVG_ICONS.voice}</svg>
-                        Voice Chat
+                        <span id="voice-mode-label">Voice Chat</span>
                     </button>
                 </div>
 
@@ -654,6 +658,8 @@
         elements.voiceInstruction = document.getElementById('voice-instruction');
         elements.widgetStatus = document.getElementById('widget-status');
         elements.widgetTitle = document.getElementById('widget-title');
+        elements.textModeLabel = document.getElementById('text-mode-label');
+        elements.voiceModeLabel = document.getElementById('voice-mode-label');
         elements.modeBtns = document.querySelectorAll('.mode-btn');
         elements.langBtns = document.querySelectorAll('.lang-btn');
         elements.modeContents = document.querySelectorAll('.mode-content');
@@ -933,7 +939,9 @@
             [elements.voiceInstruction, 'innerHTML', texts.voiceInstruction],
             [elements.voiceBtn, 'textContent', texts.startSpeaking],
             [elements.widgetStatus, 'textContent', texts.online],
-            [elements.widgetTitle, 'textContent', widgetConfig.company]
+            [elements.widgetTitle, 'textContent', widgetConfig.company],
+            [elements.textModeLabel, 'textContent', texts.textChatMode],
+            [elements.voiceModeLabel, 'textContent', texts.voiceChatMode]
         ];
         
         updates.forEach(([element, property, value]) => {
