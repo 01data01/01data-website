@@ -45,8 +45,8 @@
             listening: "Listening...",
             speaking: "Speaking...",
             online: "Online",
-            textChatMode: "Text Chat",
-            voiceChatMode: "Voice Chat"
+            textChatMode: "Let's Message",
+            voiceChatMode: "Let's Talk"
         },
         tr: {
             welcome: "Merhaba! Size nasıl yardımcı olabilirim?",
@@ -114,11 +114,11 @@
                 <div class="mode-switcher">
                     <button class="mode-btn active" data-mode="text" id="text-mode-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">${SVG_ICONS.textChat}</svg>
-                        <span id="text-mode-label">Text Chat</span>
+                        <span id="text-mode-label">Let's Message</span>
                     </button>
                     <button class="mode-btn" data-mode="voice" id="voice-mode-btn">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">${SVG_ICONS.voice}</svg>
-                        <span id="voice-mode-label">Voice Chat</span>
+                        <span id="voice-mode-label">Let's Talk</span>
                     </button>
                 </div>
 
