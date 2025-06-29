@@ -30,6 +30,21 @@
   status = 200
 
 [[redirects]]
+  from = "/widget/demo"
+  to = "/ai-widget-api-service/widget/demo.html"
+  status = 200
+
+[[redirects]]
+  from = "/widget/demo.html"
+  to = "/ai-widget-api-service/widget/demo.html"
+  status = 200
+
+[[redirects]]
+  from = "/widget/*"
+  to = "/ai-widget-api-service/widget/:splat"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
