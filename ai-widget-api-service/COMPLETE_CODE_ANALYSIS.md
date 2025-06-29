@@ -26,6 +26,56 @@ The `ai-widget-api-service` folder contains a complete SaaS API service for prov
                     └─────────────────┘    └─────────────────┘
 ```
 
+## 💼 **COMPLETE BUSINESS PROCESS FLOW**
+
+### **Step 1**: API Key Generation (01data.org)
+```
+01data.org Admin → Generate API Key → Provide Integration Code to Client
+```
+**Integration Code Template:**
+```html
+<!-- Add before closing </body> tag -->
+<script src="https://01data.org/widget/embed.js"></script>
+<script>
+AIWidget.init({
+  apiKey: 'sk_a1pvc_demo123',
+  language: 'tr', 
+  company: 'A1 PVC Market',
+  position: 'bottom-right'
+});
+</script>
+```
+
+### **Step 2**: Client Implementation
+```
+A1 Website Builder → Add Integration Code → Widget Appears on Site
+```
+
+### **Steps 3-10**: User Interaction Flow
+```
+User Clicks Widget (A1 site)
+            ↓
+Widget Sends Request → Our API (with A1's API key)
+            ↓
+Our API Validates → A1's Key & Usage Limits
+            ↓
+Our API Calls → ElevenLabs (Voice) + Claude (Text)
+            ↓
+AI Services Return → Voice Chat + Text Chat Responses
+            ↓
+Our API Sends Response → Back to Widget
+            ↓
+Widget Displays/Plays → Audio/Text to User
+            ↓
+We Track & Bill → Analytics & Usage Data to Company
+```
+
+### **Revenue Generation**
+- **Usage Tracking**: Every minute of conversation tracked
+- **Billing**: Monthly invoices based on actual usage
+- **Analytics**: Detailed reports provided to clients
+- **Service Management**: 24/7 monitoring and support
+
 ## 📋 **KEY FUNCTIONS REFERENCE**
 ### Widget (embed.js)
 - `AIWidget.init(config)` - Initialize widget

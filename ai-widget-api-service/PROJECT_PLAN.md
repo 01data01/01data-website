@@ -21,6 +21,55 @@ Company Website → AI Widget (embed.js) → API (/widget-api/*) → ElevenLabs/
                Admin Dashboard → API Key Management → Usage Tracking → Billing
 ```
 
+## 🔄 **COMPLETE BUSINESS PROCESS FLOW**
+
+### **Step 1**: Generate API Key (01data.org)
+I (01data.org website owner) generate API key and provide integration code to client:
+
+**Integration Code Provided to Client:**
+```html
+<!-- Add before closing </body> tag -->
+<script src="https://01data.org/widget/embed.js"></script>
+<script>
+AIWidget.init({
+  apiKey: 'sk_a1pvc_demo123',
+  language: 'tr',
+  company: 'A1 PVC Market',
+  position: 'bottom-right'
+});
+</script>
+```
+
+### **Step 2**: Client Integration
+A1 website builder uses our API and integration code to add widget to their site
+
+### **Step 3**: User Interaction
+User clicks widget on A1 website
+
+### **Step 4**: API Request
+Widget sends request to OUR API (with A1's API key)
+
+### **Step 5**: Authentication
+Our API validates A1's key and usage limits
+
+### **Step 6**: AI Service Calls
+Our API calls:
+- **ElevenLabs** for Voice chat
+- **Claude** for Text chat
+
+### **Step 7**: AI Responses
+- ElevenLabs returns voice chat response
+- Claude returns text chat response
+
+### **Step 8**: Response Delivery
+Our API sends response back to widget
+
+### **Step 9**: User Experience
+Widget plays audio/displays text to user
+
+### **Step 10**: Business Intelligence
+We track billing, analytics, and usage, providing comprehensive service data to the company
+
 ## 📁 **CURRENT FILE STRUCTURE**
 ```
 ai-widget-api-service/
