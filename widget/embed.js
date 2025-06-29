@@ -316,8 +316,31 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 20px;
             background: #f8f9fa;
+            max-height: 400px;
+            min-height: 300px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
 
         .message {
@@ -508,6 +531,12 @@
                 bottom: 80px;
                 right: 16px;
             }
+
+            .chat-messages {
+                -webkit-overflow-scrolling: touch;
+                overflow-scrolling: touch;
+                padding: 15px;
+            }
         }
 
         /* Loading spinner */
@@ -610,9 +639,14 @@
         
         if (widgetState.isOpen) {
             panel.classList.add('active');
-            if (widgetState.currentMode === 'text') {
-                document.getElementById('message-input').focus();
-            }
+            
+            // Ensure proper scrolling when opening
+            setTimeout(() => {
+                forceScrollToBottom();
+                if (widgetState.currentMode === 'text') {
+                    document.getElementById('message-input').focus();
+                }
+            }, 300); // Wait for animation to complete
         } else {
             panel.classList.remove('active');
             if (widgetState.isRecording) {
@@ -635,9 +669,12 @@
             content.classList.toggle('active', content.id === mode + '-mode');
         });
         
-        // Focus input if switching to text mode
+        // Focus input and ensure scroll if switching to text mode
         if (mode === 'text') {
-            setTimeout(() => document.getElementById('message-input').focus(), 100);
+            setTimeout(() => {
+                forceScrollToBottom();
+                document.getElementById('message-input').focus();
+            }, 100);
         }
     }
 
@@ -738,7 +775,7 @@
     // Add message to chat
     function addMessageToChat(message, sender) {
         const messagesContainer = document.getElementById('chat-messages');
-        const messageId = 'msg_' + Date.now();
+        const messageId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         
         const messageElement = document.createElement('div');
         messageElement.className = `message ${sender}-message`;
@@ -750,7 +787,15 @@
         `;
         
         messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        
+        // Smooth scroll to bottom with multiple methods for better compatibility
+        setTimeout(() => {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            messagesContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            
+            // Alternative scroll method for better mobile support
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 100);
         
         return messageId;
     }
@@ -759,6 +804,23 @@
     function removeMessageFromChat(messageId) {
         const element = document.getElementById(messageId);
         if (element) element.remove();
+    }
+
+    // Force scroll to bottom of chat
+    function forceScrollToBottom() {
+        const messagesContainer = document.getElementById('chat-messages');
+        if (messagesContainer) {
+            // Multiple scroll methods for maximum compatibility
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Force reflow
+            messagesContainer.offsetHeight;
+            
+            // Try again after reflow
+            setTimeout(() => {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 10);
+        }
     }
 
     // Call API
