@@ -708,10 +708,26 @@
             removeMessageFromChat(loadingId);
             
             if (response.success) {
-                const aiResponse = response.response.content?.[0]?.text || response.response.text || 'Response received';
+                // Handle different API response formats
+                let aiResponse = 'Response received';
+                
+                if (response.response?.content?.[0]?.text) {
+                    // Claude API format
+                    aiResponse = response.response.content[0].text;
+                } else if (response.response?.text) {
+                    // Direct text format
+                    aiResponse = response.response.text;
+                } else if (response.response?.choices?.[0]?.message?.content) {
+                    // OpenAI format
+                    aiResponse = response.response.choices[0].message.content;
+                } else if (typeof response.response === 'string') {
+                    // String response
+                    aiResponse = response.response;
+                }
+                
                 addMessageToChat(aiResponse, 'ai');
             } else {
-                addMessageToChat('Sorry, I encountered an error. Please try again.', 'ai');
+                addMessageToChat('Üzgünüm, bir hata oluştu. Lütfen tekrar deneyin.', 'ai');
             }
         } catch (error) {
             removeMessageFromChat(loadingId);
@@ -784,7 +800,7 @@
     // Add message to chat
     function addMessageToChat(message, sender) {
         const messagesContainer = document.getElementById('chat-messages');
-        const messageId = 'msg_' + Date.now();
+        const messageId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         
         const messageElement = document.createElement('div');
         messageElement.className = `message ${sender}-message`;
@@ -796,6 +812,9 @@
         `;
         
         messagesContainer.appendChild(messageElement);
+        
+        // Debug log
+        console.log(`Added message [${messageId}]:`, message, `(${sender})`);
         
         // Smooth scroll to bottom with multiple methods for better compatibility
         setTimeout(() => {
@@ -812,7 +831,12 @@
     // Remove message from chat
     function removeMessageFromChat(messageId) {
         const element = document.getElementById(messageId);
-        if (element) element.remove();
+        if (element) {
+            console.log(`Removing message [${messageId}]`);
+            element.remove();
+        } else {
+            console.log(`Message [${messageId}] not found for removal`);
+        }
     }
 
     // Force scroll to bottom of chat
