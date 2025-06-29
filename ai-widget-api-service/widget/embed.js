@@ -379,7 +379,8 @@
             flex: 1;
             display: none;
             flex-direction: column;
-            height: 100%;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .mode-content.active {
@@ -393,7 +394,8 @@
             overflow-x: hidden;
             padding: 20px;
             background: #ffffff;
-            min-height: 300px;
+            min-height: 0;
+            max-height: calc(100vh - 300px);
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
@@ -455,6 +457,7 @@
             padding: 16px 20px;
             background: #ffffff;
             border-top: 1px solid #f1f5f9;
+            flex-shrink: 0;
         }
 
         .input-wrapper {
