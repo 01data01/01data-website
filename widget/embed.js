@@ -306,6 +306,8 @@
             flex: 1;
             display: none;
             flex-direction: column;
+            height: 100%;
+            overflow: hidden;
         }
 
         .mode-content.active {
@@ -314,15 +316,16 @@
 
         /* Text Chat Styles */
         .chat-messages {
-            flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
             padding: 20px;
             background: #f8f9fa;
-            max-height: 400px;
-            min-height: 300px;
+            height: 350px;
+            min-height: 250px;
+            max-height: 350px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
+            flex-shrink: 1;
         }
 
         .chat-messages::-webkit-scrollbar {
@@ -375,6 +378,9 @@
             padding: 20px;
             background: white;
             border-top: 1px solid #e9ecef;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 10;
         }
 
         .input-wrapper {
@@ -536,6 +542,14 @@
                 -webkit-overflow-scrolling: touch;
                 overflow-scrolling: touch;
                 padding: 15px;
+                height: 60vh;
+                max-height: 60vh;
+            }
+
+            .chat-input {
+                padding: 15px;
+                position: sticky;
+                bottom: 0;
             }
         }
 
