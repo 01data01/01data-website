@@ -879,29 +879,223 @@
         }
     }
 
-    // Voice recording functions (placeholder)
-    function startVoiceRecording() {
-        console.log('Voice recording started...');
+    // Voice recording state
+    let mediaRecorder;
+    let audioChunks = [];
+    let stream;
+
+    // Voice recording functions with proper implementation
+    async function startVoiceRecording() {
+        console.log('Starting voice recording...');
+        const texts = translations[widgetConfig.language];
+        
+        try {
+            // Request microphone permission
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    sampleRate: 44100
+                } 
+            });
+            
+            console.log('Microphone access granted');
+            
+            // Initialize MediaRecorder
+            mediaRecorder = new MediaRecorder(stream, {
+                mimeType: 'audio/webm;codecs=opus'
+            });
+            
+            audioChunks = [];
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+            
+            mediaRecorder.onstop = async () => {
+                console.log('Recording stopped, processing audio...');
+                await processVoiceRecording();
+            };
+            
+            mediaRecorder.start();
+            elements.voiceStatus.textContent = texts.listening;
+            
+        } catch (error) {
+            console.error('Error accessing microphone:', error);
+            elements.voiceStatus.textContent = 'Microphone access denied';
+            widgetState.isRecording = false;
+            elements.voiceBtn.classList.remove('recording');
+            elements.voiceBtn.textContent = texts.startSpeaking;
+            
+            // Show error message to user
+            if (error.name === 'NotAllowedError') {
+                alert('Microphone access is required for voice chat. Please allow microphone access and try again.');
+            } else {
+                alert('Unable to access microphone. Please check your microphone settings.');
+            }
+        }
     }
 
     function stopVoiceRecording() {
-        console.log('Voice recording stopped...');
+        console.log('Stopping voice recording...');
         const texts = translations[widgetConfig.language];
         
-        setTimeout(async () => {
-            try {
-                const response = await callAPI('Voice message received', 'voice');
-                elements.voiceStatus.textContent = texts.speaking;
-                setTimeout(() => {
-                    elements.voiceStatus.textContent = texts.voiceReady;
-                }, 3000);
-            } catch (error) {
-                elements.voiceStatus.textContent = 'Error occurred';
-                setTimeout(() => {
-                    elements.voiceStatus.textContent = texts.voiceReady;
-                }, 2000);
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            elements.voiceStatus.textContent = texts.processing;
+        }
+        
+        // Stop all audio tracks
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    }
+
+    // Process recorded audio
+    async function processVoiceRecording() {
+        const texts = translations[widgetConfig.language];
+        
+        try {
+            if (audioChunks.length === 0) {
+                throw new Error('No audio data recorded');
             }
-        }, 1000);
+            
+            // Create audio blob
+            const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
+            console.log('Audio blob created, size:', audioBlob.size);
+            
+            // For now, we'll use ElevenLabs agent embed instead of processing audio directly
+            // This will open the ElevenLabs conversational AI in a modal
+            await openElevenLabsVoiceChat();
+            
+        } catch (error) {
+            console.error('Error processing voice recording:', error);
+            elements.voiceStatus.textContent = 'Error processing audio';
+            setTimeout(() => {
+                elements.voiceStatus.textContent = texts.voiceReady;
+            }, 2000);
+        }
+    }
+
+    // Open ElevenLabs Voice Chat
+    async function openElevenLabsVoiceChat() {
+        const texts = translations[widgetConfig.language];
+        
+        try {
+            // Get voice token from our API
+            const response = await fetch(widgetConfig.endpoint.replace('/conversation', '/get-voice-token'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': widgetConfig.apiKey
+                },
+                body: JSON.stringify({
+                    language: widgetConfig.language
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to get voice token');
+            }
+
+            // Create ElevenLabs embed iframe
+            const embedUrl = data.embedUrl;
+            elements.voiceStatus.textContent = texts.speaking;
+            
+            // Create modal with ElevenLabs embed
+            createVoiceModal(embedUrl);
+            
+        } catch (error) {
+            console.error('Error getting voice token:', error);
+            elements.voiceStatus.textContent = 'Voice service unavailable';
+            setTimeout(() => {
+                elements.voiceStatus.textContent = texts.voiceReady;
+            }, 2000);
+        }
+    }
+
+    // Create voice modal with ElevenLabs embed
+    function createVoiceModal(embedUrl) {
+        const texts = translations[widgetConfig.language];
+        
+        // Remove existing modal if any
+        const existingModal = document.getElementById('elevenlabs-voice-modal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        // Create modal
+        const modal = document.createElement('div');
+        modal.id = 'elevenlabs-voice-modal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        `;
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1;
+        `;
+        
+        const iframe = document.createElement('iframe');
+        iframe.src = embedUrl;
+        iframe.style.cssText = `
+            width: 400px;
+            height: 600px;
+            border: none;
+            border-radius: 8px;
+        `;
+        
+        closeBtn.onclick = () => {
+            modal.remove();
+            elements.voiceStatus.textContent = texts.voiceReady;
+        };
+        
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                elements.voiceStatus.textContent = texts.voiceReady;
+            }
+        };
+        
+        modalContent.appendChild(closeBtn);
+        modalContent.appendChild(iframe);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
     }
 
     // Optimized message adding with better performance
