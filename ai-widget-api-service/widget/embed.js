@@ -57,7 +57,12 @@
                                 </div>
                             </div>
                         </div>
-                        <button class="close-btn" id="widget-close">
+                        <div class="header-right">
+                            <div class="language-toggle">
+                                <button class="lang-btn ${widgetConfig.language === 'tr' ? 'active' : ''}" data-lang="tr" id="lang-tr">TR</button>
+                                <button class="lang-btn ${widgetConfig.language === 'en' ? 'active' : ''}" data-lang="en" id="lang-en">EN</button>
+                            </div>
+                            <button class="close-btn" id="widget-close">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                             </svg>
@@ -211,6 +216,12 @@
             align-items: center;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .header-left {
             display: flex;
             align-items: center;
@@ -249,6 +260,38 @@
             height: 6px;
             background: #4ade80;
             border-radius: 50%;
+        }
+
+        .language-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.2);
+            border-radius: 16px;
+            padding: 2px;
+            gap: 2px;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.8);
+            padding: 6px 12px;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 32px;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: ${widgetConfig.primaryColor};
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
         .close-btn {
@@ -546,6 +589,16 @@
                 position: sticky;
                 bottom: 0;
             }
+
+            .language-toggle {
+                padding: 1px;
+            }
+
+            .lang-btn {
+                padding: 4px 8px;
+                font-size: 11px;
+                min-width: 28px;
+            }
         }
 
         /* Loading spinner */
@@ -639,6 +692,11 @@
         
         // Voice chat
         document.getElementById('voice-btn').addEventListener('click', toggleVoiceRecording);
+        
+        // Language toggle
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchLanguage(btn.dataset.lang));
+        });
     }
 
     // Toggle widget visibility
@@ -685,6 +743,21 @@
                 document.getElementById('message-input').focus();
             }, 100);
         }
+    }
+
+    // Switch language
+    function switchLanguage(lang) {
+        widgetConfig.language = lang;
+        
+        // Update language buttons
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+        
+        // Update all UI text
+        updateLanguage();
+        
+        console.log(`Language switched to: ${lang}`);
     }
 
     // Send text message
@@ -914,8 +987,7 @@
         },
         
         setLanguage: function(lang) {
-            widgetConfig.language = lang;
-            updateLanguage();
+            switchLanguage(lang);
         }
     };
 
