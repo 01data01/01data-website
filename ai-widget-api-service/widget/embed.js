@@ -373,6 +373,7 @@
             flex: 1;
             display: none;
             flex-direction: column;
+            height: 100%;
         }
 
         .mode-content.active {
@@ -384,11 +385,9 @@
             flex: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 24px 20px;
+            padding: 20px;
             background: #ffffff;
-            height: 350px;
-            min-height: 250px;
-            max-height: 350px;
+            min-height: 300px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
         }
@@ -625,8 +624,8 @@
                 -webkit-overflow-scrolling: touch;
                 overflow-scrolling: touch;
                 padding: 15px;
-                height: 60vh;
-                max-height: 60vh;
+                flex: 1;
+                min-height: 0;
             }
 
             .chat-input {
