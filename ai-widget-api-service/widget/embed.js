@@ -185,9 +185,12 @@
             ${widgetConfig.position.includes('bottom') ? 'bottom: 90px;' : 'top: 90px;'}
             width: 380px;
             height: 600px;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             display: none;
             flex-direction: column;
             overflow: hidden;
@@ -233,7 +236,7 @@
         .header-logo {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, ${widgetConfig.primaryColor} 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, ${widgetConfig.primaryColor} 0%, #ffb366 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -241,7 +244,9 @@
             font-weight: 700;
             color: white;
             font-size: 14px;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 4px 16px rgba(247, 147, 30, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .header-info h3 {
@@ -422,10 +427,12 @@
         }
 
         .ai-message .message-bubble {
-            background: linear-gradient(135deg, ${widgetConfig.primaryColor} 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, ${widgetConfig.primaryColor} 0%, #ffb366 100%);
             color: white;
-            border: none;
-            box-shadow: 0 4px 16px rgba(247, 147, 30, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(247, 147, 30, 0.15);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .user-message {
@@ -477,20 +484,23 @@
         .send-btn {
             width: 36px;
             height: 36px;
-            background: linear-gradient(135deg, ${widgetConfig.primaryColor} 0%, #3b82f6 100%);
-            border: none;
+            background: linear-gradient(135deg, ${widgetConfig.primaryColor} 0%, #ffb366 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(247, 147, 30, 0.3);
+            box-shadow: 0 4px 16px rgba(247, 147, 30, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .send-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(247, 147, 30, 0.4);
+            box-shadow: 0 6px 24px rgba(247, 147, 30, 0.3);
+            background: linear-gradient(135deg, #ff8a4c 0%, #ffb366 100%);
         }
 
         /* Voice Chat Styles */
