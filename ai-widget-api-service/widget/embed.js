@@ -997,6 +997,13 @@
             });
 
             if (!response.ok) {
+                // If endpoint not available yet, use direct ElevenLabs embed as fallback
+                if (response.status === 404) {
+                    console.log('Voice token endpoint not deployed yet, using direct embed');
+                    const directEmbedUrl = 'https://elevenlabs.io/convai/agents/your-agent-id';
+                    createVoiceModal(directEmbedUrl);
+                    return;
+                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
@@ -1015,10 +1022,18 @@
             
         } catch (error) {
             console.error('Error getting voice token:', error);
-            elements.voiceStatus.textContent = 'Voice service unavailable';
-            setTimeout(() => {
-                elements.voiceStatus.textContent = texts.voiceReady;
-            }, 2000);
+            
+            // Fallback: Show user message about deployment
+            const alertMsg = widgetConfig.language === 'tr' 
+                ? 'Sesli sohbet özelliği yakında kullanıma açılacak. Şimdilik metin sohbetini kullanabilirsiniz.'
+                : 'Voice chat feature will be available soon. You can use text chat for now.';
+            
+            alert(alertMsg);
+            
+            elements.voiceStatus.textContent = texts.voiceReady;
+            
+            // Switch back to text mode
+            switchMode('text');
         }
     }
 
