@@ -1112,7 +1112,11 @@
     // Get agent ID from backend (environment variable)
     async function getAgentIdFromBackend() {
         try {
-            const response = await fetch(widgetConfig.endpoint.replace('/conversation', '/get-voice-token'), {
+            const url = widgetConfig.endpoint.replace('/conversation', '/get-voice-token');
+            console.log('Fetching agent ID from:', url);
+            console.log('Using API key:', widgetConfig.apiKey);
+            
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1120,11 +1124,17 @@
                 }
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                console.error('Response error text:', errorText);
+                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
             }
 
             const data = await response.json();
+            console.log('Response data:', data);
             
             if (!data.success) {
                 throw new Error(data.error || 'Failed to get agent ID');
