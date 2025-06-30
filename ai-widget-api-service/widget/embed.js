@@ -15,7 +15,8 @@
         position: 'bottom-right',
         company: 'AI Assistant',
         primaryColor: '#f7931e',
-        voiceColor: '#00d4ff'
+        voiceColor: '#00d4ff',
+        elevenLabsAgentId: '' // Optional: direct agent ID for public agents
     };
     
     let widgetConfig = {};
@@ -1108,43 +1109,20 @@
         }
     }
 
-    // Get agent ID from backend
-    async function getAgentIdFromBackend() {
-        try {
-            const response = await fetch(widgetConfig.endpoint.replace('/conversation', '/get-voice-token'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': widgetConfig.apiKey
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to get agent ID');
-            }
-
-            return data.agent_id;
-        } catch (error) {
-            console.error('Error getting agent ID from backend:', error);
-            throw error;
-        }
-    }
-
     // Start ElevenLabs voice conversation using proper WebSocket API
     async function startVoiceRecording() {
         console.log('Starting ElevenLabs voice conversation...');
         const texts = translations[widgetConfig.language];
         
         try {
-            // Get agent ID from backend first
-            const agentId = await getAgentIdFromBackend();
-            console.log('Retrieved agent ID:', agentId);
+            // For public agents, use the agent ID directly from config
+            const agentId = widgetConfig.elevenLabsAgentId;
+            
+            if (!agentId || agentId.trim() === '' || agentId === 'YOUR_ELEVENLABS_AGENT_ID' || agentId === 'your_agent_id_here') {
+                throw new Error('ElevenLabs agent ID is required for voice chat. Please set elevenLabsAgentId in AIWidget.init() configuration.');
+            }
+            
+            console.log('Using public agent ID:', agentId);
             
             // Create new voice widget instance with valid agent ID
             elevenLabsVoice = new ElevenLabsVoiceWidget(agentId, {
@@ -1204,14 +1182,10 @@
                 alertMsg = widgetConfig.language === 'tr' 
                     ? 'Sesli sohbet için mikrofon erişimi gereklidir. Lütfen mikrofon erişimine izin verin ve tekrar deneyin.'
                     : 'Microphone access is required for voice chat. Please allow microphone access and try again.';
-            } else if (error.message.includes('HTTP error! status: 404')) {
+            } else if (error.message.includes('ElevenLabs agent ID is required')) {
                 alertMsg = widgetConfig.language === 'tr' 
-                    ? 'Sesli sohbet servisi henüz yapılandırılmamış. Lütfen yöneticinizle iletişime geçin.'
-                    : 'Voice chat service is not configured yet. Please contact your administrator.';
-            } else if (error.message.includes('Failed to get agent ID') || error.message.includes('ElevenLabs agent ID not configured')) {
-                alertMsg = widgetConfig.language === 'tr' 
-                    ? 'Sesli sohbet yapılandırması eksik. Lütfen daha sonra tekrar deneyin.'
-                    : 'Voice chat configuration is missing. Please try again later.';
+                    ? 'Sesli sohbet için ElevenLabs agent ID gereklidir. Lütfen widget yapılandırmasında elevenLabsAgentId parametresini ayarlayın.'
+                    : 'ElevenLabs agent ID is required for voice chat. Please set elevenLabsAgentId parameter in widget configuration.';
             } else {
                 alertMsg = widgetConfig.language === 'tr' 
                     ? 'Sesli sohbet başlatılamadı. Lütfen daha sonra tekrar deneyin.'
