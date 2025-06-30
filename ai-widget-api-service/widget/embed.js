@@ -904,8 +904,12 @@
 
         async startConversation() {
             try {
-                // Get agent ID from backend first
-                const agentData = await this.getAgentId();
+                // Validate agent ID first
+                if (!this.agentId || this.agentId.trim() === '') {
+                    throw new Error('Agent ID is required and cannot be empty');
+                }
+                
+                console.log('Starting conversation with agent ID:', this.agentId);
                 
                 // Request microphone permission
                 const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -917,12 +921,14 @@
                     } 
                 });
                 
-                // Connect to WebSocket
-                const wsUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${agentData.agent_id}`;
+                // Connect directly to WebSocket - NO HTTP requests needed for public agents
+                const wsUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${this.agentId}`;
+                console.log('Connecting to:', wsUrl);
+                
                 this.websocket = new WebSocket(wsUrl);
                 
                 this.websocket.onopen = () => {
-                    console.log('WebSocket connected to ElevenLabs');
+                    console.log('WebSocket connected to ElevenLabs successfully');
                     this.isConnected = true;
                     this.onConnect();
                     
@@ -939,8 +945,8 @@
                     this.handleMessage(JSON.parse(event.data));
                 };
 
-                this.websocket.onclose = () => {
-                    console.log('WebSocket disconnected from ElevenLabs');
+                this.websocket.onclose = (event) => {
+                    console.log('WebSocket disconnected from ElevenLabs:', event.code, event.reason);
                     this.isConnected = false;
                     this.onDisconnect();
                     this.stopRecording();
@@ -948,35 +954,13 @@
 
                 this.websocket.onerror = (error) => {
                     console.error('WebSocket error:', error);
-                    this.onError(error);
+                    this.onError(new Error(`WebSocket connection failed: ${error.message || 'Unknown error'}`));
                 };
 
             } catch (error) {
                 console.error('Failed to start conversation:', error);
                 this.onError(error);
             }
-        }
-
-        async getAgentId() {
-            const response = await fetch(widgetConfig.endpoint.replace('/conversation', '/get-voice-token'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': widgetConfig.apiKey
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to get agent ID');
-            }
-
-            return data;
         }
 
         async startRecording(stream) {
@@ -1097,7 +1081,13 @@
 
         sendMessage(message) {
             if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-                this.websocket.send(JSON.stringify(message));
+                try {
+                    this.websocket.send(JSON.stringify(message));
+                } catch (error) {
+                    console.error('Error sending WebSocket message:', error);
+                }
+            } else {
+                console.warn('WebSocket not ready, message not sent:', message);
             }
         }
 
@@ -1118,14 +1108,46 @@
         }
     }
 
+    // Get agent ID from backend
+    async function getAgentIdFromBackend() {
+        try {
+            const response = await fetch(widgetConfig.endpoint.replace('/conversation', '/get-voice-token'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': widgetConfig.apiKey
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to get agent ID');
+            }
+
+            return data.agent_id;
+        } catch (error) {
+            console.error('Error getting agent ID from backend:', error);
+            throw error;
+        }
+    }
+
     // Start ElevenLabs voice conversation using proper WebSocket API
     async function startVoiceRecording() {
         console.log('Starting ElevenLabs voice conversation...');
         const texts = translations[widgetConfig.language];
         
         try {
-            // Create new voice widget instance
-            elevenLabsVoice = new ElevenLabsVoiceWidget(null, {
+            // Get agent ID from backend first
+            const agentId = await getAgentIdFromBackend();
+            console.log('Retrieved agent ID:', agentId);
+            
+            // Create new voice widget instance with valid agent ID
+            elevenLabsVoice = new ElevenLabsVoiceWidget(agentId, {
                 onConnect: () => {
                     console.log('Voice conversation connected');
                     elements.voiceStatus.textContent = texts.listening;
@@ -1170,23 +1192,33 @@
             
         } catch (error) {
             console.error('Error starting voice conversation:', error);
-            elements.voiceStatus.textContent = 'Microphone access denied';
+            elements.voiceStatus.textContent = 'Voice connection error';
             widgetState.isRecording = false;
             elements.voiceBtn.classList.remove('recording');
             elements.voiceBtn.textContent = texts.startSpeaking;
             
-            // Show error message to user
+            // Show appropriate error message based on error type
+            let alertMsg;
+            
             if (error.name === 'NotAllowedError') {
-                const alertMsg = widgetConfig.language === 'tr' 
+                alertMsg = widgetConfig.language === 'tr' 
                     ? 'Sesli sohbet için mikrofon erişimi gereklidir. Lütfen mikrofon erişimine izin verin ve tekrar deneyin.'
                     : 'Microphone access is required for voice chat. Please allow microphone access and try again.';
-                alert(alertMsg);
+            } else if (error.message.includes('HTTP error! status: 404')) {
+                alertMsg = widgetConfig.language === 'tr' 
+                    ? 'Sesli sohbet servisi henüz yapılandırılmamış. Lütfen yöneticinizle iletişime geçin.'
+                    : 'Voice chat service is not configured yet. Please contact your administrator.';
+            } else if (error.message.includes('Failed to get agent ID') || error.message.includes('ElevenLabs agent ID not configured')) {
+                alertMsg = widgetConfig.language === 'tr' 
+                    ? 'Sesli sohbet yapılandırması eksik. Lütfen daha sonra tekrar deneyin.'
+                    : 'Voice chat configuration is missing. Please try again later.';
             } else {
-                const alertMsg = widgetConfig.language === 'tr' 
-                    ? 'Sesli sohbet başlatılamadı. Lütfen mikrofon ayarlarınızı kontrol edin.'
-                    : 'Unable to start voice chat. Please check your microphone settings.';
-                alert(alertMsg);
+                alertMsg = widgetConfig.language === 'tr' 
+                    ? 'Sesli sohbet başlatılamadı. Lütfen daha sonra tekrar deneyin.'
+                    : 'Unable to start voice chat. Please try again later.';
             }
+            
+            alert(alertMsg);
         }
     }
 
