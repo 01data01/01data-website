@@ -3,131 +3,713 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Widget Demo - A1 PVC Integration</title>
+    <title>AI Customer Assistant - A1 PVC Market Demo</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Animated gradient background */
+        .hero-section {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
+            padding: 80px 20px 40px;
+            background: #0a0a0a;
         }
 
-        .demo-container {
-            max-width: 800px;
+        /* Flowing background animation */
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .flow-element {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: flow 20s infinite ease-in-out;
+        }
+
+        .flow-element:nth-child(1) {
+            background: linear-gradient(135deg, #14b8a6, #10b981);
+            top: -300px;
+            left: -300px;
+            animation-duration: 25s;
+        }
+
+        .flow-element:nth-child(2) {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            bottom: -300px;
+            right: -300px;
+            animation-duration: 30s;
+            animation-delay: -5s;
+        }
+
+        .flow-element:nth-child(3) {
+            background: linear-gradient(135deg, #22d3ee, #14b8a6);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-duration: 35s;
+            animation-delay: -10s;
+        }
+
+        @keyframes flow {
+            0%, 100% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+            }
+            33% {
+                transform: translate(30px, -30px) scale(1.1) rotate(120deg);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9) rotate(240deg);
+            }
+        }
+
+        /* Particle animation */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #14b8a6;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particle-float 15s infinite linear;
+        }
+
+        @keyframes particle-float {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) translateX(0);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) translateX(100px);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
             text-align: center;
-            color: white;
+            margin-bottom: 80px;
+            animation: fadeInUp 1s ease-out;
         }
 
-        .demo-header {
-            margin-bottom: 60px;
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .demo-title {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            background: linear-gradient(45deg, #fff, #f0f0f0);
+        .company-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(20, 184, 166, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(20, 184, 166, 0.3);
+            border-radius: 50px;
+            padding: 8px 20px;
+            margin-bottom: 32px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #14b8a6;
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(20, 184, 166, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(20, 184, 166, 0.8);
+            }
+        }
+
+        .hero-title {
+            font-size: clamp(48px, 8vw, 84px);
+            font-weight: 800;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #ffffff 0%, #14b8a6 50%, #06b6d4 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            background-size: 200% 200%;
+            animation: gradient-shift 5s ease infinite;
         }
 
-        .demo-subtitle {
-            font-size: 20px;
-            opacity: 0.9;
-            margin-bottom: 32px;
+        @keyframes gradient-shift {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: clamp(18px, 3vw, 24px);
+            color: #94a3b8;
+            margin-bottom: 48px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
         }
 
         .demo-features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            margin-bottom: 60px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 32px;
+            margin-bottom: 80px;
         }
 
         .feature-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.3s ease;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px 32px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, #14b8a6, #06b6d4, #14b8a6);
+            border-radius: 24px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            animation: border-flow 3s linear infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes border-flow {
+            0% {
+                background-position: 0% 0%;
+            }
+            100% {
+                background-position: 200% 200%;
+            }
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px) scale(1.02);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: transparent;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
         }
 
         .feature-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #14b8a6 0%, #10b981 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 24px;
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+            transform-style: preserve-3d;
+            box-shadow: 0 10px 30px rgba(20, 184, 166, 0.3);
+        }
+
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: inherit;
+            opacity: 0.5;
+            z-index: -1;
+            transform: translateZ(-10px) scale(1.1);
+            filter: blur(10px);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotateY(0deg);
+            }
+            25% {
+                transform: translateY(-10px) rotateY(90deg);
+            }
+            50% {
+                transform: translateY(0) rotateY(180deg);
+            }
+            75% {
+                transform: translateY(-10px) rotateY(270deg);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: translateZ(-10px) scale(1.1);
+            }
+            50% {
+                transform: translateZ(-10px) scale(1.3);
+            }
+        }
+
+        .feature-card:nth-child(1) .feature-icon {
+            animation-delay: 0s;
+        }
+
+        .feature-card:nth-child(2) .feature-icon {
+            animation-delay: 1s;
+        }
+
+        .feature-card:nth-child(3) .feature-icon {
+            animation-delay: 2s;
+        }
+
+        .feature-card:nth-child(4) .feature-icon {
+            animation-delay: 3s;
+        }
+
+        .feature-card:nth-child(5) .feature-icon {
+            animation-delay: 4s;
+        }
+
+        .feature-card:nth-child(6) .feature-icon {
+            animation-delay: 5s;
         }
 
         .feature-title {
             font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 12px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
         }
 
         .feature-description {
             font-size: 16px;
-            opacity: 0.9;
+            color: #94a3b8;
             line-height: 1.6;
         }
 
-        .demo-instructions {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
+        .widget-preview {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 48px;
+            margin-bottom: 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .widget-preview::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.1) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        .preview-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+        }
+
+        .preview-subtitle {
+            font-size: 18px;
+            color: #94a3b8;
             margin-bottom: 40px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .instructions-title {
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            margin-bottom: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 32px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(20, 184, 166, 0.4), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(20, 184, 166, 0.5);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #14b8a6;
+            margin-bottom: 8px;
+            display: inline-block;
+            animation: count 2s ease-out;
+        }
+
+        @keyframes count {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .integration-section {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 24px;
+            padding: 48px;
+            margin-bottom: 80px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .integration-title {
             font-size: 28px;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 24px;
+            text-align: center;
+            color: #ffffff;
         }
 
-        .instructions-list {
-            text-align: left;
-            max-width: 600px;
-            margin: 0 auto;
+        .integration-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+            position: relative;
         }
 
-        .instructions-list li {
-            margin-bottom: 12px;
-            font-size: 16px;
-            line-height: 1.6;
+        .integration-steps::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #14b8a6, transparent);
+            z-index: 0;
+            animation: line-flow 3s ease-in-out infinite;
         }
 
-        .highlight {
-            background: rgba(247, 147, 30, 0.3);
-            padding: 2px 8px;
-            border-radius: 8px;
+        @keyframes line-flow {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scaleX(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+        }
+
+        .step-card {
+            text-align: center;
+            padding: 24px;
+            position: relative;
+            z-index: 1;
+            background: #0a0a0a;
+            border-radius: 20px;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 auto 16px;
+            color: white;
+            position: relative;
+            animation: step-pulse 2s ease-in-out infinite;
+        }
+
+        .step-number::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            border-radius: 50%;
+            z-index: -1;
+            animation: ripple 2s ease-in-out infinite;
+        }
+
+        @keyframes step-pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .step-title {
+            font-size: 18px;
             font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
         }
 
-        .api-info {
-            background: rgba(0, 0, 0, 0.2);
+        .step-description {
+            font-size: 14px;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 60px 48px;
+            background: linear-gradient(135deg, rgba(20, 184, 166, 0.05) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.2) 0%, transparent 70%);
+            animation: cta-rotate 30s linear infinite;
+        }
+
+        @keyframes cta-rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .cta-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-subtitle {
+            font-size: 18px;
+            color: #94a3b8;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #14b8a6 0%, #10b981 100%);
+            border: none;
+            border-radius: 16px;
+            padding: 18px 36px;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 8px 32px rgba(20, 184, 166, 0.3);
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .cta-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(20, 184, 166, 0.5);
+        }
+
+        /* Widget Configuration Notice */
+        .widget-notice {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
             border-radius: 16px;
             padding: 24px;
-            margin-top: 40px;
+            margin: 40px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .widget-notice-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffc107;
+            font-size: 18px;
+        }
+
+        .widget-notice p {
+            color: #f0f0f0;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        /* API Info Section */
+        .api-info {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 40px auto;
+            max-width: 800px;
             text-align: left;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .api-title {
             font-size: 20px;
             font-weight: 600;
             margin-bottom: 16px;
-            color: #4ade80;
+            color: #14b8a6;
         }
 
         .api-code {
@@ -139,147 +721,217 @@
             white-space: pre-wrap;
             overflow-x: auto;
             margin: 12px 0;
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .notice {
-            background: rgba(255, 193, 7, 0.2);
-            border: 1px solid rgba(255, 193, 7, 0.5);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 30px;
-        }
-
-        .notice-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #ffc107;
-        }
-
-        .setup-notice {
-            background: rgba(33, 150, 243, 0.2);
-            border: 1px solid rgba(33, 150, 243, 0.5);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .setup-notice-title {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: #2196f3;
-        }
-
+        /* Responsive design */
         @media (max-width: 768px) {
-            .demo-title {
-                font-size: 36px;
+            .hero-section {
+                padding: 60px 16px 20px;
             }
             
-            .demo-subtitle {
-                font-size: 18px;
+            .demo-features {
+                grid-template-columns: 1fr;
+                gap: 24px;
             }
             
-            .demo-container {
-                padding: 20px 16px;
+            .feature-card {
+                padding: 32px 24px;
+            }
+        }
+
+        /* Loading animation */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(20, 184, 166, 0.3);
+            border-radius: 50%;
+            border-top-color: #14b8a6;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Typing animation */
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #14b8a6;
+            border-radius: 50%;
+            animation: typing 1.4s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
             }
         }
     </style>
 </head>
 <body>
-    <div class="demo-container">
-        <div class="demo-header">
-            <h1 class="demo-title">AI Widget Demo</h1>
-            <p class="demo-subtitle">
-                Experience the power of AI-powered customer support<br>
-                with both text chat and voice conversation modes
-            </p>
+    <div class="hero-section">
+        <div class="hero-bg">
+            <div class="flow-element"></div>
+            <div class="flow-element"></div>
+            <div class="flow-element"></div>
         </div>
-
-        <div class="demo-features">
-            <div class="feature-card">
-                <div class="feature-icon">💬</div>
-                <h3 class="feature-title">Text Chat</h3>
-                <p class="feature-description">
-                    Intelligent text-based conversations powered by Claude AI.
-                    Perfect for detailed questions and support.
+        <div class="particles" id="particles"></div>
+        <div class="container">
+            <div class="hero-content">
+                <div class="company-badge">
+                    🏢 A1 PVC Market Demo
+                </div>
+                <h1 class="hero-title">AI Customer Assistant</h1>
+                <p class="hero-subtitle">
+                    Transform your customer service with intelligent AI that understands, responds, and engages naturally through text and voice
                 </p>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">🎤</div>
-                <h3 class="feature-title">Voice Chat</h3>
-                <p class="feature-description">
-                    Natural voice conversations using ElevenLabs Conversational AI.
-                    Speak naturally and get voice responses.
-                </p>
+            <div class="demo-features">
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3 class="feature-title">Intelligent Text Chat</h3>
+                    <p class="feature-description">
+                        Advanced conversational AI that understands context, handles complex queries, and provides accurate responses in real-time.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎤</div>
+                    <h3 class="feature-title">Natural Voice Conversations</h3>
+                    <p class="feature-description">
+                        Speak naturally and receive human-like voice responses. Perfect for hands-free customer support and accessibility.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Multi-Language Support</h3>
+                    <p class="feature-description">
+                        Communicate in multiple languages including Turkish and English with automatic language detection and switching.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Instant Deployment</h3>
+                    <p class="feature-description">
+                        Deploy in minutes with our simple integration. Fully customizable to match your brand and business needs.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Analytics & Insights</h3>
+                    <p class="feature-description">
+                        Track conversations, measure satisfaction, and gain insights into customer needs with detailed analytics.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Enterprise Security</h3>
+                    <p class="feature-description">
+                        Bank-level security with data encryption, privacy compliance, and secure cloud infrastructure.
+                    </p>
+                </div>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-icon">🌍</div>
-                <h3 class="feature-title">Multi-Language</h3>
-                <p class="feature-description">
-                    Supports multiple languages including Turkish and English.
-                    Automatic language detection available.
+            <div class="widget-preview">
+                <h2 class="preview-title">Try the Live Demo</h2>
+                <p class="preview-subtitle">
+                    Experience the AI assistant in action. Click the <span style="color: #f7931e; font-weight: 600;">orange floating button</span> in the bottom-right corner to start a conversation.
                 </p>
+                
+                <div class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Always Available</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">&lt;2s</div>
+                        <div class="stat-label">Response Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">30+</div>
+                        <div class="stat-label">Languages</div>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="demo-instructions">
-            <h2 class="instructions-title">Try the Widget</h2>
-            <ol class="instructions-list">
-                <li>Look for the <span class="highlight">orange floating button</span> in the bottom-right corner</li>
-                <li>Click the button to open the AI assistant</li>
-                <li>Choose between <span class="highlight">Text Chat</span> or <span class="highlight">Voice Chat</span> mode</li>
-                <li>For voice chat, allow microphone access when prompted</li>
-                <li>Start a conversation and experience the AI assistance</li>
-                <li>Test both modes to see the difference</li>
-            </ol>
-        </div>
+            <div class="widget-notice">
+                <div class="widget-notice-title">⚡ Live Demo Active</div>
+                <p>The widget in the bottom-right corner is fully functional. It uses Claude AI for text chat and ElevenLabs for voice conversations. All conversations are processed in real-time through our AI backend.</p>
+            </div>
 
-        <div class="api-info">
-            <div class="api-title">🔧 Integration Code</div>
-            <p>Add this code to your website to integrate the AI widget:</p>
-            
-            <div class="api-code">&lt;!-- Add before closing &lt;/body&gt; tag --&gt;
-&lt;script src="https://01data.org/widget/embed.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-AIWidget.init({
-  apiKey: 'sk_a1pvc_demo123',
-  language: 'tr',
-  company: 'A1 PVC Market',
-  position: 'bottom-right',
-  elevenLabsAgentId: 'your-agent-id-here' // Optional: if not set in env
-});
-&lt;/script&gt;</div>
+            <div class="integration-section">
+                <h2 class="integration-title">Quick Integration</h2>
+                <p style="text-align: center; color: #94a3b8; margin-bottom: 32px;">
+                    Get your AI assistant running in just 3 simple steps
+                </p>
+                
+                <div class="integration-steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Configure Settings</h3>
+                        <p class="step-description">Customize the assistant with your company branding, language preferences, and business rules.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Add Code Snippet</h3>
+                        <p class="step-description">Copy and paste our lightweight code snippet into your website - no technical expertise required.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Go Live</h3>
+                        <p class="step-description">Your AI assistant is now live and ready to help your customers 24/7 with intelligent support.</p>
+                    </div>
+                </div>
+            </div>
 
-            <div class="api-title">📊 API Usage</div>
-            <p>Current demo configuration:</p>
-            <div class="api-code">API Key: sk_a1pvc_demo123
-Company: A1 PVC Market  
-Language: Turkish (tr)
-Usage Limit: 5000 requests
-Text Chat: Claude AI
-Voice Chat: ElevenLabs Conversational AI</div>
-        </div>
-
-        <div class="setup-notice">
-            <div class="setup-notice-title">🔧 Setup Instructions</div>
-            <p>To enable voice chat, you need to:</p>
-            <ol style="margin: 10px 0; padding-left: 20px;">
-                <li>Create an ElevenLabs account and set up a Conversational AI agent</li>
-                <li>Get your agent ID from the ElevenLabs dashboard</li>
-                <li>Set the <code>ELEVENLABS_AGENT_ID</code> environment variable in your deployment</li>
-                <li>Or pass the agent ID directly in the widget configuration</li>
-            </ol>
-        </div>
-
-        <div class="notice">
-            <div class="notice-title">⚡ Live Demo</div>
-            <p>This is a live demo using the actual API service. Text chat works with Claude AI. Voice chat requires proper ElevenLabs agent configuration. All conversations are processed through our AI backend with real-time responses.</p>
+            <div class="cta-section">
+                <h2 class="cta-title">Ready to Transform Your Customer Service?</h2>
+                <p class="cta-subtitle">
+                    Join hundreds of businesses already using our AI customer assistant to improve satisfaction and reduce response times.
+                </p>
+                <a href="#contact" class="cta-button">
+                    <span>Get Started Today</span>
+                    <span>→</span>
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- AI Widget Integration -->
-    <script src="embed.js"></script>
+    <!-- AI Widget Integration will be loaded here by embed.js -->
+
+    <!-- AI Widget Integration Script -->
+    <script src="https://01data.org/widget/embed.js"></script>
     <script>
         // Initialize the AI Widget
         AIWidget.init({
@@ -287,34 +939,140 @@ Voice Chat: ElevenLabs Conversational AI</div>
             language: 'tr',
             company: 'A1 PVC Market',
             position: 'bottom-right',
-            primaryColor: '#f7931e',
-            voiceColor: '#00d4ff',
+            primaryColor: '#f7931e',  // Orange color for the widget
+            voiceColor: '#00d4ff',    // Cyan color for voice mode
             // ElevenLabs agent ID - set this to your actual agent ID
             // or configure ELEVENLABS_AGENT_ID environment variable
             elevenLabsAgentId: '' // Leave empty to use environment variable
         });
 
-        // Demo analytics
-        console.log('AI Widget Demo Loaded');
-        console.log('Features: Text Chat (Claude AI) + Voice Chat (ElevenLabs)');
-        console.log('Languages: Turkish, English');
-        console.log('Backend: Netlify Functions + ElevenLabs SDK + Claude');
-        
-        // Check if voice is properly configured
-        fetch('https://01data.org/widget-api/get-voice-token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-api-key': 'sk_a1pvc_demo123'
+        // Generate floating particles
+        function generateParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+                particlesContainer.appendChild(particle);
             }
-        }).then(response => response.json()).then(data => {
-            if (data.success) {
-                console.log('✅ Voice chat is properly configured');
-            } else {
-                console.log('⚠️ Voice chat configuration needed:', data.error);
-            }
-        }).catch(error => {
-            console.log('⚠️ Voice chat backend not available:', error.message);
+        }
+
+        // Initialize animations on load
+        document.addEventListener('DOMContentLoaded', function() {
+            generateParticles();
+
+            // Animate feature cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }, index * 100);
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.feature-card, .stat-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+                observer.observe(card);
+            });
+
+            // Add smooth scroll
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Mouse move effect on hero section
+            const heroSection = document.querySelector('.hero-section');
+            let mouseX = 0, mouseY = 0;
+            
+            heroSection.addEventListener('mousemove', (e) => {
+                const rect = heroSection.getBoundingClientRect();
+                mouseX = (e.clientX - rect.left) / rect.width - 0.5;
+                mouseY = (e.clientY - rect.top) / rect.height - 0.5;
+                
+                document.querySelectorAll('.flow-element').forEach((el, index) => {
+                    const speed = (index + 1) * 0.5;
+                    el.style.transform = `translate(${mouseX * speed * 20}px, ${mouseY * speed * 20}px)`;
+                });
+            });
+
+            // Demo analytics
+            console.log('AI Customer Assistant Demo - A1 PVC Market');
+            console.log('Features: Text Chat (Claude AI) + Voice Chat (ElevenLabs)');
+            console.log('Multi-language support with Turkish & English');
+            console.log('Widget API: https://01data.org/widget/embed.js');
+            
+            // Check if voice is properly configured
+            fetch('https://01data.org/widget-api/get-voice-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': 'sk_a1pvc_demo123'
+                }
+            }).then(response => response.json()).then(data => {
+                if (data.success) {
+                    console.log('✅ Voice chat is properly configured');
+                } else {
+                    console.log('⚠️ Voice chat configuration needed:', data.error);
+                }
+            }).catch(error => {
+                console.log('⚠️ Voice chat backend not available:', error.message);
+            });
+        });
+
+        // Dynamic stat counter
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value + (element.textContent.includes('%') ? '%' : '');
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Animate stats when in view
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumber = entry.target.querySelector('.stat-number');
+                    if (statNumber && statNumber.textContent.includes('%')) {
+                        const value = parseInt(statNumber.textContent);
+                        statNumber.textContent = '0%';
+                        animateValue(statNumber, 0, value, 2000);
+                    }
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            statsObserver.observe(card);
         });
     </script>
 </body>
