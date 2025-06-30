@@ -1,5 +1,5 @@
 /**
- * AI Widget Embed Script - Updated with ElevenLabs SDK
+ * AI Widget Embed Script - Fixed ElevenLabs Integration
  * Embeddable widget for AI-powered customer support
  * Supports both text chat and voice conversation modes
  */
@@ -27,8 +27,7 @@
         currentMode: 'text',
         sessionId: 'session_' + Date.now(),
         isRecording: false,
-        initialized: false,
-        elevenLabsLoaded: false
+        initialized: false
     };
     
     // Cache DOM elements
@@ -82,28 +81,222 @@
         send: '<path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>'
     };
 
-    // Load ElevenLabs SDK
-    function loadElevenLabsSDK() {
-        return new Promise((resolve, reject) => {
-            if (widgetState.elevenLabsLoaded) {
-                resolve();
-                return;
-            }
+    // ElevenLabs Voice Chat Implementation using Direct WebSocket API
+    class ElevenLabsVoiceWidget {
+        constructor(agentId, options = {}) {
+            this.agentId = agentId;
+            this.websocket = null;
+            this.isConnected = false;
+            this.isRecording = false;
+            this.mediaRecorder = null;
+            this.audioContext = null;
+            this.audioQueue = [];
+            this.isPlaying = false;
+            this.stream = null;
+            
+            // Callbacks
+            this.onConnect = options.onConnect || (() => {});
+            this.onDisconnect = options.onDisconnect || (() => {});
+            this.onError = options.onError || (() => {});
+            this.onModeChange = options.onModeChange || (() => {});
+            this.onMessage = options.onMessage || (() => {});
+        }
 
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/@11labs/client@latest/dist/index.js';
-            script.type = 'module';
-            script.onload = () => {
-                widgetState.elevenLabsLoaded = true;
-                console.log('ElevenLabs SDK loaded successfully');
-                resolve();
-            };
-            script.onerror = () => {
-                console.error('Failed to load ElevenLabs SDK');
-                reject(new Error('Failed to load ElevenLabs SDK'));
-            };
-            document.head.appendChild(script);
-        });
+        async startConversation() {
+            try {
+                console.log('Starting conversation with agent ID:', this.agentId);
+                
+                // Request microphone permission first
+                this.stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        channelCount: 1,
+                        sampleRate: 16000,
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    } 
+                });
+                
+                // Create audio context for processing
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: 16000
+                });
+                
+                // Connect to ElevenLabs WebSocket
+                const wsUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${this.agentId}`;
+                console.log('Connecting to:', wsUrl);
+                
+                this.websocket = new WebSocket(wsUrl);
+                
+                this.websocket.onopen = () => {
+                    console.log('WebSocket connected to ElevenLabs');
+                    this.isConnected = true;
+                    this.onConnect();
+                    this.startRecording();
+                };
+
+                this.websocket.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        this.handleMessage(data);
+                    } catch (error) {
+                        console.error('Error parsing WebSocket message:', error);
+                    }
+                };
+
+                this.websocket.onclose = (event) => {
+                    console.log('WebSocket disconnected:', event.code, event.reason);
+                    this.isConnected = false;
+                    this.onDisconnect();
+                    this.cleanup();
+                };
+
+                this.websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    this.onError(new Error('Voice connection failed'));
+                };
+
+            } catch (error) {
+                console.error('Failed to start conversation:', error);
+                this.onError(error);
+            }
+        }
+
+        startRecording() {
+            if (!this.stream || !this.audioContext) return;
+            
+            try {
+                const source = this.audioContext.createMediaStreamSource(this.stream);
+                const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+                
+                processor.onaudioprocess = (event) => {
+                    if (this.isRecording && this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                        const inputBuffer = event.inputBuffer.getChannelData(0);
+                        const audioData = this.encodeAudioData(inputBuffer);
+                        
+                        this.websocket.send(JSON.stringify({
+                            user_audio_chunk: audioData
+                        }));
+                    }
+                };
+                
+                source.connect(processor);
+                processor.connect(this.audioContext.destination);
+                
+                this.isRecording = true;
+                console.log('Recording started');
+                
+            } catch (error) {
+                console.error('Failed to start recording:', error);
+                this.onError(error);
+            }
+        }
+
+        encodeAudioData(inputBuffer) {
+            const buffer = new ArrayBuffer(inputBuffer.length * 2);
+            const view = new DataView(buffer);
+            
+            for (let i = 0; i < inputBuffer.length; i++) {
+                const sample = Math.max(-1, Math.min(1, inputBuffer[i]));
+                view.setInt16(i * 2, sample * 0x7FFF, true);
+            }
+            
+            return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        }
+
+        handleMessage(data) {
+            console.log('Received message type:', data.type);
+
+            switch (data.type) {
+                case 'ping':
+                    setTimeout(() => {
+                        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                            this.websocket.send(JSON.stringify({
+                                type: 'pong',
+                                event_id: data.ping_event?.event_id
+                            }));
+                        }
+                    }, data.ping_event?.ping_ms || 0);
+                    break;
+
+                case 'user_transcript':
+                    console.log('User said:', data.user_transcription_event?.user_transcript);
+                    this.onMessage({
+                        type: 'user_transcript',
+                        text: data.user_transcription_event?.user_transcript
+                    });
+                    break;
+
+                case 'agent_response':
+                    console.log('Agent response:', data.agent_response_event?.agent_response);
+                    this.onMessage({
+                        type: 'agent_response',
+                        text: data.agent_response_event?.agent_response
+                    });
+                    this.onModeChange({ mode: 'speaking' });
+                    break;
+
+                case 'audio':
+                    if (data.audio_event?.audio_base_64) {
+                        this.playAudio(data.audio_event.audio_base_64);
+                    }
+                    break;
+
+                case 'interruption':
+                    console.log('Conversation interrupted');
+                    this.onModeChange({ mode: 'listening' });
+                    break;
+
+                default:
+                    console.log('Unknown message type:', data.type);
+            }
+        }
+
+        async playAudio(base64Audio) {
+            try {
+                const binaryString = atob(base64Audio);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                const audioBuffer = await this.audioContext.decodeAudioData(bytes.buffer);
+                const source = this.audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(this.audioContext.destination);
+                
+                source.onended = () => {
+                    this.onModeChange({ mode: 'listening' });
+                };
+                
+                source.start();
+                
+            } catch (error) {
+                console.error('Error playing audio:', error);
+            }
+        }
+
+        cleanup() {
+            this.isRecording = false;
+            
+            if (this.stream) {
+                this.stream.getTracks().forEach(track => track.stop());
+                this.stream = null;
+            }
+            
+            if (this.audioContext) {
+                this.audioContext.close();
+                this.audioContext = null;
+            }
+        }
+
+        endConversation() {
+            this.cleanup();
+            if (this.websocket) {
+                this.websocket.close();
+                this.websocket = null;
+            }
+        }
     }
 
     // Create widget HTML template
@@ -770,12 +963,6 @@
         // Set initial language
         updateLanguage();
         
-        // Load ElevenLabs SDK
-        loadElevenLabsSDK().catch(error => {
-            console.warn('ElevenLabs SDK failed to load:', error.message);
-            // Voice chat will be disabled but text chat will still work
-        });
-        
         widgetState.initialized = true;
         console.log('AI Widget initialized successfully');
     }
@@ -909,11 +1096,6 @@
 
     // Optimized voice recording toggle
     function toggleVoiceRecording() {
-        if (!widgetState.elevenLabsLoaded) {
-            showVoiceError();
-            return;
-        }
-
         widgetState.isRecording = !widgetState.isRecording;
         
         if (widgetState.isRecording) {
@@ -923,16 +1105,7 @@
         }
     }
 
-    // Show voice error message
-    function showVoiceError() {
-        const texts = translations[widgetConfig.language];
-        elements.voiceStatus.textContent = texts.voiceError;
-        setTimeout(() => {
-            elements.voiceStatus.textContent = texts.voiceReady;
-        }, 3000);
-    }
-
-    // Start ElevenLabs voice conversation using official SDK
+    // Start ElevenLabs voice conversation using Direct WebSocket API
     async function startVoiceRecording() {
         console.log('Starting ElevenLabs voice conversation...');
         const texts = translations[widgetConfig.language];
@@ -963,11 +1136,8 @@
                 console.log('Using configured agent ID:', agentId);
             }
 
-            // Initialize ElevenLabs conversation using the official SDK
-            const { Conversation } = await import('https://cdn.jsdelivr.net/npm/@11labs/client@latest/dist/index.js');
-            
-            elevenLabsConversation = await Conversation.startSession({
-                agentId: agentId,
+            // Create new voice widget instance with valid agent ID
+            elevenLabsConversation = new ElevenLabsVoiceWidget(agentId, {
                 onConnect: () => {
                     console.log('Voice conversation connected');
                     elements.voiceStatus.textContent = texts.listening;
@@ -1006,14 +1176,15 @@
                         elements.voiceAvatar.classList.add('speaking');
                     } else if (mode.mode === 'listening') {
                         elements.voiceStatus.textContent = texts.listening;
-                        elements.voiceAvatar.classList.remove('speaking');
                     }
                 },
                 onMessage: (message) => {
-                    console.log('Voice message:', message.type, message.message);
+                    console.log('Voice message:', message.type, message.text);
                     // You can add transcription display here if needed
                 }
             });
+
+            await elevenLabsConversation.startConversation();
             
         } catch (error) {
             console.error('Error starting voice conversation:', error);
@@ -1049,11 +1220,7 @@
         const texts = translations[widgetConfig.language];
         
         if (elevenLabsConversation) {
-            try {
-                await elevenLabsConversation.endSession();
-            } catch (error) {
-                console.warn('Error ending conversation:', error);
-            }
+            elevenLabsConversation.endConversation();
             elevenLabsConversation = null;
         }
         
