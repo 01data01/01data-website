@@ -879,51 +879,82 @@
         }
     }
 
-    // Voice recording state
-    let mediaRecorder;
-    let audioChunks = [];
-    let stream;
+    // ElevenLabs Conversation state
+    let conversation = null;
+    let isVoiceConnected = false;
 
-    // Voice recording functions with proper implementation
+    // Load ElevenLabs client dynamically
+    async function loadElevenLabsClient() {
+        if (window.ElevenLabsConversation) {
+            return window.ElevenLabsConversation;
+        }
+        
+        try {
+            const module = await import('https://unpkg.com/@elevenlabs/client@latest/dist/index.js');
+            window.ElevenLabsConversation = module.Conversation;
+            return module.Conversation;
+        } catch (error) {
+            console.error('Failed to load ElevenLabs client:', error);
+            throw new Error('Voice chat service unavailable');
+        }
+    }
+
+    // Start ElevenLabs voice conversation
     async function startVoiceRecording() {
-        console.log('Starting voice recording...');
+        console.log('Starting ElevenLabs voice conversation...');
         const texts = translations[widgetConfig.language];
         
         try {
-            // Request microphone permission
-            stream = await navigator.mediaDevices.getUserMedia({ 
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    sampleRate: 44100
-                } 
-            });
-            
+            // Request microphone permission first
+            await navigator.mediaDevices.getUserMedia({ audio: true });
             console.log('Microphone access granted');
             
-            // Initialize MediaRecorder
-            mediaRecorder = new MediaRecorder(stream, {
-                mimeType: 'audio/webm;codecs=opus'
+            // Load ElevenLabs client
+            const Conversation = await loadElevenLabsClient();
+            
+            // Get agent ID from environment variable through our API
+            const agentId = await getAgentId();
+            
+            // Start the conversation
+            conversation = await Conversation.startSession({
+                agentId: agentId,
+                onConnect: () => {
+                    console.log('Voice conversation connected');
+                    isVoiceConnected = true;
+                    elements.voiceStatus.textContent = texts.listening;
+                    elements.voiceAvatar.classList.add('speaking');
+                },
+                onDisconnect: () => {
+                    console.log('Voice conversation disconnected');
+                    isVoiceConnected = false;
+                    elements.voiceStatus.textContent = texts.voiceReady;
+                    elements.voiceAvatar.classList.remove('speaking');
+                    widgetState.isRecording = false;
+                    elements.voiceBtn.classList.remove('recording');
+                    elements.voiceBtn.textContent = texts.startSpeaking;
+                },
+                onError: (error) => {
+                    console.error('Voice conversation error:', error);
+                    elements.voiceStatus.textContent = 'Voice error occurred';
+                    setTimeout(() => {
+                        elements.voiceStatus.textContent = texts.voiceReady;
+                    }, 2000);
+                },
+                onModeChange: (mode) => {
+                    // mode.mode will be 'speaking' or 'listening'
+                    console.log('Agent is now:', mode.mode);
+                    if (mode.mode === 'speaking') {
+                        elements.voiceStatus.textContent = texts.speaking;
+                        elements.voiceAvatar.classList.add('speaking');
+                    } else {
+                        elements.voiceStatus.textContent = texts.listening;
+                        elements.voiceAvatar.classList.remove('speaking');
+                    }
+                },
             });
             
-            audioChunks = [];
-            
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    audioChunks.push(event.data);
-                }
-            };
-            
-            mediaRecorder.onstop = async () => {
-                console.log('Recording stopped, processing audio...');
-                await processVoiceRecording();
-            };
-            
-            mediaRecorder.start();
-            elements.voiceStatus.textContent = texts.listening;
-            
         } catch (error) {
-            console.error('Error accessing microphone:', error);
+            console.error('Error starting voice conversation:', error);
             elements.voiceStatus.textContent = 'Microphone access denied';
             widgetState.isRecording = false;
             elements.voiceBtn.classList.remove('recording');
@@ -931,60 +962,40 @@
             
             // Show error message to user
             if (error.name === 'NotAllowedError') {
-                alert('Microphone access is required for voice chat. Please allow microphone access and try again.');
+                const alertMsg = widgetConfig.language === 'tr' 
+                    ? 'Sesli sohbet için mikrofon erişimi gereklidir. Lütfen mikrofon erişimine izin verin ve tekrar deneyin.'
+                    : 'Microphone access is required for voice chat. Please allow microphone access and try again.';
+                alert(alertMsg);
             } else {
-                alert('Unable to access microphone. Please check your microphone settings.');
+                const alertMsg = widgetConfig.language === 'tr' 
+                    ? 'Sesli sohbet başlatılamadı. Lütfen mikrofon ayarlarınızı kontrol edin.'
+                    : 'Unable to start voice chat. Please check your microphone settings.';
+                alert(alertMsg);
             }
         }
     }
 
-    function stopVoiceRecording() {
-        console.log('Stopping voice recording...');
+    // Stop ElevenLabs voice conversation
+    async function stopVoiceRecording() {
+        console.log('Stopping voice conversation...');
         const texts = translations[widgetConfig.language];
         
-        if (mediaRecorder && mediaRecorder.state === 'recording') {
-            mediaRecorder.stop();
-            elements.voiceStatus.textContent = texts.processing;
-        }
-        
-        // Stop all audio tracks
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-    }
-
-    // Process recorded audio
-    async function processVoiceRecording() {
-        const texts = translations[widgetConfig.language];
-        
-        try {
-            if (audioChunks.length === 0) {
-                throw new Error('No audio data recorded');
-            }
-            
-            // Create audio blob
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm;codecs=opus' });
-            console.log('Audio blob created, size:', audioBlob.size);
-            
-            // For now, we'll use ElevenLabs agent embed instead of processing audio directly
-            // This will open the ElevenLabs conversational AI in a modal
-            await openElevenLabsVoiceChat();
-            
-        } catch (error) {
-            console.error('Error processing voice recording:', error);
-            elements.voiceStatus.textContent = 'Error processing audio';
-            setTimeout(() => {
+        if (conversation && isVoiceConnected) {
+            try {
+                await conversation.endSession();
+                conversation = null;
+                isVoiceConnected = false;
                 elements.voiceStatus.textContent = texts.voiceReady;
-            }, 2000);
+                elements.voiceAvatar.classList.remove('speaking');
+            } catch (error) {
+                console.error('Error ending voice conversation:', error);
+            }
         }
     }
 
-    // Open ElevenLabs Voice Chat
-    async function openElevenLabsVoiceChat() {
-        const texts = translations[widgetConfig.language];
-        
+    // Get agent ID from our backend
+    async function getAgentId() {
         try {
-            // Get voice token from our API
             const response = await fetch(widgetConfig.endpoint.replace('/conversation', '/get-voice-token'), {
                 method: 'POST',
                 headers: {
@@ -997,121 +1008,24 @@
             });
 
             if (!response.ok) {
-                // If endpoint not available yet, use direct ElevenLabs embed as fallback
-                if (response.status === 404) {
-                    console.log('Voice token endpoint not deployed yet, using direct embed');
-                    const directEmbedUrl = 'https://elevenlabs.io/convai/agents/your-agent-id';
-                    createVoiceModal(directEmbedUrl);
-                    return;
-                }
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
             
             if (!data.success) {
-                throw new Error(data.error || 'Failed to get voice token');
+                throw new Error(data.error || 'Failed to get agent ID');
             }
 
-            // Create ElevenLabs embed iframe
-            const embedUrl = data.embedUrl;
-            elements.voiceStatus.textContent = texts.speaking;
-            
-            // Create modal with ElevenLabs embed
-            createVoiceModal(embedUrl);
+            return data.agent_id;
             
         } catch (error) {
-            console.error('Error getting voice token:', error);
-            
-            // Fallback: Show user message about deployment
-            const alertMsg = widgetConfig.language === 'tr' 
-                ? 'Sesli sohbet özelliği yakında kullanıma açılacak. Şimdilik metin sohbetini kullanabilirsiniz.'
-                : 'Voice chat feature will be available soon. You can use text chat for now.';
-            
-            alert(alertMsg);
-            
-            elements.voiceStatus.textContent = texts.voiceReady;
-            
-            // Switch back to text mode
-            switchMode('text');
+            console.error('Error getting agent ID:', error);
+            // Fallback to environment variable approach
+            throw new Error('Voice service configuration error');
         }
     }
 
-    // Create voice modal with ElevenLabs embed
-    function createVoiceModal(embedUrl) {
-        const texts = translations[widgetConfig.language];
-        
-        // Remove existing modal if any
-        const existingModal = document.getElementById('elevenlabs-voice-modal');
-        if (existingModal) {
-            existingModal.remove();
-        }
-        
-        // Create modal
-        const modal = document.createElement('div');
-        modal.id = 'elevenlabs-voice-modal';
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        `;
-        
-        const modalContent = document.createElement('div');
-        modalContent.style.cssText = `
-            background: white;
-            border-radius: 16px;
-            padding: 20px;
-            max-width: 90%;
-            max-height: 90%;
-            position: relative;
-        `;
-        
-        const closeBtn = document.createElement('button');
-        closeBtn.textContent = '✕';
-        closeBtn.style.cssText = `
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            z-index: 1;
-        `;
-        
-        const iframe = document.createElement('iframe');
-        iframe.src = embedUrl;
-        iframe.style.cssText = `
-            width: 400px;
-            height: 600px;
-            border: none;
-            border-radius: 8px;
-        `;
-        
-        closeBtn.onclick = () => {
-            modal.remove();
-            elements.voiceStatus.textContent = texts.voiceReady;
-        };
-        
-        modal.onclick = (e) => {
-            if (e.target === modal) {
-                modal.remove();
-                elements.voiceStatus.textContent = texts.voiceReady;
-            }
-        };
-        
-        modalContent.appendChild(closeBtn);
-        modalContent.appendChild(iframe);
-        modal.appendChild(modalContent);
-        document.body.appendChild(modal);
-    }
 
     // Optimized message adding with better performance
     function addMessageToChat(message, sender) {

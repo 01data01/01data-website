@@ -74,7 +74,7 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Get ElevenLabs agent link/token
+    // Get ElevenLabs agent ID directly
     const agentId = process.env.ELEVENLABS_AGENT_ID;
     
     if (!agentId) {
@@ -88,14 +88,8 @@ exports.handler = async (event, context) => {
       };
     }
 
-    const response = await axios.get(
-      `https://api.elevenlabs.io/v1/convai/agents/${agentId}/link`,
-      {
-        headers: {
-          'xi-api-key': process.env.ELEVENLABS_API_KEY
-        }
-      }
-    );
+    // Increment usage for voice conversation session
+    client.used++;
 
     return {
       statusCode: 200,
@@ -105,10 +99,7 @@ exports.handler = async (event, context) => {
       },
       body: JSON.stringify({
         success: true,
-        agent_id: response.data.agent_id,
-        token: response.data.token,
-        conversationUrl: `https://elevenlabs.io/convai/agent/${agentId}`,
-        embedUrl: `https://elevenlabs.io/convai/embed/${agentId}`,
+        agent_id: agentId,
         usage: {
           used: client.used,
           limit: client.limit,
