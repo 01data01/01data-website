@@ -879,54 +879,260 @@
         }
     }
 
-    // ElevenLabs Conversation state
-    let conversation = null;
-    let isVoiceConnected = false;
+    // ElevenLabs Voice Chat Integration using Direct WebSocket API
+    let elevenLabsVoice = null;
 
-    // Load ElevenLabs client dynamically
-    async function loadElevenLabsClient() {
-        if (window.ElevenLabsConversation) {
-            return window.ElevenLabsConversation;
+    // ElevenLabs Voice Widget Class
+    class ElevenLabsVoiceWidget {
+        constructor(agentId, options = {}) {
+            this.agentId = agentId;
+            this.websocket = null;
+            this.isConnected = false;
+            this.isRecording = false;
+            this.mediaRecorder = null;
+            this.audioContext = null;
+            this.audioQueue = [];
+            this.isPlaying = false;
+            
+            // Callbacks
+            this.onConnect = options.onConnect || (() => {});
+            this.onDisconnect = options.onDisconnect || (() => {});
+            this.onError = options.onError || (() => {});
+            this.onModeChange = options.onModeChange || (() => {});
+            this.onMessage = options.onMessage || (() => {});
         }
-        
-        try {
-            const module = await import('https://unpkg.com/@elevenlabs/client@latest/dist/index.js');
-            window.ElevenLabsConversation = module.Conversation;
-            return module.Conversation;
-        } catch (error) {
-            console.error('Failed to load ElevenLabs client:', error);
-            throw new Error('Voice chat service unavailable');
+
+        async startConversation() {
+            try {
+                // Get agent ID from backend first
+                const agentData = await this.getAgentId();
+                
+                // Request microphone permission
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        channelCount: 1,
+                        sampleRate: 16000,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    } 
+                });
+                
+                // Connect to WebSocket
+                const wsUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${agentData.agent_id}`;
+                this.websocket = new WebSocket(wsUrl);
+                
+                this.websocket.onopen = () => {
+                    console.log('WebSocket connected to ElevenLabs');
+                    this.isConnected = true;
+                    this.onConnect();
+                    
+                    // Send initial client data
+                    this.sendMessage({
+                        type: "conversation_initiation_client_data"
+                    });
+                    
+                    // Start recording
+                    this.startRecording(stream);
+                };
+
+                this.websocket.onmessage = (event) => {
+                    this.handleMessage(JSON.parse(event.data));
+                };
+
+                this.websocket.onclose = () => {
+                    console.log('WebSocket disconnected from ElevenLabs');
+                    this.isConnected = false;
+                    this.onDisconnect();
+                    this.stopRecording();
+                };
+
+                this.websocket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    this.onError(error);
+                };
+
+            } catch (error) {
+                console.error('Failed to start conversation:', error);
+                this.onError(error);
+            }
+        }
+
+        async getAgentId() {
+            const response = await fetch(widgetConfig.endpoint.replace('/conversation', '/get-voice-token'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': widgetConfig.apiKey
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to get agent ID');
+            }
+
+            return data;
+        }
+
+        async startRecording(stream) {
+            try {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = this.audioContext.createMediaStreamSource(stream);
+                
+                // Create a script processor for audio chunks
+                const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
+                
+                processor.onaudioprocess = (event) => {
+                    if (this.isRecording && this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                        const inputBuffer = event.inputBuffer.getChannelData(0);
+                        
+                        // Convert to base64
+                        const audioData = this.encodeAudioData(inputBuffer);
+                        
+                        this.sendMessage({
+                            user_audio_chunk: audioData
+                        });
+                    }
+                };
+                
+                source.connect(processor);
+                processor.connect(this.audioContext.destination);
+                
+                this.isRecording = true;
+                
+            } catch (error) {
+                console.error('Failed to start recording:', error);
+                this.onError(error);
+            }
+        }
+
+        encodeAudioData(inputBuffer) {
+            // Convert Float32Array to base64
+            const buffer = new ArrayBuffer(inputBuffer.length * 2);
+            const view = new DataView(buffer);
+            
+            for (let i = 0; i < inputBuffer.length; i++) {
+                const sample = Math.max(-1, Math.min(1, inputBuffer[i]));
+                view.setInt16(i * 2, sample * 0x7FFF, true);
+            }
+            
+            return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        }
+
+        handleMessage(data) {
+            console.log('Received message:', data.type);
+
+            switch (data.type) {
+                case 'ping':
+                    // Respond to ping to keep connection alive
+                    setTimeout(() => {
+                        this.sendMessage({
+                            type: 'pong',
+                            event_id: data.ping_event.event_id
+                        });
+                    }, data.ping_event.ping_ms || 0);
+                    break;
+
+                case 'user_transcript':
+                    console.log('User said:', data.user_transcription_event.user_transcript);
+                    this.onMessage({
+                        type: 'user_transcript',
+                        text: data.user_transcription_event.user_transcript
+                    });
+                    break;
+
+                case 'agent_response':
+                    console.log('Agent response:', data.agent_response_event.agent_response);
+                    this.onMessage({
+                        type: 'agent_response',
+                        text: data.agent_response_event.agent_response
+                    });
+                    this.onModeChange({ mode: 'speaking' });
+                    break;
+
+                case 'audio':
+                    this.playAudio(data.audio_event.audio_base_64);
+                    break;
+
+                case 'interruption':
+                    console.log('Conversation interrupted');
+                    this.onModeChange({ mode: 'listening' });
+                    break;
+
+                default:
+                    console.log('Unknown message type:', data.type);
+            }
+        }
+
+        async playAudio(base64Audio) {
+            try {
+                // Decode base64 audio
+                const binaryString = atob(base64Audio);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                // Create audio buffer and play
+                const audioBuffer = await this.audioContext.decodeAudioData(bytes.buffer);
+                const source = this.audioContext.createBufferSource();
+                source.buffer = audioBuffer;
+                source.connect(this.audioContext.destination);
+                
+                source.onended = () => {
+                    this.onModeChange({ mode: 'listening' });
+                };
+                
+                source.start();
+                
+            } catch (error) {
+                console.error('Error playing audio:', error);
+            }
+        }
+
+        sendMessage(message) {
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify(message));
+            }
+        }
+
+        stopRecording() {
+            this.isRecording = false;
+            if (this.audioContext) {
+                this.audioContext.close();
+                this.audioContext = null;
+            }
+        }
+
+        endConversation() {
+            this.stopRecording();
+            if (this.websocket) {
+                this.websocket.close();
+                this.websocket = null;
+            }
         }
     }
 
-    // Start ElevenLabs voice conversation
+    // Start ElevenLabs voice conversation using proper WebSocket API
     async function startVoiceRecording() {
         console.log('Starting ElevenLabs voice conversation...');
         const texts = translations[widgetConfig.language];
         
         try {
-            // Request microphone permission first
-            await navigator.mediaDevices.getUserMedia({ audio: true });
-            console.log('Microphone access granted');
-            
-            // Load ElevenLabs client
-            const Conversation = await loadElevenLabsClient();
-            
-            // Get agent ID from environment variable through our API
-            const agentId = await getAgentId();
-            
-            // Start the conversation
-            conversation = await Conversation.startSession({
-                agentId: agentId,
+            // Create new voice widget instance
+            elevenLabsVoice = new ElevenLabsVoiceWidget(null, {
                 onConnect: () => {
                     console.log('Voice conversation connected');
-                    isVoiceConnected = true;
                     elements.voiceStatus.textContent = texts.listening;
                     elements.voiceAvatar.classList.add('speaking');
                 },
                 onDisconnect: () => {
                     console.log('Voice conversation disconnected');
-                    isVoiceConnected = false;
                     elements.voiceStatus.textContent = texts.voiceReady;
                     elements.voiceAvatar.classList.remove('speaking');
                     widgetState.isRecording = false;
@@ -935,23 +1141,32 @@
                 },
                 onError: (error) => {
                     console.error('Voice conversation error:', error);
-                    elements.voiceStatus.textContent = 'Voice error occurred';
-                    setTimeout(() => {
-                        elements.voiceStatus.textContent = texts.voiceReady;
-                    }, 2000);
+                    elements.voiceStatus.textContent = 'Voice connection error';
+                    widgetState.isRecording = false;
+                    elements.voiceBtn.classList.remove('recording');
+                    elements.voiceBtn.textContent = texts.startSpeaking;
+                    
+                    // Show user-friendly error message
+                    const alertMsg = widgetConfig.language === 'tr' 
+                        ? 'Sesli sohbet başlatılamadı. Lütfen mikrofon ayarlarınızı kontrol edin.'
+                        : 'Unable to start voice chat. Please check your microphone settings.';
+                    alert(alertMsg);
                 },
                 onModeChange: (mode) => {
-                    // mode.mode will be 'speaking' or 'listening'
-                    console.log('Agent is now:', mode.mode);
                     if (mode.mode === 'speaking') {
                         elements.voiceStatus.textContent = texts.speaking;
                         elements.voiceAvatar.classList.add('speaking');
                     } else {
                         elements.voiceStatus.textContent = texts.listening;
-                        elements.voiceAvatar.classList.remove('speaking');
                     }
                 },
+                onMessage: (message) => {
+                    // Log voice messages for debugging
+                    console.log('Voice message:', message.type, message.text);
+                }
             });
+
+            await elevenLabsVoice.startConversation();
             
         } catch (error) {
             console.error('Error starting voice conversation:', error);
@@ -975,55 +1190,18 @@
         }
     }
 
-    // Stop ElevenLabs voice conversation
+    // Stop ElevenLabs voice conversation  
     async function stopVoiceRecording() {
         console.log('Stopping voice conversation...');
         const texts = translations[widgetConfig.language];
         
-        if (conversation && isVoiceConnected) {
-            try {
-                await conversation.endSession();
-                conversation = null;
-                isVoiceConnected = false;
-                elements.voiceStatus.textContent = texts.voiceReady;
-                elements.voiceAvatar.classList.remove('speaking');
-            } catch (error) {
-                console.error('Error ending voice conversation:', error);
-            }
+        if (elevenLabsVoice) {
+            elevenLabsVoice.endConversation();
+            elevenLabsVoice = null;
         }
-    }
-
-    // Get agent ID from our backend
-    async function getAgentId() {
-        try {
-            const response = await fetch(widgetConfig.endpoint.replace('/conversation', '/get-voice-token'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': widgetConfig.apiKey
-                },
-                body: JSON.stringify({
-                    language: widgetConfig.language
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to get agent ID');
-            }
-
-            return data.agent_id;
-            
-        } catch (error) {
-            console.error('Error getting agent ID:', error);
-            // Fallback to environment variable approach
-            throw new Error('Voice service configuration error');
-        }
+        
+        elements.voiceStatus.textContent = texts.voiceReady;
+        elements.voiceAvatar.classList.remove('speaking');
     }
 
 

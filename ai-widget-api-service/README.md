@@ -56,6 +56,11 @@ CLAUDE_API_KEY=your_claude_key
 - **Limits**: Configurable per client
 
 ## 🎯 Current Status
+- **Voice Chat**: ✅ Upgraded to ElevenLabs direct WebSocket API for better performance
+- **Text Chat**: ✅ Claude API integration working perfectly
+- **Widget**: ✅ Optimized 25KB embeddable widget with dual-mode support
+- **API**: ✅ Complete serverless backend with usage tracking
+
 See [PROJECT_PLAN.md](./PROJECT_PLAN.md) for detailed progress tracking.
 
 ---
