@@ -1155,20 +1155,19 @@
         try {
             let agentId;
             
-            // Try to get agent ID from backend first (environment variable)
-            try {
-                agentId = await getAgentIdFromBackend();
-                console.log('Using agent ID from environment variable:', agentId);
-            } catch (backendError) {
-                console.log('Backend failed, trying direct configuration:', backendError.message);
-                
-                // Fallback to direct configuration
-                agentId = widgetConfig.elevenLabsAgentId;
-                
-                if (!agentId || agentId.trim() === '' || agentId === 'YOUR_ELEVENLABS_AGENT_ID' || agentId === 'your_agent_id_here') {
-                    throw new Error('ElevenLabs agent ID is required. Either set ELEVENLABS_AGENT_ID environment variable or configure elevenLabsAgentId in widget initialization.');
+            // For public agents, try direct configuration first, then backend fallback
+            agentId = widgetConfig.elevenLabsAgentId;
+            
+            if (!agentId || agentId.trim() === '' || agentId === 'YOUR_ELEVENLABS_AGENT_ID' || agentId === 'your_agent_id_here' || agentId === 'YOUR_ACTUAL_AGENT_ID_HERE') {
+                // Try to get agent ID from backend as fallback
+                try {
+                    agentId = await getAgentIdFromBackend();
+                    console.log('Using agent ID from backend environment variable:', agentId);
+                } catch (backendError) {
+                    console.log('Backend also failed:', backendError.message);
+                    throw new Error('ElevenLabs agent ID is required. Please set elevenLabsAgentId in widget configuration or configure ELEVENLABS_AGENT_ID environment variable.');
                 }
-                
+            } else {
                 console.log('Using direct agent ID configuration:', agentId);
             }
             
