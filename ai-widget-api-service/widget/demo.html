@@ -155,6 +155,20 @@
             color: #ffc107;
         }
 
+        .setup-notice {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .setup-notice-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2196f3;
+        }
+
         @media (max-width: 768px) {
             .demo-title {
                 font-size: 36px;
@@ -194,7 +208,7 @@
                 <div class="feature-icon">🎤</div>
                 <h3 class="feature-title">Voice Chat</h3>
                 <p class="feature-description">
-                    Natural voice conversations using ElevenLabs technology.
+                    Natural voice conversations using ElevenLabs Conversational AI.
                     Speak naturally and get voice responses.
                 </p>
             </div>
@@ -215,6 +229,7 @@
                 <li>Look for the <span class="highlight">orange floating button</span> in the bottom-right corner</li>
                 <li>Click the button to open the AI assistant</li>
                 <li>Choose between <span class="highlight">Text Chat</span> or <span class="highlight">Voice Chat</span> mode</li>
+                <li>For voice chat, allow microphone access when prompted</li>
                 <li>Start a conversation and experience the AI assistance</li>
                 <li>Test both modes to see the difference</li>
             </ol>
@@ -231,8 +246,8 @@ AIWidget.init({
   apiKey: 'sk_a1pvc_demo123',
   language: 'tr',
   company: 'A1 PVC Market',
-  position: 'bottom-right'
-  // elevenLabsAgentId: 'agent_id' // Optional: only if env var not set
+  position: 'bottom-right',
+  elevenLabsAgentId: 'your-agent-id-here' // Optional: if not set in env
 });
 &lt;/script&gt;</div>
 
@@ -242,12 +257,24 @@ AIWidget.init({
 Company: A1 PVC Market  
 Language: Turkish (tr)
 Usage Limit: 5000 requests
-Mode: Both text and voice supported</div>
+Text Chat: Claude AI
+Voice Chat: ElevenLabs Conversational AI</div>
+        </div>
+
+        <div class="setup-notice">
+            <div class="setup-notice-title">🔧 Setup Instructions</div>
+            <p>To enable voice chat, you need to:</p>
+            <ol style="margin: 10px 0; padding-left: 20px;">
+                <li>Create an ElevenLabs account and set up a Conversational AI agent</li>
+                <li>Get your agent ID from the ElevenLabs dashboard</li>
+                <li>Set the <code>ELEVENLABS_AGENT_ID</code> environment variable in your deployment</li>
+                <li>Or pass the agent ID directly in the widget configuration</li>
+            </ol>
         </div>
 
         <div class="notice">
             <div class="notice-title">⚡ Live Demo</div>
-            <p>This is a live demo using the actual API service. All conversations are processed through our AI backend with real ElevenLabs voice synthesis and Claude text responses.</p>
+            <p>This is a live demo using the actual API service. Text chat works with Claude AI. Voice chat requires proper ElevenLabs agent configuration. All conversations are processed through our AI backend with real-time responses.</p>
         </div>
     </div>
 
@@ -262,15 +289,33 @@ Mode: Both text and voice supported</div>
             position: 'bottom-right',
             primaryColor: '#f7931e',
             voiceColor: '#00d4ff',
-            // Temporarily add your agent ID here for testing while we debug the environment variable
-            elevenLabsAgentId: 'YOUR_ACTUAL_AGENT_ID_HERE' // Replace with your actual ElevenLabs agent ID
+            // ElevenLabs agent ID - set this to your actual agent ID
+            // or configure ELEVENLABS_AGENT_ID environment variable
+            elevenLabsAgentId: '' // Leave empty to use environment variable
         });
 
         // Demo analytics
         console.log('AI Widget Demo Loaded');
-        console.log('Features: Text Chat + Voice Chat');
+        console.log('Features: Text Chat (Claude AI) + Voice Chat (ElevenLabs)');
         console.log('Languages: Turkish, English');
-        console.log('Backend: Netlify Functions + ElevenLabs + Claude');
+        console.log('Backend: Netlify Functions + ElevenLabs SDK + Claude');
+        
+        // Check if voice is properly configured
+        fetch('https://01data.org/widget-api/get-voice-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': 'sk_a1pvc_demo123'
+            }
+        }).then(response => response.json()).then(data => {
+            if (data.success) {
+                console.log('✅ Voice chat is properly configured');
+            } else {
+                console.log('⚠️ Voice chat configuration needed:', data.error);
+            }
+        }).catch(error => {
+            console.log('⚠️ Voice chat backend not available:', error.message);
+        });
     </script>
 </body>
 </html>
