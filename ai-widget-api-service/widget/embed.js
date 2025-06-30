@@ -1,7 +1,6 @@
 /**
- * AI Widget Embed Script - Fixed ElevenLabs Integration
- * Embeddable widget for AI-powered customer support
- * Supports both text chat and voice conversation modes
+ * AI Widget Embed Script - A1 Style Voice Integration
+ * Based on proven www.01data.org/a1 implementation
  */
 
 (function() {
@@ -16,7 +15,7 @@
         company: 'AI Assistant',
         primaryColor: '#f7931e',
         voiceColor: '#00d4ff',
-        elevenLabsAgentId: '' // Required for voice chat
+        elevenLabsAgentId: '' // Optional - will use environment variable if not provided
     };
     
     let widgetConfig = {};
@@ -33,10 +32,10 @@
     // Cache DOM elements
     const elements = {};
     
-    // ElevenLabs conversation instance
-    let elevenLabsConversation = null;
+    // Voice chat instance (A1 style)
+    let voiceChat = null;
     
-    // Translations (moved to top level for better access)
+    // Translations
     const translations = {
         en: {
             welcome: "Hello! How can I help you today?",
@@ -72,7 +71,7 @@
         }
     };
 
-    // SVG icons as constants to avoid repetition
+    // SVG icons
     const SVG_ICONS = {
         chat: '<path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/><circle cx="12" cy="8" r="1"/><circle cx="16" cy="8" r="1"/><circle cx="8" cy="8" r="1"/>',
         close: '<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>',
@@ -81,10 +80,9 @@
         send: '<path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>'
     };
 
-    // ElevenLabs Voice Chat Implementation using Direct WebSocket API
-    class ElevenLabsVoiceWidget {
-        constructor(agentId, options = {}) {
-            this.agentId = agentId;
+    // A1 Style Voice Chat Class (Based on working implementation)
+    class A1VoiceChat {
+        constructor() {
             this.websocket = null;
             this.isConnected = false;
             this.isRecording = false;
@@ -93,191 +91,382 @@
             this.audioQueue = [];
             this.isPlaying = false;
             this.stream = null;
+            this.selectedAgent = 'primary'; // Default to primary agent
             
-            // Callbacks
-            this.onConnect = options.onConnect || (() => {});
-            this.onDisconnect = options.onDisconnect || (() => {});
-            this.onError = options.onError || (() => {});
-            this.onModeChange = options.onModeChange || (() => {});
-            this.onMessage = options.onMessage || (() => {});
+            // Configuration
+            this.config = {
+                sampleRate: 16000,
+                audioFormat: 'pcm_16000'
+            };
+
+            this.callbacks = {
+                onConnectionChange: null,
+                onTranscript: null,
+                onAgentResponse: null,
+                onError: null,
+                onModeChange: null
+            };
+
+            console.log('🚀 A1VoiceChat initialized - Widget Version');
+        }
+
+        setCallbacks(callbacks) {
+            this.callbacks = { ...this.callbacks, ...callbacks };
+        }
+
+        setSelectedAgent(agentType) {
+            this.selectedAgent = agentType;
+            console.log(`Voice chat agent selected: ${agentType}`);
         }
 
         async startConversation() {
+            console.log('A1: VoiceChat.startConversation() called - A1 Style');
+            
+            if (this.isConnected) {
+                console.log('A1: Conversation already active');
+                return;
+            }
+
             try {
-                console.log('Starting conversation with agent ID:', this.agentId);
+                console.log('A1: Requesting microphone permission...');
                 
-                // Request microphone permission first
+                // Request microphone permission
                 this.stream = await navigator.mediaDevices.getUserMedia({ 
                     audio: {
+                        sampleRate: this.config.sampleRate,
                         channelCount: 1,
-                        sampleRate: 16000,
                         echoCancellation: true,
-                        noiseSuppression: true,
-                        autoGainControl: true
-                    } 
-                });
-                
-                // Create audio context for processing
-                this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
-                    sampleRate: 16000
-                });
-                
-                // Connect to ElevenLabs WebSocket
-                const wsUrl = `wss://api.elevenlabs.io/v1/convai/conversation?agent_id=${this.agentId}`;
-                console.log('Connecting to:', wsUrl);
-                
-                this.websocket = new WebSocket(wsUrl);
-                
-                this.websocket.onopen = () => {
-                    console.log('WebSocket connected to ElevenLabs');
-                    this.isConnected = true;
-                    this.onConnect();
-                    this.startRecording();
-                };
-
-                this.websocket.onmessage = (event) => {
-                    try {
-                        const data = JSON.parse(event.data);
-                        this.handleMessage(data);
-                    } catch (error) {
-                        console.error('Error parsing WebSocket message:', error);
+                        noiseSuppression: true
                     }
-                };
+                });
 
-                this.websocket.onclose = (event) => {
-                    console.log('WebSocket disconnected:', event.code, event.reason);
-                    this.isConnected = false;
-                    this.onDisconnect();
-                    this.cleanup();
-                };
+                console.log('A1: Microphone permission granted');
 
-                this.websocket.onerror = (error) => {
-                    console.error('WebSocket error:', error);
-                    this.onError(new Error('Voice connection failed'));
-                };
-
+                // Set up WebSocket connection using A1 approach
+                await this.connectWebSocket();
+                
+                // Set up audio recording
+                await this.setupAudioRecording();
+                
+                console.log('A1: Voice conversation started successfully');
+                
             } catch (error) {
-                console.error('Failed to start conversation:', error);
-                this.onError(error);
+                console.error('A1: Failed to start conversation:', error);
+                this.handleError('Failed to start voice conversation: ' + error.message);
             }
         }
 
-        startRecording() {
-            if (!this.stream || !this.audioContext) return;
-            
+        async connectWebSocket() {
+            return new Promise(async (resolve, reject) => {
+                try {
+                    console.log('A1: Getting signed URL from server...');
+                    
+                    // Use the A1 style endpoint approach
+                    let url = 'https://01data.org/.netlify/functions/elevenlabs-signed-url';
+                    
+                    // Add agent selection parameter if secondary agent
+                    if (this.selectedAgent === 'secondary') {
+                        url += '?agent_id=secondary';
+                        console.log('A1: Using secondary agent');
+                    } else {
+                        console.log('A1: Using primary agent (default)');
+                    }
+                    
+                    console.log('A1: Fetching signed URL from:', url);
+                    
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 10000);
+                    
+                    const response = await fetch(url, {
+                        signal: controller.signal,
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    clearTimeout(timeoutId);
+                    
+                    console.log('A1: Signed URL response status:', response.status);
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.error('A1: Signed URL error response:', errorText);
+                        throw new Error(`Failed to get signed URL: ${response.status} - ${errorText}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('A1: Signed URL response data received');
+                    
+                    const signedUrl = data.signed_url;
+                    
+                    if (!signedUrl) {
+                        console.error('A1: No signed URL in response');
+                        throw new Error('No signed URL received from server');
+                    }
+                    
+                    console.log('A1: Connecting with signed URL...');
+                    console.log('A1: Using agent ID:', data.agent_id);
+                    
+                    this.websocket = new WebSocket(signedUrl);
+
+                    this.websocket.onopen = () => {
+                        console.log('A1: WebSocket connected successfully');
+                        this.isConnected = true;
+                        this.updateConnectionStatus(true);
+                        
+                        // Send conversation initiation (A1 style)
+                        console.log('A1: Sending conversation initiation...');
+                        this.sendMessage({
+                            type: 'conversation_initiation_client_data',
+                            conversation_config_override: {
+                                agent: {
+                                    prompt: {
+                                        prompt: 'You are a helpful AI assistant. Provide professional customer support in both Turkish and English.'
+                                    },
+                                    first_message: 'Hello! How can I help you today?',
+                                    language: widgetConfig.language || 'en'
+                                }
+                            }
+                        });
+                        
+                        resolve();
+                    };
+
+                    this.websocket.onmessage = (event) => {
+                        this.handleWebSocketMessage(event);
+                    };
+
+                    this.websocket.onclose = (event) => {
+                        console.log('A1: WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
+                        this.isConnected = false;
+                        this.cleanup();
+                        reject(new Error(`WebSocket connection closed: ${event.code} - ${event.reason}`));
+                    };
+
+                    this.websocket.onerror = (error) => {
+                        console.error('A1: WebSocket error:', error);
+                        this.isConnected = false;
+                        this.cleanup();
+                        reject(error);
+                    };
+
+                    // Connection timeout
+                    setTimeout(() => {
+                        if (!this.isConnected) {
+                            reject(new Error('WebSocket connection timeout'));
+                        }
+                    }, 10000);
+                    
+                } catch (error) {
+                    console.error('Error setting up WebSocket connection:', error);
+                    reject(error);
+                }
+            });
+        }
+
+        async setupAudioRecording() {
             try {
+                // Create audio context
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: this.config.sampleRate
+                });
+
+                console.log('A1: Setting up audio processing...');
                 const source = this.audioContext.createMediaStreamSource(this.stream);
+                
+                // Use script processor for audio chunks
                 const processor = this.audioContext.createScriptProcessor(4096, 1, 1);
                 
                 processor.onaudioprocess = (event) => {
-                    if (this.isRecording && this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-                        const inputBuffer = event.inputBuffer.getChannelData(0);
-                        const audioData = this.encodeAudioData(inputBuffer);
+                    if (this.isRecording && this.isConnected) {
+                        const inputData = event.inputBuffer.getChannelData(0);
+                        const audioData = this.convertFloat32ToPCM16(inputData);
+                        const base64Audio = this.arrayBufferToBase64(audioData);
                         
-                        this.websocket.send(JSON.stringify({
-                            user_audio_chunk: audioData
-                        }));
+                        this.sendMessage({
+                            user_audio_chunk: base64Audio
+                        });
                     }
                 };
-                
+
                 source.connect(processor);
                 processor.connect(this.audioContext.destination);
-                
+
                 this.isRecording = true;
-                console.log('Recording started');
+                console.log('A1: Audio recording started successfully');
                 
             } catch (error) {
-                console.error('Failed to start recording:', error);
-                this.onError(error);
+                console.error('Failed to setup audio recording:', error);
+                throw error;
             }
         }
 
-        encodeAudioData(inputBuffer) {
-            const buffer = new ArrayBuffer(inputBuffer.length * 2);
-            const view = new DataView(buffer);
-            
-            for (let i = 0; i < inputBuffer.length; i++) {
-                const sample = Math.max(-1, Math.min(1, inputBuffer[i]));
-                view.setInt16(i * 2, sample * 0x7FFF, true);
-            }
-            
-            return btoa(String.fromCharCode(...new Uint8Array(buffer)));
-        }
-
-        handleMessage(data) {
-            console.log('Received message type:', data.type);
-
-            switch (data.type) {
-                case 'ping':
-                    setTimeout(() => {
-                        if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
-                            this.websocket.send(JSON.stringify({
-                                type: 'pong',
-                                event_id: data.ping_event?.event_id
-                            }));
-                        }
-                    }, data.ping_event?.ping_ms || 0);
-                    break;
-
-                case 'user_transcript':
-                    console.log('User said:', data.user_transcription_event?.user_transcript);
-                    this.onMessage({
-                        type: 'user_transcript',
-                        text: data.user_transcription_event?.user_transcript
-                    });
-                    break;
-
-                case 'agent_response':
-                    console.log('Agent response:', data.agent_response_event?.agent_response);
-                    this.onMessage({
-                        type: 'agent_response',
-                        text: data.agent_response_event?.agent_response
-                    });
-                    this.onModeChange({ mode: 'speaking' });
-                    break;
-
-                case 'audio':
-                    if (data.audio_event?.audio_base_64) {
-                        this.playAudio(data.audio_event.audio_base_64);
-                    }
-                    break;
-
-                case 'interruption':
-                    console.log('Conversation interrupted');
-                    this.onModeChange({ mode: 'listening' });
-                    break;
-
-                default:
-                    console.log('Unknown message type:', data.type);
-            }
-        }
-
-        async playAudio(base64Audio) {
+        handleWebSocketMessage(event) {
             try {
-                const binaryString = atob(base64Audio);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
+                const data = JSON.parse(event.data);
+                console.log('A1: Received WebSocket message:', data.type);
+                
+                switch (data.type) {
+                    case 'conversation_initiation_metadata':
+                        console.log('Conversation initialized');
+                        break;
+                        
+                    case 'user_transcript':
+                        const transcript = data.user_transcription_event?.user_transcript;
+                        console.log('User transcript:', transcript);
+                        if (this.callbacks.onTranscript) {
+                            this.callbacks.onTranscript(transcript, 'user');
+                        }
+                        break;
+                        
+                    case 'agent_response':
+                        const response = data.agent_response_event?.agent_response;
+                        console.log('Agent response:', response);
+                        if (this.callbacks.onAgentResponse) {
+                            this.callbacks.onAgentResponse(response);
+                        }
+                        if (this.callbacks.onModeChange) {
+                            this.callbacks.onModeChange({ mode: 'speaking' });
+                        }
+                        break;
+                        
+                    case 'audio':
+                        const audioData = data.audio_event?.audio_base_64;
+                        if (audioData && audioData.length > 0) {
+                            console.log('A1: Playing audio response...');
+                            this.playAudioResponse(audioData);
+                        }
+                        break;
+                        
+                    case 'ping':
+                        const pingEventId = data.ping_event?.event_id;
+                        const pingMs = data.ping_event?.ping_ms || 0;
+                        
+                        setTimeout(() => {
+                            this.sendMessage({
+                                type: 'pong',
+                                event_id: pingEventId
+                            });
+                        }, pingMs);
+                        break;
+                        
+                    case 'interruption':
+                        console.log('Conversation interrupted');
+                        this.stopAudioPlayback();
+                        if (this.callbacks.onModeChange) {
+                            this.callbacks.onModeChange({ mode: 'listening' });
+                        }
+                        break;
+                        
+                    default:
+                        console.log('Unknown message type:', data.type);
                 }
+            } catch (error) {
+                console.error('Error handling WebSocket message:', error);
+            }
+        }
 
-                const audioBuffer = await this.audioContext.decodeAudioData(bytes.buffer);
-                const source = this.audioContext.createBufferSource();
-                source.buffer = audioBuffer;
-                source.connect(this.audioContext.destination);
+        async playAudioResponse(base64Audio) {
+            try {
+                if (!base64Audio) return;
                 
-                source.onended = () => {
-                    this.onModeChange({ mode: 'listening' });
-                };
+                // Decode base64 audio
+                const audioBuffer = this.base64ToArrayBuffer(base64Audio);
                 
-                source.start();
+                // Add to audio queue
+                this.audioQueue.push({ buffer: audioBuffer });
+                
+                // Start playback if not already playing
+                if (!this.isPlaying) {
+                    this.processAudioQueue();
+                }
+            } catch (error) {
+                console.error('A1: Error playing audio response:', error);
+            }
+        }
+
+        async processAudioQueue() {
+            if (this.audioQueue.length === 0) {
+                this.isPlaying = false;
+                if (this.callbacks.onModeChange) {
+                    this.callbacks.onModeChange({ mode: 'listening' });
+                }
+                return;
+            }
+
+            this.isPlaying = true;
+            const audioItem = this.audioQueue.shift();
+            
+            try {
+                // Resume audio context if suspended
+                if (this.audioContext.state === 'suspended') {
+                    await this.audioContext.resume();
+                }
+                
+                // Convert PCM data to audio buffer
+                const audioBuffer = await this.pcmToAudioBuffer(audioItem.buffer);
+                
+                if (audioBuffer) {
+                    // Create audio source and play
+                    const source = this.audioContext.createBufferSource();
+                    source.buffer = audioBuffer;
+                    source.connect(this.audioContext.destination);
+                    
+                    source.onended = () => {
+                        this.processAudioQueue();
+                    };
+                    
+                    source.start();
+                }
                 
             } catch (error) {
-                console.error('Error playing audio:', error);
+                console.error('Error processing audio queue:', error);
+                this.processAudioQueue();
             }
+        }
+
+        async pcmToAudioBuffer(pcmData) {
+            if (!pcmData || pcmData.byteLength === 0) return null;
+            
+            const frameCount = pcmData.byteLength / 2;
+            if (frameCount <= 0) return null;
+            
+            const audioBuffer = this.audioContext.createBuffer(1, frameCount, this.config.sampleRate);
+            const channelData = audioBuffer.getChannelData(0);
+            
+            // Convert 16-bit PCM to Float32
+            const view = new DataView(pcmData);
+            for (let i = 0; i < channelData.length; i++) {
+                channelData[i] = view.getInt16(i * 2, true) / 32768.0;
+            }
+            
+            return audioBuffer;
+        }
+
+        stopAudioPlayback() {
+            this.audioQueue = [];
+            this.isPlaying = false;
+        }
+
+        sendMessage(message) {
+            if (this.websocket && this.websocket.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify(message));
+            }
+        }
+
+        stopConversation() {
+            this.cleanup();
         }
 
         cleanup() {
             this.isRecording = false;
+            this.isConnected = false;
+            this.updateConnectionStatus(false);
+            
+            if (this.websocket) {
+                this.websocket.close();
+                this.websocket = null;
+            }
             
             if (this.stream) {
                 this.stream.getTracks().forEach(track => track.stop());
@@ -288,14 +477,64 @@
                 this.audioContext.close();
                 this.audioContext = null;
             }
+            
+            this.stopAudioPlayback();
+            console.log('Voice conversation stopped');
         }
 
-        endConversation() {
-            this.cleanup();
-            if (this.websocket) {
-                this.websocket.close();
-                this.websocket = null;
+        updateConnectionStatus(connected) {
+            if (this.callbacks.onConnectionChange) {
+                this.callbacks.onConnectionChange(connected);
             }
+        }
+
+        handleError(message) {
+            console.error('Voice chat error:', message);
+            if (this.callbacks.onError) {
+                this.callbacks.onError(message);
+            }
+        }
+
+        // Utility functions
+        convertFloat32ToPCM16(float32Array) {
+            const buffer = new ArrayBuffer(float32Array.length * 2);
+            const view = new DataView(buffer);
+            
+            for (let i = 0; i < float32Array.length; i++) {
+                const sample = Math.max(-1, Math.min(1, float32Array[i]));
+                view.setInt16(i * 2, sample * 0x7FFF, true);
+            }
+            
+            return buffer;
+        }
+
+        arrayBufferToBase64(buffer) {
+            const bytes = new Uint8Array(buffer);
+            let binary = '';
+            for (let i = 0; i < bytes.byteLength; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            
+            return bytes.buffer;
+        }
+
+        isConnectedToVoice() {
+            return this.isConnected;
+        }
+
+        isRecordingVoice() {
+            return this.isRecording;
         }
     }
 
@@ -385,7 +624,7 @@
         `;
     }
 
-    // Optimized CSS with better organization and reduced redundancy
+    // Create widget styles (same as before - keeping existing CSS)
     function createWidgetStyles() {
         const { primaryColor, voiceColor, position } = widgetConfig;
         const isRight = position.includes('right');
@@ -902,15 +1141,12 @@
         elements.modeContents = document.querySelectorAll('.mode-content');
     }
 
-    // Optimized event listeners with event delegation
+    // Event listeners
     function initEventListeners() {
-        // Toggle widget
         elements.trigger.addEventListener('click', toggleWidget);
         elements.closeBtn.addEventListener('click', toggleWidget);
         
-        // Mode and language switching with improved event delegation
         document.addEventListener('click', (e) => {
-            // Find the closest mode button (handles clicks on children like spans/svgs)
             const modeBtn = e.target.closest('.mode-btn');
             if (modeBtn) {
                 e.preventDefault();
@@ -918,7 +1154,6 @@
                 return;
             }
             
-            // Find the closest language button
             const langBtn = e.target.closest('.lang-btn');
             if (langBtn) {
                 e.preventDefault();
@@ -927,7 +1162,6 @@
             }
         });
         
-        // Text chat events
         elements.sendBtn.addEventListener('click', sendMessage);
         elements.messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -936,38 +1170,31 @@
             }
         });
         
-        // Voice chat
         elements.voiceBtn.addEventListener('click', toggleVoiceRecording);
     }
 
-    // Optimized widget initialization
+    // Initialize widget
     function initWidget(config) {
         if (widgetState.initialized) return;
         
-        // Merge config with defaults
         widgetConfig = Object.assign({}, defaultConfig, config);
         
-        // Create and insert widget
         const container = document.createElement('div');
         container.id = 'ai-widget-container';
         container.innerHTML = createWidgetHTML();
         
-        // Add styles and container to page
         document.head.insertAdjacentHTML('beforeend', createWidgetStyles());
         document.body.appendChild(container);
         
-        // Cache elements and setup events
         cacheElements();
         initEventListeners();
-        
-        // Set initial language
         updateLanguage();
         
         widgetState.initialized = true;
         console.log('AI Widget initialized successfully');
     }
 
-    // Optimized toggle function
+    // Toggle widget
     function toggleWidget() {
         widgetState.isOpen = !widgetState.isOpen;
         
@@ -981,26 +1208,24 @@
             });
         } else {
             elements.panel.classList.remove('active');
-            if (widgetState.isRecording && elevenLabsConversation) {
+            if (widgetState.isRecording && voiceChat) {
                 stopVoiceRecording();
             }
         }
     }
 
-    // Optimized mode switching with better reliability
+    // Switch mode
     function switchMode(mode) {
         if (!mode || widgetState.currentMode === mode) return;
         
         console.log(`Switching from ${widgetState.currentMode} to ${mode} mode`);
         
-        // Stop voice conversation when switching away from voice mode
-        if (widgetState.currentMode === 'voice' && elevenLabsConversation) {
+        if (widgetState.currentMode === 'voice' && voiceChat) {
             stopVoiceRecording();
         }
         
         widgetState.currentMode = mode;
         
-        // Update buttons - more explicit approach
         elements.modeBtns.forEach(btn => {
             if (btn.dataset.mode === mode) {
                 btn.classList.add('active');
@@ -1009,7 +1234,6 @@
             }
         });
         
-        // Update content - more explicit approach
         elements.modeContents.forEach(content => {
             if (content.id === mode + '-mode') {
                 content.classList.add('active');
@@ -1018,7 +1242,6 @@
             }
         });
         
-        // Handle focus and scroll for text mode
         if (mode === 'text') {
             requestAnimationFrame(() => {
                 forceScrollToBottom();
@@ -1027,11 +1250,9 @@
                 }
             });
         }
-        
-        console.log(`Mode switched to: ${mode}`);
     }
 
-    // Optimized language switching
+    // Switch language
     function switchLanguage(lang) {
         if (widgetConfig.language === lang) return;
         
@@ -1044,16 +1265,14 @@
         updateLanguage();
     }
 
-    // Optimized message sending with better error handling
+    // Send message
     async function sendMessage() {
         const message = elements.messageInput.value.trim();
         if (!message) return;
         
-        // Add user message and clear input
         addMessageToChat(message, 'user');
         elements.messageInput.value = '';
         
-        // Show loading
         const loadingId = addMessageToChat('<div class="loading-spinner"></div>', 'ai');
         
         try {
@@ -1073,7 +1292,7 @@
         }
     }
 
-    // Helper function to extract response text from different API formats
+    // Extract response text
     function extractResponseText(response) {
         if (response.response?.content?.[0]?.text) {
             return response.response.content[0].text;
@@ -1094,7 +1313,7 @@
             : 'Sorry, an error occurred. Please try again.';
     }
 
-    // Optimized voice recording toggle
+    // Toggle voice recording
     function toggleVoiceRecording() {
         widgetState.isRecording = !widgetState.isRecording;
         
@@ -1105,86 +1324,71 @@
         }
     }
 
-    // Start ElevenLabs voice conversation using Direct WebSocket API
+    // Start voice recording (A1 style)
     async function startVoiceRecording() {
-        console.log('Starting ElevenLabs voice conversation...');
+        console.log('Starting A1 style voice conversation...');
         const texts = translations[widgetConfig.language];
         
         try {
-            // Update UI to show connecting state
             elements.voiceBtn.classList.add('connecting');
             elements.voiceBtn.textContent = texts.connecting;
             elements.voiceStatus.textContent = texts.connecting;
             
-            // Get agent ID
-            let agentId = widgetConfig.elevenLabsAgentId;
+            // Create A1 style voice chat instance
+            voiceChat = new A1VoiceChat();
             
-            if (!agentId || agentId.trim() === '' || 
-                agentId === 'YOUR_ELEVENLABS_AGENT_ID' || 
-                agentId === 'your_agent_id_here' || 
-                agentId === 'YOUR_ACTUAL_AGENT_ID_HERE') {
-                
-                // Try to get agent ID from backend
-                try {
-                    agentId = await getAgentIdFromBackend();
-                    console.log('Using agent ID from backend:', agentId);
-                } catch (backendError) {
-                    console.log('Backend failed:', backendError.message);
-                    throw new Error('ElevenLabs agent ID is required. Please configure it in widget settings.');
-                }
-            } else {
-                console.log('Using configured agent ID:', agentId);
-            }
-
-            // Create new voice widget instance with valid agent ID
-            elevenLabsConversation = new ElevenLabsVoiceWidget(agentId, {
-                onConnect: () => {
-                    console.log('Voice conversation connected');
-                    elements.voiceStatus.textContent = texts.listening;
-                    elements.voiceAvatar.classList.add('speaking');
-                    elements.voiceBtn.classList.remove('connecting');
-                    elements.voiceBtn.classList.add('recording');
-                    elements.voiceBtn.textContent = texts.stopSpeaking;
+            voiceChat.setCallbacks({
+                onConnectionChange: (connected) => {
+                    console.log('A1: Voice connection status changed:', connected);
+                    if (connected) {
+                        elements.voiceStatus.textContent = texts.listening;
+                        elements.voiceAvatar.classList.add('speaking');
+                        elements.voiceBtn.classList.remove('connecting');
+                        elements.voiceBtn.classList.add('recording');
+                        elements.voiceBtn.textContent = texts.stopSpeaking;
+                    } else {
+                        elements.voiceStatus.textContent = texts.voiceReady;
+                        elements.voiceAvatar.classList.remove('speaking');
+                        elements.voiceBtn.classList.remove('recording', 'connecting');
+                        elements.voiceBtn.textContent = texts.startSpeaking;
+                        widgetState.isRecording = false;
+                        voiceChat = null;
+                    }
                 },
-                onDisconnect: () => {
-                    console.log('Voice conversation disconnected');
-                    elements.voiceStatus.textContent = texts.voiceReady;
-                    elements.voiceAvatar.classList.remove('speaking');
-                    elements.voiceBtn.classList.remove('recording', 'connecting');
-                    elements.voiceBtn.textContent = texts.startSpeaking;
-                    widgetState.isRecording = false;
-                    elevenLabsConversation = null;
+                onTranscript: (transcript, role) => {
+                    console.log('A1: Voice transcript received:', transcript, 'role:', role);
+                    if (role === 'user') {
+                        addMessageToChat(transcript, 'user');
+                    }
+                },
+                onAgentResponse: (response) => {
+                    console.log('A1: Voice agent response:', response);
+                    addMessageToChat(response, 'ai');
                 },
                 onError: (error) => {
-                    console.error('Voice conversation error:', error);
+                    console.error('A1: Voice chat error:', error);
                     elements.voiceStatus.textContent = texts.voiceError;
                     elements.voiceBtn.classList.remove('recording', 'connecting');
                     elements.voiceBtn.textContent = texts.startSpeaking;
                     widgetState.isRecording = false;
-                    elevenLabsConversation = null;
+                    voiceChat = null;
                     
-                    // Show user-friendly error message
                     const alertMsg = widgetConfig.language === 'tr' 
                         ? 'Sesli sohbet başlatılamadı. Lütfen mikrofon ayarlarınızı kontrol edin.'
                         : 'Unable to start voice chat. Please check your microphone settings.';
                     setTimeout(() => alert(alertMsg), 100);
                 },
                 onModeChange: (mode) => {
-                    console.log('Mode change:', mode);
                     if (mode.mode === 'speaking') {
                         elements.voiceStatus.textContent = texts.speaking;
                         elements.voiceAvatar.classList.add('speaking');
                     } else if (mode.mode === 'listening') {
                         elements.voiceStatus.textContent = texts.listening;
                     }
-                },
-                onMessage: (message) => {
-                    console.log('Voice message:', message.type, message.text);
-                    // You can add transcription display here if needed
                 }
             });
 
-            await elevenLabsConversation.startConversation();
+            await voiceChat.startConversation();
             
         } catch (error) {
             console.error('Error starting voice conversation:', error);
@@ -1193,17 +1397,11 @@
             elements.voiceBtn.textContent = texts.startSpeaking;
             widgetState.isRecording = false;
             
-            // Show appropriate error message based on error type
             let alertMsg;
-            
             if (error.name === 'NotAllowedError') {
                 alertMsg = widgetConfig.language === 'tr' 
                     ? 'Sesli sohbet için mikrofon erişimi gereklidir. Lütfen mikrofon erişimine izin verin ve tekrar deneyin.'
                     : 'Microphone access is required for voice chat. Please allow microphone access and try again.';
-            } else if (error.message.includes('agent ID')) {
-                alertMsg = widgetConfig.language === 'tr' 
-                    ? 'Sesli sohbet için ElevenLabs agent ID gereklidir. Lütfen yapılandırmayı kontrol edin.'
-                    : 'ElevenLabs agent ID is required for voice chat. Please check configuration.';
             } else {
                 alertMsg = widgetConfig.language === 'tr' 
                     ? 'Sesli sohbet başlatılamadı. Lütfen daha sonra tekrar deneyin.'
@@ -1214,14 +1412,14 @@
         }
     }
 
-    // Stop ElevenLabs voice conversation  
+    // Stop voice recording  
     async function stopVoiceRecording() {
         console.log('Stopping voice conversation...');
         const texts = translations[widgetConfig.language];
         
-        if (elevenLabsConversation) {
-            elevenLabsConversation.endConversation();
-            elevenLabsConversation = null;
+        if (voiceChat) {
+            voiceChat.stopConversation();
+            voiceChat = null;
         }
         
         elements.voiceStatus.textContent = texts.voiceReady;
@@ -1231,41 +1429,7 @@
         widgetState.isRecording = false;
     }
 
-    // Get agent ID from backend (environment variable)
-    async function getAgentIdFromBackend() {
-        try {
-            const url = widgetConfig.endpoint.replace('/conversation', '/get-voice-token');
-            console.log('Fetching agent ID from:', url);
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-api-key': widgetConfig.apiKey
-                }
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('Response error text:', errorText);
-                throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
-            }
-
-            const data = await response.json();
-            console.log('Response data:', data);
-            
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to get agent ID');
-            }
-
-            return data.agent_id;
-        } catch (error) {
-            console.error('Error getting agent ID from backend:', error);
-            throw error;
-        }
-    }
-
-    // Optimized message adding with better performance
+    // Add message to chat
     function addMessageToChat(message, sender) {
         const messageId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
         
@@ -1276,7 +1440,6 @@
         
         elements.chatMessages.appendChild(messageElement);
         
-        // Use requestAnimationFrame for better performance
         requestAnimationFrame(() => {
             elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
         });
@@ -1284,7 +1447,7 @@
         return messageId;
     }
 
-    // Optimized message removal
+    // Remove message from chat
     function removeMessageFromChat(messageId) {
         const element = document.getElementById(messageId);
         if (element) {
@@ -1292,14 +1455,14 @@
         }
     }
 
-    // Optimized scroll function
+    // Force scroll to bottom
     function forceScrollToBottom() {
         if (elements.chatMessages) {
             elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
         }
     }
 
-    // Optimized API call with fetch
+    // Call API
     async function callAPI(message, mode) {
         const response = await fetch(widgetConfig.endpoint, {
             method: 'POST',
@@ -1322,7 +1485,7 @@
         return response.json();
     }
 
-    // Optimized language update
+    // Update language
     function updateLanguage() {
         const texts = translations[widgetConfig.language];
         
